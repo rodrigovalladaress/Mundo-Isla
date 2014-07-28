@@ -1,0 +1,113 @@
+fileFormatVersion: 2
+guid: 871999f4851f2624e9cdf4c78cafc8a0
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: policia_RightUpLeg
+    100002: policia_RightShoulder
+    100004: policia_LeftLeg
+    100006: policia_LeftFoot
+    100008: policia_RightToeBase
+    100010: policia_Hips
+    100012: policia_Spine2
+    100014: policia_LeftUpLeg
+    100016: policia_LeftToeBase
+    100018: policia_RightForeArm
+    100020: jefepolicia
+    100022: policia_RightFoot
+    100024: policia_RightArm
+    100026: policia_LeftHand
+    100028: policia_LeftForeArm
+    100030: policia_Reference
+    100032: policia_Spine
+    100034: policia_RightLeg
+    100036: policia_LeftArm
+    100038: //RootNode
+    100040: policia_Neck
+    100042: policia_Spine1
+    100044: policia_Head
+    100046: policia_RightHand
+    100048: policia_LeftShoulder
+    400000: policia_RightUpLeg
+    400002: policia_RightShoulder
+    400004: policia_LeftLeg
+    400006: policia_LeftFoot
+    400008: policia_RightToeBase
+    400010: policia_Hips
+    400012: policia_Spine2
+    400014: policia_LeftUpLeg
+    400016: policia_LeftToeBase
+    400018: policia_RightForeArm
+    400020: jefepolicia
+    400022: policia_RightFoot
+    400024: policia_RightArm
+    400026: policia_LeftHand
+    400028: policia_LeftForeArm
+    400030: policia_Reference
+    400032: policia_Spine
+    400034: policia_RightLeg
+    400036: policia_LeftArm
+    400038: //RootNode
+    400040: policia_Neck
+    400042: policia_Spine1
+    400044: policia_Head
+    400046: policia_RightHand
+    400048: policia_LeftShoulder
+    4300000: jefepolicia
+    7400000: Take 001
+    11100000: //RootNode
+    13700000: policia_Hips
+    13700002: jefepolicia
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 1
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  additionalBone: 0
+  userData: 

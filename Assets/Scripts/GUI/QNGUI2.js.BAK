@@ -1,0 +1,1008 @@
+#pragma strict
+class QNGUI2 extends MonoBehaviour {
+
+	static var lastScreenSize:Vector2;
+	
+	function Start() {
+		
+		Text.SetDefaults();
+		
+		// We define the area to draw the menus
+		Area.Reload();
+		
+	}
+	
+	function OnGUI() {
+	
+		GUI.skin = Resources.Load("Skin") as GUISkin;
+		GUI.depth = 0;
+		
+		// check the screen size...
+		var screenSize:Vector2 = new Vector2(Camera.current.GetScreenWidth(), Camera.current.GetScreenHeight());
+		// and reconfigure the areas if it changed.
+		if(this.lastScreenSize != screenSize) Area.Reload();
+		
+		if (GameObject.Find("Root")) return;
+		
+		else if (Menu.show){
+			Menu.Box();
+			Content.Box();
+		}
+		else if (DialogInterface.show){
+			DialogInterface.Box();
+		}
+		else if (JournalInterface.show){
+			JournalInterface.Box();
+		}
+		else{
+			
+			InventoryInterface.Box();
+			
+			MainToolbar.Box();
+			
+			ChatInterface.Box();
+		}
+	}
+	
+	
+	static class Text{
+		var dic:Dictionary.<String,String> = new Dictionary.<String, String>();
+		
+		function SetDefaults(){
+		
+			dic["Open"] = "Abrir";
+			dic["Close"] = "Cerrar";
+			dic["Cancel"] = "Cancelar";
+			dic["Back"] = "Atras";
+			dic["Accept"] = "Aceptar";
+			dic["Port"] = "Puerto";
+			dic["Servers"] = "Servers";
+			dic["Host"] = "Hostear";
+			dic["Host Server"] = "Hostear";
+			dic["Find Hosts"] = "Encontrar serv.";
+			dic["Refresh server list"] = "Recargar servidores";
+			dic["Direct Connect"] = "Conectar dir";
+			dic["Max. Players"] = "Jugadores máx";
+			dic["Server type"] = "Tipo de serv.";
+			dic["Public"] = "Public";
+			dic["Private"] = "Private";
+			dic["Game Name"] = "Nombre de juego";
+			dic["Game description"] = "Descripcion";
+			dic["Name field required"] = "Nombre requerido";
+			dic["Start"] = "Empezar";
+			dic["Save"] = "Guardar";
+			dic["Delete"] = "Eliminar";
+			dic["Connect"] = "Conectar";
+			dic["Send"] = "Enviar";
+			dic["SkinEditor"] = "Avatar";
+			dic["Player Name"] = "Nombre de Jugador";
+			dic["Password"] = "Contraseña";
+			dic["Login"] = "Login";
+			dic["Incorrect User or Password"] = "Nombre de usuario o contraseña incorrectos";
+			dic["Player options"] = "Opciones de Jugador";
+			dic["Player"] = "Jugador";
+			dic["Singleplayer"] = "Monojugador";
+			dic["Multiplayer"] = "Multijugador";
+			dic["Journal"] = "Diario";
+			dic["Inventory"] = "Inventario";
+			dic["Menu"] = "Menu";
+			dic["Toogle Fullscreen"] = "Pantalla completa";
+			dic["Active Missions"] = "Misiones activas";
+			dic["Completed Missions"] = "Misiones comp.";
+			dic["Failed Missions"] = "Misiones fallidas";
+			dic["Anwsers"] = "Respuestas";
+			dic["Downloading"] = "Descargando";
+			dic["Loading"] = "Cargando";
+			dic["Character"] = "Personaje";
+			dic["Head"] = "Cabeza";
+			dic["Eyes"] = "Ojos";
+			dic["Hair"] = "Pelo";
+			dic["Body"] = "Cuerpo";
+			dic["Legs"] = "Piernas";
+			dic["Feet"] = "Pies";
+			
+		}
+		
+	}
+	
+	static class Menu{
+		var windowID : int = 0;
+		var show : boolean = true;
+		var current : String = "";
+		var rect : Rect = Area._Menu;
+		
+		function Box(){
+			if (current != "" && show == true)
+			GUILayout.Window (windowID, rect, Window, Text.dic[current]);
+		}
+		
+		function Toogle(){
+			if(show == true) {
+				current = "Menu";
+				Content.current = "";
+				show = false;
+			}
+			else show = true;
+		}
+		
+		function Window(windowID : int){
+			rect = Area._Menu;
+			switch (current){
+			
+				case "Menu":
+					if (Network.isClient || Network.isServer) rect = Area._Center;
+					else rect = Area._Menu;
+					Main.Box();
+					break;
+					
+				case "Multiplayer":
+					Multiplayer.Box();
+					break;
+					
+				case "SkinEditor":
+					SkinEditor.Box();
+					break;
+					
+				default:
+					
+					break;
+					
+					
+			}
+		}
+		
+		static class Main{
+			
+			function Box(){
+				// Menu elements always shown
+				
+				// Menu elements shown only when we are not in play
+				if(!Player.isPlaying()){
+					
+					GUILayout.FlexibleSpace();
+					GUILayout.FlexibleSpace();
+					MenuSwitch(Text.dic["Player options"], "SkinEditor");
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button(Text.dic["Singleplayer"])){
+						Server.Host();
+						Toogle();
+					}
+					GUILayout.FlexibleSpace();
+					MenuSwitch(Text.dic["Multiplayer"], "Multiplayer");
+					GUILayout.FlexibleSpace();
+					GUILayout.FlexibleSpace();
+					GUILayout.FlexibleSpace();
+					GUILayout.FlexibleSpace();
+					GUILayout.FlexibleSpace();
+				}
+				
+				// Menu elements shown only when we are in play
+				else{
+					// If we are in play, we may add a button to disconnect
+					//if(GUILayout.Button("Disconnect"))	Server.disconnect();
+					
+					FullScreen();
+					
+					// and a button to close the menu at the bottom
+					GUILayout.FlexibleSpace();
+					if(GUILayout.Button(Text.dic["Close"])) Toogle();
+				}
+			}
+		
+			function FullScreen(){
+				if(GUILayout.Button(Text.dic["Toogle Fullscreen"])){
+					if (Screen.fullScreen == true){
+						Screen.fullScreen = false;
+						Screen.SetResolution(760,600,false);
+						Minimap.Relocate(Player.object());
+					}
+					else{
+						Screen.fullScreen = true;
+						Screen.SetResolution ( Screen.currentResolution.width, Screen.currentResolution.height, true );
+						Minimap.Relocate( Player.object() );
+					}
+				}
+			}
+			
+		}
+		
+		static class Multiplayer{
+		
+			function Box(){
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				ContentSwitch(Text.dic["Host Server"], "Host");
+				GUILayout.FlexibleSpace();
+				ContentSwitch(Text.dic["Find Hosts"], "Servers");
+				GUILayout.FlexibleSpace();
+				ContentSwitch(Text.dic["Direct Connect"], "Direct Connect");
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				MenuSwitch(Text.dic["Back"], "Menu");
+			}
+			
+		}
+		
+		static class SkinEditor{
+		
+			function Box(){
+				if (Skin.generator == null) return;
+			    
+				// Show download progress or indicate assets are being loaded.
+			    GUI.enabled = true;
+			    GUILayout.FlexibleSpace();
+			    
+			    if (!Skin.usingLatestConfig){
+			        var progress : float = Skin.generator.CurrentConfigProgress;
+			        var status : String = Text.dic["Loading"];
+			        if (progress != 1) status = Text.dic["Downloading"] + " " + (progress * 100).ToString().Split("."[0])[0] + "%";
+			        GUILayout.Label(status);
+			    }
+			    
+			    GUI.enabled = Skin.usingLatestConfig && !Skin.character.animation.IsPlaying("walkin");
+			    
+			    GUILayout.FlexibleSpace();
+				
+			    // Buttons for changing the active character.
+			    GUILayout.BeginHorizontal();
+				    GUILayout.Label(Text.dic["Character"]);
+				    if (GUILayout.Button("<", GUILayout.Width(20))) Skin.ChangeCharacter(false);
+					if (GUILayout.Button(">", GUILayout.Width(20))) Skin.ChangeCharacter(true);
+			    GUILayout.EndHorizontal();
+			
+			    // Buttons for changing character elements.
+			    SkinCategory("face", Text.dic["Head"], null);
+			    SkinCategory("eyes", Text.dic["Eyes"], null);
+			    SkinCategory("hair", Text.dic["Hair"], null);
+			    SkinCategory("top", Text.dic["Body"], "item_shirt");
+			    SkinCategory("pants", Text.dic["Legs"], "item_pants");
+			    SkinCategory("shoes", Text.dic["Feet"], "item_boots");
+			    
+			    GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+				
+			    // Buttons for saving and deleting configurations.
+			    if (GUILayout.Button(Text.dic["Save"]))
+			    	Server.StartCoroutine( Server.Retrieve.PlayerSkin(Skin.generator.GetConfig()) );
+			    if (GUILayout.Button(Text.dic["Delete"]))
+			    	Player.skinString = "";
+			    
+			    GUILayout.FlexibleSpace();
+			    
+			    MenuSwitch(Text.dic["Back"], "Menu");
+			}
+			
+			function SkinCategory(category:String, displayName:String, anim:String){
+			    GUILayout.BeginHorizontal();
+				    GUILayout.Label(displayName);
+				    if (GUILayout.Button("<", GUILayout.Width(20))) Skin.ChangeElement(category, false, anim);
+					if (GUILayout.Button(">", GUILayout.Width(20))) Skin.ChangeElement(category, true, anim);
+			    GUILayout.EndHorizontal();
+			}
+			
+		}
+		
+		function MenuSwitch(label:String, menu:String){
+			if (GUILayout.Button(label)){
+				QNGUI2.Menu.current = menu;
+				QNGUI2.Content.current = "";
+			}
+		}
+		function MenuSwitch(label:String, menu:String, content:String){
+			if (GUILayout.Button(label)){
+				QNGUI2.Menu.current = menu;
+				QNGUI2.Content.current = content;
+			}
+		}
+		
+		function ContentSwitch(label:String, content:String){
+			if (GUILayout.Button(label))
+				QNGUI2.Content.current = content;
+		}
+		
+	}
+	
+	static class Content{
+		var windowID : int = 1;
+		var current:String = "Login";
+		var rect:Rect = Area._Content;
+		
+		function Box(){
+			if (current != "" && Menu.show == true)
+				GUILayout.Window (windowID, rect, Window, Text.dic[current]);
+		}
+		
+		function Window(windowID : int){
+			rect = Area._Content;
+			switch (current){
+				
+				case "Servers":
+					Servers.Box();
+					break;
+					
+				case "Host":
+					Host.Box();
+					break;
+					
+				case "Direct Connect":
+					DirectConnect.Box();
+					break;
+					
+				case "Login":
+					rect = Area._Center;
+					Login.Box();
+					break;
+					
+			}
+		}
+		
+		static class Servers{
+		
+			var SP : Vector2 = Vector2.zero;
+		
+			function Box(){
+				// Refresh button
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+					if(GUILayout.Button(Text.dic["Refresh server list"], GUILayout.ExpandWidth(false))){
+						Server.Log("server", "Refreshing hosts...");
+						Server.RefreshHostList();
+					}
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				// Start scroll view
+				SP = GUILayout.BeginScrollView (SP);
+				
+				// Only show if there is data to work with
+				if(Server.hostData){
+					// Create a button for each server found
+					for(var i:int = 0; i < Server.hostData.length; i++){
+						if(GUILayout.Button(Server.hostData[i].gameName + " (" + Server.hostData[i].connectedPlayers + "/" + Server.hostData[i].playerLimit + ")")){
+							Network.Connect(Server.hostData[i]);
+							Menu.Toogle();
+						}
+					}		
+				}
+				
+				// End scroll view
+					GUILayout.EndScrollView();
+			}
+			
+		}
+		
+		static class Host{
+		
+			private var serverIP:String = "127.0.0.1";
+			private var port:int = 25001;
+			private var maxPlayers:int = 5;
+			
+			var SP:Vector2 = Vector2.zero;
+			var serverTypeSelected:int = 0;
+			var serverTypes : String[] = ["Public", "Private"];
+			
+			function Box(){
+				// Port input field
+					GUILayout.BeginHorizontal();
+						GUILayout.Label(Text.dic["Port"] + ": ", GUILayout.ExpandWidth(false));
+						var portString = GUILayout.TextField (port.ToString());
+						if(portString == "") port = 0;
+						else try port = int.Parse(portString); catch(FormatException) Server.Log("server", "Bad input in port field");
+					GUILayout.EndHorizontal();
+				
+				// Max Players input scroll
+					GUILayout.BeginHorizontal();
+						GUILayout.Label (Text.dic["Max. Players"] + ": ", GUILayout.ExpandWidth(false));
+						maxPlayers = GUILayout.HorizontalSlider (maxPlayers, 1, 31);
+						GUILayout.Label ((maxPlayers + 1).ToString(), GUILayout.Width(20));
+					GUILayout.EndHorizontal();
+				
+				// Type switcher
+					GUILayout.BeginHorizontal();
+						GUILayout.Label (Text.dic["Server type"] + ": ", GUILayout.ExpandWidth(false));
+						serverTypeSelected = GUILayout.Toolbar(serverTypeSelected, serverTypes);
+					GUILayout.EndHorizontal();
+				
+				GUILayout.FlexibleSpace();
+				
+				// If server type is Public
+				if (serverTypeSelected == 0){
+					var gameName:String = "";
+					var gameDescription:String = "";
+					// Name input field
+						GUILayout.BeginHorizontal();
+							GUI.SetNextControlName("New server name box");
+							GUILayout.Label(Text.dic["Game Name"] + ": ", GUILayout.ExpandWidth(false));
+							gameName = GUILayout.TextField (gameName);
+						GUILayout.EndHorizontal();
+					
+					// Description input field
+						GUILayout.Label (Text.dic["Game description"] + ": ");
+						
+						SP = GUILayout.BeginScrollView(SP);
+							gameDescription = GUILayout.TextArea(gameDescription);
+						GUILayout.EndScrollView();
+					
+					// Move next controls to the bottom
+					GUILayout.FlexibleSpace();
+					
+				// Start button
+					if (gameName == ""){
+						GUI.enabled = false;
+						GUI.color.a = 2;
+						GUILayout.Button(Text.dic["Name field required"]);
+						GUI.color.a = 1;
+						GUI.enabled = true;
+						}
+					else{
+						if(GUILayout.Button(Text.dic["Start"])){
+							Server.Host(maxPlayers, port, gameName, gameDescription);
+							Menu.Toogle();
+						}
+						// Execute the startServer function if return is pressed and the box has focus
+						if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' && GUI.GetNameOfFocusedControl() == "New server name box"){
+							Server.Host(maxPlayers, port, gameName, gameDescription);
+							Menu.Toogle();
+						}
+					}
+				}
+				// If server type is Private
+				else if (serverTypeSelected == 1){
+					// Move next controls to the bottom
+					GUILayout.FlexibleSpace();
+					
+					// Start button
+					if(GUILayout.Button(Text.dic["Start"])){
+						Server.Host(maxPlayers, port);
+						Menu.Toogle();
+					}
+				}
+				
+			}
+			
+		}
+		
+		static class DirectConnect{
+			
+			private var serverIP:String = "127.0.0.1";
+			private var port:int = 25001;
+			
+			function Box(){
+				// IP input field
+				GUI.SetNextControlName("DC Server IP box");
+				GUILayout.Label("IP");
+				serverIP = GUILayout.TextField (serverIP);
+			
+				// Port input field
+				GUILayout.Label(Text.dic["Port"]);
+				var portString = GUILayout.TextField (port.ToString());
+				if(portString == "") port = 0;
+				else try port = int.Parse(portString); catch(FormatException) print("Bad input in port field");
+					
+				if(GUILayout.Button(Text.dic["Connect"])){
+						Server.Connect(serverIP, port.ToString());
+						Menu.Toogle();
+				}
+			}
+			
+		}
+		
+		static class Login{
+		
+			function Box(){
+				GUILayout.FlexibleSpace();
+				// Name input field
+				GUILayout.Label(Text.dic["Player Name"] + ": ");
+				Player.nickname = GUILayout.TextField(Player.nickname);
+				
+				GUILayout.FlexibleSpace();
+				
+				// Password input field
+				GUILayout.Label(Text.dic["Password"] + ": ");
+				Player.password = GUILayout.PasswordField(Player.password, "*"[0]);
+				
+				GUILayout.FlexibleSpace();
+				
+				// Login button
+				GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					if(GUILayout.Button(Text.dic["Login"], GUILayout.ExpandWidth(false))) Server.StartCoroutine( Server.Login() );
+					GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				GUILayout.FlexibleSpace();
+				GUILayout.FlexibleSpace();
+			}
+			
+		}
+	}
+	
+	static class ChatInterface{
+		
+		var rect = Area._Chat;
+		var SP:Vector2 = Vector2.zero;
+		
+		/******************************
+		|	Chat Box
+		******************************/
+		function Box(){
+			GUILayout.BeginArea (rect);
+				ViewBox();
+				InputBox(rect);
+			GUILayout.EndArea ();
+		}
+		
+		function ViewBox(){
+		
+			GUILayout.FlexibleSpace ();
+			
+			SP = GUILayout.BeginScrollView(SP);
+			
+				GUI.enabled = false;
+				GUI.color.a = 2;
+				GUILayout.TextArea(Chat.chatText);
+				GUI.color.a = 1;
+				GUI.enabled = true;
+				
+			GUILayout.EndScrollView();
+			
+		}
+		
+		function InputBox(rect : Rect){
+			GUILayout.BeginHorizontal();
+					
+				GUI.SetNextControlName("Chat input box");
+				Chat.inputBoxValue = GUILayout.TextField(Chat.inputBoxValue, GUILayout.Width(rect.width - rect.width * 0.25 - rect.x));
+				
+				if (Chat.inputBoxValue != ""){
+					// Execute the send function if this button is pressed
+					if(GUILayout.Button(Text.dic["Send"], GUILayout.Width(rect.width * 0.25 - rect.x))) Chat.Send();
+					
+					// Execute the send function if return is pressed and the box has focus
+					if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' && GUI.GetNameOfFocusedControl() == "Chat input box") Chat.Send();
+				}
+				else{
+					GUI.enabled = false;
+					GUI.color.a = 2;
+					GUI.SetNextControlName("Disabled Send button");
+					GUILayout.Button(Text.dic["Send"], GUILayout.Width(rect.width * 0.25 - rect.x));
+					GUI.color.a = 1;
+					GUI.enabled = true;
+				}
+			GUILayout.EndHorizontal();
+		}
+		
+		
+	}
+	
+	static class JournalInterface{
+	
+		var show : boolean = false;
+		
+		var WindowAID : int = 0;
+		var WindowBID : int = 1;
+		var rectA : Rect = Area._Menu;
+		var rectB : Rect = Area._Content;
+		private var SPA:Vector2 = Vector2.zero;
+		private var SPB:Vector2 = Vector2.zero;
+		
+		var currentMission:String = "";
+		var description:String = "";
+		
+		function Box(){
+			if (show == true){
+				GUILayout.Window (WindowAID, rectA, WindowA, Text.dic["Journal"]);
+				GUILayout.Window (WindowBID, rectB, WindowB, currentMission);
+			}
+		}
+		
+		function Toogle(){
+			if(show) show = false;
+			else show = true;
+		}
+		
+		
+		/******************************
+		|	Journal List Window
+		******************************/
+		function WindowA (windowID : int) {
+			SPA = GUILayout.BeginScrollView(SPA);
+				
+				MissionList(Text.dic["Active Missions"] + ":", 1);
+				
+				MissionList(Text.dic["Completed Missions"] + ":", 0);
+				
+				MissionList(Text.dic["Failed Missions"] + ":", -1);
+				
+			GUILayout.EndScrollView();
+			
+			GUILayout.FlexibleSpace ();
+			if (GUILayout.Button(Text.dic["Close"])) Toogle();
+		}
+		
+		/******************************
+		|	Journal Mission Lookup Window
+		******************************/
+		function WindowB (windowID : int) {
+		
+			SPB = GUILayout.BeginScrollView(SPB);
+			
+			GUI.enabled = false;
+			GUI.color.a = 2;
+			
+			GUILayout.TextArea(description, GUILayout.ExpandHeight(true));
+			
+			GUI.color.a = 1;
+			GUI.enabled = true;
+				
+			GUILayout.EndScrollView();
+		}
+		
+		/*******************************************************
+		|	
+		|	Element definitions
+		|	
+		*******************************************************/
+		
+		function MissionList(label:String, status:int){
+			if (Journal.missions.Count > 0){
+				GUILayout.Label(label);
+				
+				if (status == 1){
+					for (var mission in Journal.missions){
+						if (mission.Value >= status) missionButton(mission.Key);
+					}
+				}
+				
+				else{
+					for (var mission in Journal.missions){
+						if (mission.Value == status) missionButton(mission.Key);
+					}
+				}
+				
+			}
+		}
+		
+		function missionButton (mission:String){
+			GUILayout.BeginHorizontal();
+			
+			GUI.enabled = false;
+			GUI.color.a = 2;
+			GUILayout.TextArea(mission);
+			GUI.color.a = 1;
+			GUI.enabled = true;
+			
+			if(GUILayout.Button("►", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true))){
+				currentMission = mission;
+				Server.StartCoroutine(Server.Retrieve.TXT("JournalInterface", "Texts/MissionDesc/" + mission));
+			}
+			GUILayout.EndHorizontal();
+		}
+		
+		
+		
+	}
+	
+	static class InventoryInterface{
+			
+		var show:boolean = false;
+		var rect:Rect = Area._List;
+		private var SP:Vector2 = Vector2.zero;
+		
+		function Toogle(){
+			if(show == true) show = false;
+			else show = true;
+		}
+		
+		/******************************
+		|	Inventory Box
+		******************************/
+		function Box(){
+			if (show == true) GUI.Window (0, rect, Window, Text.dic["Inventory"]);
+		}
+		
+		/******************************
+		|	Inventory Window
+		******************************/
+		function Window(windowID : int) {
+			
+			GUILayout.FlexibleSpace ();
+			SP = GUILayout.BeginScrollView(SP);
+				
+				try {
+					for (var item in Inventory.items){
+						GUILayout.BeginHorizontal();
+						
+							ItemButton(item.Key);
+							
+							GUILayout.Label(item.Key.Split("."[0])[0], GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+							
+							GUILayout.Label(item.Value.ToString(), GUILayout.ExpandHeight(true), GUILayout.Width(40));
+							
+						GUILayout.EndHorizontal();
+					}
+				}
+				catch (InvalidOperationException){
+					Debug.Log("Expected error dropping item. Don't panic.");
+				}
+				
+			GUILayout.EndScrollView();
+			
+			if (GUILayout.Button(Text.dic["Close"])) Toogle();
+		}
+		
+		/******************************
+		|	Item Button
+		******************************/
+		function ItemButton(item:String){
+			if ( Inventory.textures.ContainsKey( item ) ){
+				if ( GUILayout.Button( Inventory.textures[item] , GUILayout.ExpandWidth(false)) ) Inventory.DropItem(item);
+			}
+			else{
+				if ( GUILayout.Button( Resources.Load("Textures/Item") , GUILayout.ExpandWidth(false), GUILayout.Width(38), GUILayout.Height(38)) ) Inventory.DropItem(item);
+				Server.StartCoroutine(Server.Retrieve.ItemTexture(item));
+			}
+		}
+		
+	}
+	
+	static class DialogInterface{
+	
+		var show:boolean = false;
+		
+		var WindowAID : int = 0;
+		var WindowBID : int = 1;
+		var rectA:Rect = Area._CenterDown;
+		var rectB:Rect = Area._CenterUp;
+		
+		private var SPA:Vector2 = Vector2.zero;
+		private var SPB:Vector2 = Vector2.zero;
+		
+		/******************************
+		|	Dialog Box
+		******************************/
+		function Box(){
+			if (show == true) {
+				GUI.Window (WindowAID, rectA, WindowA, Text.dic["Anwsers"]);
+				GUI.Window (WindowBID, rectB, WindowB, Dialog.fileName);
+			}
+		}
+		
+		function WindowB (windowID : int) {
+			SPB = GUILayout.BeginScrollView(SPB);
+				GUI.enabled = false;
+				GUI.color.a = 2;
+				if (Dialog.text) GUILayout.TextArea(Dialog.text, GUILayout.ExpandHeight(true));
+				GUI.color.a = 1;
+				GUI.enabled = true;
+			GUILayout.EndScrollView();
+		}
+		
+		function WindowA (windowID : int) {
+			SPA = GUILayout.BeginScrollView(SPA);
+				Anwsers();
+				GUILayout.FlexibleSpace();
+			GUILayout.EndScrollView();
+		}
+		
+		function Anwsers(){
+			try{
+				// if there are more nodes inside this node...
+				if(Dialog.node["n"] != null){
+					// we get ready to check if we can show one...
+					var hasValidOptions:boolean = false;
+					// and for each node, we add a button to go there
+					var nodeList:XMLNodeList = Dialog.node["n"] as XMLNodeList;
+					for (var i:int = 0; i < nodeList.length; i ++ ){
+						var n = nodeList[i] as XMLNode;
+						// but only if there are no requeriments
+						var nIf:XMLNodeList = n["if"] as XMLNodeList;
+						if (!nIf){
+							
+							hasValidOptions = true;
+							
+							GUILayout.BeginHorizontal();
+								GUI.enabled = false;
+								GUI.color.a = 2;
+								GUILayout.TextArea(n["_text"], GUILayout.ExpandWidth(true));
+								GUI.color.a = 1;
+								GUI.enabled = true;
+								
+								if(GUILayout.Button("◄", GUILayout.Width(48), GUILayout.ExpandHeight(true))){
+									if (n["@goTo"]) Dialog.GoToNode(n["@goTo"] as String);
+									else Dialog.GetNodeData(i);
+								}
+							GUILayout.EndHorizontal();
+							
+						}
+						// or if the requeriments are met
+						else if (Dialog.Check(nIf[0] as XMLNode, "if") == true){
+							
+							hasValidOptions = true;
+							
+							GUILayout.BeginHorizontal();
+								GUI.enabled = false;
+								GUI.color.a = 2;
+								GUILayout.TextArea(n["_text"], GUILayout.ExpandWidth(true));
+								GUI.color.a = 1;
+								GUI.enabled = true;
+								
+								if(GUILayout.Button("◄", GUILayout.Width(48), GUILayout.ExpandHeight(true))){
+									if (n["@goTo"] as String) Dialog.GoToNode(n["@goTo"] as String);
+									else Dialog.GetNodeData(i);
+								}
+							GUILayout.EndHorizontal();
+							
+						}
+					}
+					//and then if we have no valid options we fall back to the
+					//default buttons, so we can close the conversation if the XML is badly formatted
+					if (!hasValidOptions){
+						GUILayout.BeginHorizontal();
+							GUI.enabled = false;
+							GUI.color.a = 2;
+							GUILayout.TextArea(Text.dic["Close"], GUILayout.ExpandWidth(true));
+							GUI.color.a = 1;
+							GUI.enabled = true;
+							
+							if(GUILayout.Button("◄", GUILayout.Width(48), GUILayout.ExpandHeight(true))){
+								Dialog.Close();
+							}
+						GUILayout.EndHorizontal();
+					}
+					
+				}
+				// if there are no more nodes inside...
+				else{
+					// we fall back to the default buttons, so we can close the conversation if the XML is badly formatted
+					GUILayout.BeginHorizontal();
+						GUI.enabled = false;
+						GUI.color.a = 2;
+						GUILayout.TextArea(Text.dic["Close"], GUILayout.ExpandWidth(true));
+						GUI.color.a = 1;
+						GUI.enabled = true;
+						
+						if(GUILayout.Button("◄", GUILayout.Width(48), GUILayout.ExpandHeight(true))){
+							Dialog.Close();
+						}
+					GUILayout.EndHorizontal();
+				}
+			}
+			catch(NullReferenceException){
+				//Debug.Log("No extra nodes where found. Falling back to default...");
+			}
+		}
+		
+	}
+	
+	static class MainToolbar{
+	
+		var show:boolean = true;
+		var rect:Rect = Area._MainToolbar;
+		
+		function Toogle(){
+			if(show == true) show = false;
+			else show = true;
+		}
+		
+		/******************************
+		|	Tool Bar Box
+		******************************/
+		function Box(){
+			if (show == true){
+				GUILayout.BeginArea(rect);
+					GUILayout.BeginHorizontal();
+						if (GUILayout.Button(Text.dic["Journal"], GUILayout.ExpandHeight(true))) JournalInterface.Toogle();
+						if (GUILayout.Button(Text.dic["Inventory"], GUILayout.ExpandHeight(true))) InventoryInterface.Toogle();
+						if (GUILayout.Button(Text.dic["Menu"], GUILayout.ExpandHeight(true))) Menu.Toogle();
+					GUILayout.EndHorizontal();
+				GUILayout.EndArea();
+			}
+		}
+		
+	}
+	
+	static class Area {
+		var _Screen:Rect;
+		var _Menu:Rect;
+		var _Content:Rect;
+		var _MainToolbar:Rect;
+		var _InGameMenu:Rect;
+		var _InGameContent:Rect;
+		var _List:Rect;
+		var _Chat:Rect;
+		var _Center:Rect;
+		var _CenterUp:Rect;
+		var _CenterDown:Rect;
+		
+		function Reload(){
+			
+			// Store the last know screen size, so we can detect changes on it
+			lastScreenSize = new Vector2(Camera.current.GetScreenWidth(), Camera.current.GetScreenHeight());
+			
+			// Defines the area inside the screen where we will draw, with margins
+			_Screen = Rect				(	Screen.width * 0.01,
+											Screen.height * 0.01,
+											Screen.width - Screen.width * 0.01 * 2,
+											Screen.height - Screen.height * 0.01 * 2
+										);
+			
+			// A list menu at the left, a quarter of the screen width, and full height
+			_Menu = Rect				(	_Screen.x,
+											_Screen.y,
+											_Screen.width * 0.33,
+											_Screen.height
+										);
+			
+			// A content box at the right, three quarters of the screen width, and full height
+			_Content = Rect			(	_Menu.width + _Screen.x * 2,
+											_Screen.y,
+											_Screen.width - _Menu.width - _Screen.x,
+											_Screen.height
+										);
+			
+			// A toolbar at bottom right, 40 percent of the screen
+			_MainToolbar = Rect		(	_Screen.xMax - _Screen.width * 0.40,
+											_Screen.yMax - _Screen.height * 0.07,
+											_Screen.width * 0.40 - _Screen.x,
+											_Screen.height * 0.07 - _Screen.y
+										);
+			
+			// A list menu at the left, a quarter of the screen width, and full height minus the toolbar height
+			_InGameMenu = Rect		(	_Menu.x,
+											_Menu.y,
+											_Menu.width,
+											_Menu.height - _MainToolbar.height - _Screen.y * 2
+										);
+			
+			// A content box at the right, three quarters of the screen width, and full height minus the toolbar height
+			_InGameContent = Rect	(	_Content.x,
+											_Content.y,
+											_Content.width,
+											_Content.height - _MainToolbar.height - _Screen.y * 2
+										);
+			
+			// A small box wich can pop up on top of the toolbar
+			_List = Rect				(	_Screen.xMax - _MainToolbar.width - _Screen.x,
+											_Screen.yMax - _Screen.height * 0.33 - _MainToolbar.height - _Screen.y * 2,
+											_MainToolbar.width,
+											_Screen.height * 0.33
+										);
+			
+			// The chat area, wich will take the width left from the toolbar
+			_Chat = Rect				(	_Screen.x,
+											_Screen.yMax - _Screen.height * 0.3 - _Screen.y,
+											_Screen.width - _MainToolbar.width - _Screen.x * 2,
+											_Screen.height * 0.3
+										);
+			
+			// A box at the center of the screen
+			_Center = Rect				(	_Screen.xMax * 0.25,
+											_Screen.y + _Screen.yMax * 0.125,
+											_Screen.xMax - _Screen.xMax * 0.5,
+											_Screen.height * 0.75
+										);
+			
+			// The box that contains the NPC dialog strings
+			_CenterUp = Rect			(	_Center.x,
+											_Center.y,
+											_Center.width,
+											_Center.height * 0.40
+										);
+			
+			// The box containing the player's possible anwsers to the NPC
+			_CenterDown = Rect			(	_Center.x,
+											_Center.y + _CenterUp.height,
+											_Center.width,
+											_Center.height * 0.60
+										);
+		}
+		
+	}
+	
+	
+	
+}

@@ -1,0 +1,125 @@
+<n>Disfruta de la isla aventurero!
+    <if>
+        <journal mission="Comida sana para el Sr. Alcalde" status="completed"></journal>
+    </if>
+</n>
+<n>Joven aventurero ¿has encontrado algo de fruta en la isla?
+    <if>
+        <journal mission="Comida sana para el Sr. Alcalde" status="2"></journal>
+    </if>
+    <n>Sí he encontrado este trozo de sandía, una fruta fresca y ligera, perfecta para después de comer.
+        <if>
+            <inventory item="Sandía" amount="1"></inventory>
+        </if>
+        <then>
+            <inventory function="AddItem" item="Sandía" amount="-1"></inventory>
+        </then>
+        <n>¡Perfecto, justo lo que necesitaba para seguir trabajando! Joven ha sido muy generoso conmigo, me siento en el deber de  darle su primera recompensa para convertirse en pirata. Aquí tiene una CAÑA, con ella podrás pescar en la playa para alimentarte. Siempre que necesites comida no dudes utilizarla en la playa. Además con esta caña desarrollarás una habilidad muy importante para los buenos piratas, la PACIENCIA. Antes de salir debe contestarme a esta pregunta. ¿Cómo se lo ha pasado durante la sesión? ¡Hasta luego!
+            <then>
+                <journal function="SetMission" mission="Comida sana para el Sr. Alcalde" status="completed"></journal>
+                <inventory function="AddItemToEveryone" item="Caña de pescar.0" amount="1"></inventory>
+                <inventory function="AddItem" item="Ensalada" amount="-1"></inventory>
+                <inventory function="AddItem" item="Pescado.1" amount="-1"></inventory>
+                <inventory function="AddItem" item="Manzana" amount="-1"></inventory>
+                <inventory function="AddItem" item="Vaso de agua" amount="-1"></inventory>
+            </then>
+            <n>Muy mal, me ha aburrido</n>
+            <n>Mal, no me ha entretenido</n>
+            <n>Normal, ni me ha aburrido ni me ha divertido</n>
+            <n>Bien,ha sido entretenido</n>
+            <n>Muy bien ha sido divertida</n>
+        </n>
+    </n>
+    <n>No la he encontrado, ¿qué puedo hacer?
+        <n>¿Ha buscado bien en todos los rincones?, estoy seguro de que podrá encontrar alguna fruta en la playa</n>
+    </n>
+</n>
+<n>¡Ya has vuelto!
+    <if>
+        <journal mission="Comida sana para el Sr. Alcalde" status="active"></journal>
+    </if>
+    <n goTo="1.0.0">Hola señor Alcalde, aquí le traigo algo una ensalada con pescado, una manzana y un  vaso de agua para que reúna fuerzas y pueda seguir trabajando
+        <if>
+            <inventory item="Ensalada" amount="1"></inventory>
+            <inventory item="Pescado.1" amount="1"></inventory>
+            <inventory item="Manzana" amount="1"></inventory>
+            <inventory item="Vaso de agua" amount="1"></inventory>
+        </if>
+        <then>
+            <inventory function="AddItem" item="Ensalada" amount="-1"></inventory>
+            <inventory function="AddItem" item="Pescado.1" amount="-1"></inventory>
+            <inventory function="AddItem" item="Manzana" amount="-1"></inventory>
+            <inventory function="AddItem" item="Vaso de agua" amount="-1"></inventory>
+        </then>
+        <n>¡Perfecto, justo lo que necesitaba para seguir trabajando! Joven ha sido muy generoso al traerme esta comida, me siento en el deber de  darle su primera recompensa para convertirse en pirata. Aquí tiene una CAÑA, con ella podrás pescar en la playa para alimentarte. Siempre que necesites comida no dudes utilizarla en la playa. Además con esta caña desarrollarás una habilidad muy importante para los buenos piratas, la PACIENCIA. Antes de salir debe contestarme a esta pregunta. ¿Cómo se lo ha pasado durante la sesión? ¡Hasta luego!
+            <n>Muy mal, me ha aburrido</n>
+            <n>Mal, no me ha entretenido</n>
+            <n>Normal, ni me ha aburrido ni me ha divertido</n>
+            <n>Bien,ha sido entretenido</n>
+            <n>Muy bien ha sido divertida</n>
+        </n>
+    </n>
+    <n>Hola señor Alcalde, aquí le traigo algo un muslo de pollo, un bol de arroz, un bollo y un vaso de agua para que reúna fuerzas y pueda seguir trabajando
+        <if>
+            <inventory item="Muslo.1" amount="1"></inventory>
+            <inventory item="Bol de arroz" amount="1"></inventory>
+            <inventory item="Pastel" amount="1"></inventory>
+            <inventory item="Vaso de agua" amount="1"></inventory>
+        </if>
+        <then>
+            <inventory function="AddItem" item="Muslo.1" amount="-1"></inventory>
+            <inventory function="AddItem" item="Bol de arroz" amount="-1"></inventory>
+            <inventory function="AddItem" item="Vaso de agua" amount="-1"></inventory>
+        </then>
+        <n>Muy amable joven, la verdad es que tengo mucha hambre y lo que me ha traído suena muy apetecible, pero no puedo aceptar el dulce. Mi médico me ha dicho que no debo comer alimentos con alto contenido en azúcar, este tipo de alimentos sólo deben comerse mensualmente y en personas de mi edad el control es importante
+            <n>Vaya, lo siento Sr. Alcalde, no sabía que no debía comerlos. ¿Puedo traerle algo más saludable de postre?
+                <n>Agradecería que me trajeras alguna fruta, creo que por la playa podrás encontrar alguna
+                    <then>
+                        <journal function="UpdateMission" mission="Comida sana para el Sr. Alcalde"></journal>
+                    </then>
+                    <n>De acuerdo volveré tan pronto como la encuentre.</n>
+                </n>
+            </n>
+            <n>Jamás pensé que comer dulces fuera poco saludable</n>
+        </n>
+    </n>
+    <n>Lo siento, Sr. Alcalde, aun no hemos encontrado nada.</n>
+</n>
+<n>¡Buenas tardes joven!
+    <if>
+        <journal mission="Hablar con el Sr. Alcalde"></journal>
+    </if>
+    <n>¡Buenas tardes señor Alcalde! He estado paseando por la playa y me he acercado a saludarle
+        <n>Muy amable estimado visitante,como Alcalde que soy lo único que quiero es que a los visitantes como usted les agrade la isla.
+            <n>Es usted muy amable en esforzarse por hacer de la isla un lugar tan agradable pero he de decirle que le veo cansado, ¿se encuentra bien?
+                <n>¡Ay, querido visitante! La verdad es que estoy muy cansando. Mi trabajo supone mucho estrés ya que me paso muchas horas aquí trabajando, tomando decisiones, recibiendo a invitados, dando órdenes a los demás...Además duermo muy pocas horas y como bastante mal y rápido ya que no tengo tiempo para ir a comer
+                    <n>Pero Sr. Alcalde debería dormir al menos 8 horas cada noche, alimentarse mejor y hacer ejercicio físico para poder tener más energía, así rendiría más en su trabajo
+                        <n>Tienes razón, por ejemplo hoy aún no he comido. La verdad es que no sé qué debería comer, ¿podrías ayudarme?
+                            <then>
+                                <journal function="SetMission" mission="Comida sana para el Sr. Alcalde" status="active"></journal>
+                            </then>
+                            <n>¡Por supuesto Señor Alcalde! Iré en busca de algo de comida sana para que coma.
+                                <n>¡Muchas gracias por tu ayuda! Pregunta por Eladia, ella tendrá variedad de comida. ¡Hasta pronto!</n>
+                            </n>
+                        </n>
+                    </n>
+                </n>
+            </n>
+            <n>Me gusta mucho la isla, debe disfrutar mucho de sus paisajes
+                <n>No te creas aventurero, suelo estar tan ocupado que nunca me paro a ver el paisaje
+                    <n goTo="3.0.0.0.0.0.0">Pues no debería ser así, también es importante descansar</n>
+                </n>
+            </n>
+        </n>
+    </n>
+</n>
+<n>¡Buenas tardes joven visitante!
+    <then>
+        <journal function="SetMission" mission="Hablar con el Sr. Alcalde" status="completed"></journal>
+    </then>
+    <n>¡Buenas tardes!
+        <n>Yo soy el Sr. Alcalde, soy la persona más importante de la isla. Si en algún momento necesitas algo no dudes en ir al Ayuntamiento a buscarme. Además he de decirte que a veces necesito la ayuda de las personas de la isla, quizás te pida ayuda en alguna ocasión
+            <n>¡Encantado de conocerle! Me han dicho que su isla es muy bonita, estoy impaciente por verla</n>
+        </n>
+    </n>
+</n>

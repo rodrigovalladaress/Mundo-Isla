@@ -1,0 +1,35 @@
+<n>Hazte fuerte para que puedas unirte a nuestra tripulación!
+    <if>
+        <journal mission="Hablar con Lena" status="completed"></journal>
+    </if>
+    <n goTo="1.1.0">Hola, he conocido a sus compañeros de tripulación y parecen divertidos
+        <if>
+            <journal mission="Hablar con Kira" status="completed"></journal>
+            <journal mission="Hablar con Thiago" status="completed"></journal>
+        </if>
+    </n>
+</n>
+<n>Buenas tardes, yo soy la Capitana Lena, ¿tú quién eres?
+    <n>Buenas tardes, soy un nuevo visitante en la isla ¿Eres capitana? ¿Tienes tu propio barco?
+        <n>No solo tengo mi propio barco sino que tengo gran experiencia en el mar y ahora he decidido junto a mi tripulación volver a esta maravillosa isla para coger provisiones para nuestro próximo viaje que será el más importante y maravilloso que se haya hecho nunca. Además de provisiones necesito reclutar nuevos miembros para mi tripulación.
+            <n goTo="1.2.0">¿De verdad?¡Qué emocionante!</n>
+        </n>
+    </n>
+    <n>Hola, he conocido a sus compañeros de tripulación y parecen divertidos
+        <if>
+            <journal mission="Hablar con Kira" status="completed"></journal>
+            <journal mission="Hablar con Thiago" status="completed"></journal>
+        </if>
+        <n>Oh sí, Kira y Thiago son muy buenos piratas son de gran ayuda en mis misiones
+            <n>¡Sí, parecen grandes piratas!</n>
+        </n>
+    </n>
+    <n>¡Hola! ¿puedo formar parte de su tripulación?
+        <n>Para ser parte de mi tripulación deberás superar diferentes pruebas en la isla y ayudar a diferentes personas, si tiene madera de pirata podrás embarcarte en el viaje con nosotros. ¡Buena suerte!
+            <then>
+                <journal function="SetMission" mission="Hablar con Lena" status="completed"></journal>
+            </then>
+        </n>
+    </n>
+    <n>Lo siento estoy investigando la isla, no puedo hablar ahora</n>
+</n>

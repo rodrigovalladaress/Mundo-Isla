@@ -1,0 +1,135 @@
+// Edited by Rodrigo Valladares Santana
+// <rodriv_tf@hotmail.com>
+// Version: 1.2
+//
+// The item stores if it hass been obtained by the player or not.
+// The position of the item must not be changed in order to not 
+// be shown in the scene when it has been obtained. This is 
+// because the state of the item is stored in LevelManager in 
+// a hash using the position (and more stuff) of the item as a key.
+//
+// 1.2: When the item has been obtained, the texture 
+// of the item is set to null.
+//
+// 1.1: Added a boolean that shows if the item has been 
+// obtained or not.
+/*******************************************************
+|	Item Script
+|
+|	This script loads a texture from the web named as the container,
+|	and then maintain it looking at the player.
+|
+|	Versión: 1.0
+|	
+|	Autor: Manlio Joaquín García González <manliojoaquin@gmail.com>
+|
+|	Proyecto SAVEH
+*******************************************************/
+#pragma strict
+class Item extends MonoBehaviour{
+
+	public static final var INVISIBLE = false;
+	public static final var VISIBLE = true;
+
+	public 			var _minDistance		:	float 	=	3.5;
+	static	private	var _player				:	GameObject;
+	public			var _labelOffset		:	int 	=	40;
+	public 			var _audioClip			:	AudioClip;
+	// It's true if the item has been obtained by the player
+	public			var _hasBeenObtained 	: 	boolean;
+	
+	function Start () {
+		var _done:boolean = false;
+		setTexture();
+	}
+	
+	private function setTexture() {
+		if ( Inventory.textures.ContainsKey(this.gameObject.name) == true ){
+			this.gameObject.renderer.material.mainTexture = Inventory.textures[this.gameObject.name];
+		}
+		else{
+			Server.StartCoroutine(Server.Retrieve.ItemTexture(this.gameObject.name));
+			while (Inventory.textures.ContainsKey(this.gameObject.name) == false) yield;
+			this.gameObject.renderer.material.mainTexture = Inventory.textures[this.gameObject.name];
+		}
+	}
+	
+	function OnBecameVisible () {
+		// If the item has been obtained, it doesn't show the item.
+		if(!_hasBeenObtained) {
+	    	//renderer.enabled = true;
+	    	setVisibility(VISIBLE);
+	    }
+	}
+	
+	function OnBecameInvisible () {
+	    //renderer.enabled = false;
+	    setVisibility(INVISIBLE);
+	}
+	
+	function setVisibility(visibility : boolean) {
+		if(visibility == VISIBLE) {
+			setTexture();
+		} else if(visibility == INVISIBLE) {
+			this.gameObject.renderer.material.mainTexture = null;
+		}
+	}
+	
+	/*********************************
+	*		Item management
+	*********************************/
+	
+	function OnGUI() {
+		GUI.skin = Resources.Load("Skin") as GUISkin;
+		GUI.depth = 1;
+		// We reorient the object to be always looking at the camera (actually, at the opposite direction, it's just the way billboards work)
+		this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90, Camera.main.transform.rotation.eulerAngles.y - 180, 0);
+		
+		if (Player.exist()){
+			if (_player == null) _player = Player.object;
+			// If the object hasn't been obtained and the player is at a certain distance, it shows the name of the object
+			if (!(_hasBeenObtained) && (Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {
+				var screenPosition:Vector3 = Camera.main.WorldToScreenPoint(transform.position);
+				var _rect:Rect = new Rect	(	screenPosition.x - gameObject.name.ToString().Length * 4,
+												Screen.height - screenPosition.y - _labelOffset,
+												gameObject.name.ToString().Length * 9,
+												25
+											);
+				GUILayout.BeginArea(_rect);
+				GUI.color.a = 0.5;
+				GUILayout.Box(gameObject.name.Split("."[0])[0]);
+				GUI.color.a = 1;
+				GUILayout.EndArea();
+			}
+		}
+	}
+	
+	public function setItemToObtained() {
+		Debug.Log("item has been obtained");
+		_hasBeenObtained = true;
+		renderer.enabled = false;
+	}
+	
+	/*********************************
+	*		Collision Interaction
+	*********************************/
+	function OnTriggerEnter(collider : Collider) {
+		//Debug.Log("Collision detected with: "+ collider.transform.gameObject.name);
+		// We check if the distance between objects is under our minimum.
+		// Wa also check wether the item has been obtained or not.
+		if (!(_hasBeenObtained) && (collider.transform.GetComponent(CharacterController))) {
+			// And add one instance of the object to the inventory
+			if ( collider.gameObject != Player.object ) return;
+			Inventory.AddItem(this.gameObject.name);
+			Player.object.audio.PlayOneShot(_audioClip);
+			//Network.Destroy(gameObject);
+			setItemToObtained();
+			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
+		}
+		else if(collider.transform.GetComponent("Terrain")){
+			Destroy(this.gameObject.rigidbody);
+		}
+	}
+	
+	
+}

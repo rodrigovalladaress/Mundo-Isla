@@ -1,0 +1,94 @@
+<n>¡Buenas tardes joven! ¿Necesitas comprar algo?
+    <if>
+        <journal mission="Cimientos del comercio" status="completed"></journal>
+    </if>
+    <n>Mas bien necesito cambiar algo, parece que al Sr. Alcalde no le sientan bien los dulces.
+        <if>
+            <journal mission="Comida sana para el Sr. Alcalde" status="2"></journal>
+            <inventory item="Pastel" amount="1"></inventory>
+        </if>
+        <n>Lo cierto es que los dulces no son muy saludables para nadie, por eso hay que tomarlos con moderación. Permiteme que te cambie ese bollo por una pieza de sandia.
+            <then>
+                <inventory function="AddItem" item="Pastel" amount="-1"></inventory>
+                <inventory function="AddItem" item="Sandía" amount="1"></inventory>
+            </then>
+            <n>Gracias Eladia!</n>
+        </n>
+    </n>
+</n>
+<n>¡Hola joven! ¿has conseguido lo que te pedí?
+    <if>
+        <journal mission="Cimientos del comercio" status="active"></journal>
+    </if>
+    <n>Sí aquí tiene 5 ladrillos para que pueda construir su mercado
+        <if>
+            <inventory item="Ladrillo" amount="5"></inventory>
+        </if>
+        <n>Gracias joven, ¿Qué clase de comida tenias pensada?
+            <then>
+                <inventory function="AddItem" item="Ladrillo" amount="-5"></inventory>
+            </then>
+            <n>He venido en busca de algo de una ensalada con pescado, una manzana y un  vaso de agua.
+                <then>
+                    <inventory function="AddItem" item="Ensalada" amount="1"></inventory>
+                    <inventory function="AddItem" item="Pescado.1" amount="1"></inventory>
+                    <inventory function="AddItem" item="Manzana" amount="1"></inventory>
+                    <inventory function="AddItem" item="Vaso de agua" amount="1"></inventory>
+                </then>
+                <n>Muchas gracias por tu compra, siempre que necesites alimentos ven por aquí, tenemos todo tipo de productos ¡Que tengas un buen día!
+                    <then>
+                        <journal function="SetMission" mission="Cimientos del comercio" status="completed"></journal>
+                    </then>
+                </n>
+            </n>
+            <n>He venido en busca de un muslo de pollo, un bol de arroz, un dulce y un vaso de agua.
+                <then>
+                    <inventory function="AddItem" item="Muslo.1" amount="1"></inventory>
+                    <inventory function="AddItem" item="Bol de arroz" amount="1"></inventory>
+                    <inventory function="AddItem" item="Pastel" amount="1"></inventory>
+                    <inventory function="AddItem" item="Vaso de agua" amount="1"></inventory>
+                </then>
+                <n goTo="1.0.0.0.0">
+                    <then>
+                        <journal function="SetMission" mission="Cimientos del comercio" status="completed"></journal>
+                    </then>
+                </n>
+            </n>
+        </n>
+    </n>
+</n>
+<n>¡Buenas tardes!. ¿Que le trae por aquí nuevo visitante?
+    <if>
+        <journal mission="Hablar con Eladia" status="completed"></journal>
+    </if>
+    <n>Hola Eladia, querria conseguir algo para el Sr. Alcalde que está hambriento y cansado. Necesita algo fresco y sano para conseguir energías para seguir trabajando.
+        <if>
+            <journal mission="Comida sana para el Sr. Alcalde" status="active"></journal>
+        </if>
+        <n>Para poder comprar el almuerzo  debes traerme 5 ladrillos que necesitamos para poder construir nuestro mercado, una vez los hayas conseguido te daré la comida que necesitas
+            <then>
+                <journal function="SetMission" mission="Cimientos del comercio" status="active"></journal>
+            </then>
+            <n>De acuerdo Eladia, vuelvo enseguida.</n>
+        </n>
+    </n>
+</n>
+<n>¡Buenas tardes! Yo soy Eladia, y junto a mi marido estamos a cargo del mercado de esta isla.
+    <n>¡Buenas tardes! Qué bien, que ya sé a quién recurrir para conseguir alimentos
+        <then>
+            <journal function="SetMission" mission="Hablar con Eladia" status="completed"></journal>
+        </then>
+        <n>Tenemos toda clase de comidas y bebidas, si alguna vez necesitas comprar búscanos que seguro podemos ofrecerte lo que necesites
+            <n>Lo tendré en cuenta, ¡gracias!</n>
+        </n>
+    </n>
+    <n>Hola, yo soy un nuevo visitante en la isla ¿sabe dónde puedo conocer a nuevos habitantes?
+        <then>
+            <journal function="SetMission" mission="Hablar con Eladia" status="completed"></journal>
+        </then>
+        <n>Puedes encontrarlos en cualquier lugar de la playa o el pueblo, siempre hay gente paseando por aquí.
+            <n>De acuerdo, muchas gracias</n>
+        </n>
+    </n>
+    <n>Lo siento ahora no puedo hablar</n>
+</n>

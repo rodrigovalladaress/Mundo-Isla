@@ -1,0 +1,17 @@
+<n>Estoy probando los dialogos.
+	<n>Vamos a abrir un script
+		<then>
+			<script name="scriptPrueba"></script>
+		</then>
+	</n>
+	<n>Vamos a probar a abrir un nuevo nivel
+		<then>
+			<load name="Prueba"></load>
+		</then>
+	</n>
+	<n>Vamos a probar a usar el Kinect
+		<then>
+			<load name="kinect1"></load>
+		</then>
+	</n>
+</n>

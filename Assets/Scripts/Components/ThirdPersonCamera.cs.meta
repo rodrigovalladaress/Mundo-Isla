@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 082df6e2d62970441826dc6b10d26e92
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - target: {fileID: 14300000, guid: 47cd88bf6d544d04bb1458cf4fa8f88d, type: 2}
+  - camera: {fileID: 2000002, guid: 6d9d4ad9e201ce04c9b4dc49e84fc60a, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 

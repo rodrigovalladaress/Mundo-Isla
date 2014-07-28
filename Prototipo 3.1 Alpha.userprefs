@@ -1,0 +1,24 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Server.js">
+    <Files>
+      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="131" Column="19" />
+      <File FileName="Assets\Scripts\Tools\DialogEditor.js" Line="48" Column="2" />
+      <File FileName="Assets\Scripts\Components\Item.js" Line="18" Column="40" />
+      <File FileName="Assets\Scripts\GameManaging\Dialog.js" Line="25" Column="16" />
+      <File FileName="Assets\Scripts\Components\NPC.js" Line="15" Column="25" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="114" Column="40" />
+      <File FileName="Assets\Scripts\GameManaging\Journal.js" Line="59" Column="3" />
+      <File FileName="Assets\Scripts\GameManaging\Inventory.js" Line="18" Column="2" />
+      <File FileName="Assets\Scripts\GameManaging\Player.js" Line="26" Column="56" />
+      <File FileName="Assets\Scripts\Components\Skin.js" Line="39" Column="7" />
+      <File FileName="Assets\Scripts\Components\Label.js" Line="32" Column="48" />
+      <File FileName="Assets\Scripts\Components\MissionZone.js" Line="12" Column="2" />
+      <File FileName="Assets\Scripts\GUI\Tutorial.js" Line="34" Column="38" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

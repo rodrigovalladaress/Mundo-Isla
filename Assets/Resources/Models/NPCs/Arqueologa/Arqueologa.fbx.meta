@@ -1,0 +1,113 @@
+fileFormatVersion: 2
+guid: fec502f89ea421144a1f3b9b972d2758
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: arqueologa1_LeftFoot
+    100002: arqueologa1_LeftLeg
+    100004: arqueologa1_RightFoot
+    100006: arqueologa1_RightLeg
+    100008: arqueologa1_RightUpLeg
+    100010: arqueologa1_LeftToeBase
+    100012: arqueologa1_LeftArm
+    100014: arqueologa1_LeftShoulder
+    100016: arqueologa
+    100018: arqueologa1_RightArm
+    100020: arqueologa1_RightShoulder
+    100022: arqueologa1_Spine
+    100024: arqueologa1_RightToeBase
+    100026: //RootNode
+    100028: arqueologa1_Head
+    100030: arqueologa1_Neck
+    100032: arqueologa1_LeftHand
+    100034: arqueologa1_LeftForeArm
+    100036: arqueologa1_LeftUpLeg
+    100038: arqueologa1_Hips
+    100040: arqueologa1_Spine2
+    100042: arqueologa1_Spine1
+    100044: arqueologa1_RightHand
+    100046: arqueologa1_RightForeArm
+    100048: arqueologa1_Reference
+    400000: arqueologa1_LeftFoot
+    400002: arqueologa1_LeftLeg
+    400004: arqueologa1_RightFoot
+    400006: arqueologa1_RightLeg
+    400008: arqueologa1_RightUpLeg
+    400010: arqueologa1_LeftToeBase
+    400012: arqueologa1_LeftArm
+    400014: arqueologa1_LeftShoulder
+    400016: arqueologa
+    400018: arqueologa1_RightArm
+    400020: arqueologa1_RightShoulder
+    400022: arqueologa1_Spine
+    400024: arqueologa1_RightToeBase
+    400026: //RootNode
+    400028: arqueologa1_Head
+    400030: arqueologa1_Neck
+    400032: arqueologa1_LeftHand
+    400034: arqueologa1_LeftForeArm
+    400036: arqueologa1_LeftUpLeg
+    400038: arqueologa1_Hips
+    400040: arqueologa1_Spine2
+    400042: arqueologa1_Spine1
+    400044: arqueologa1_RightHand
+    400046: arqueologa1_RightForeArm
+    400048: arqueologa1_Reference
+    4300000: arqueologa
+    7400002: Take 001
+    11100000: //RootNode
+    13700000: arqueologa1_Hips
+    13700002: arqueologa
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 4
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 1
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  additionalBone: 0
+  userData: 
