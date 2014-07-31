@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{D3741C2F-E0D0-6E83-6740-A384028F2CBA}</ProjectGuid>
+	<ProjectGuid>{169D8397-2FBA-C19A-2C21-8D3FCF41E3BD}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -49,15 +49,56 @@
      <Compile Include="Assets\Plugins\CharacterElement.cs" />
      <Compile Include="Assets\Plugins\CharacterElementHolder.cs" />
      <Compile Include="Assets\Plugins\CharacterGenerator.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\CustomTypes.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\Enums.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\Extensions.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\FriendInfo.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\LoadbalancingPeer.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\NetworkingPeer.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonClasses.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonHandler.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonLagSimulationGui.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonNetwork.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonPlayer.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonStatsGui.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PhotonView.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\PingCloudRegions.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\RPC.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\Room.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\RoomInfo.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\RpcIndexComponent.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\ServerSettings.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\SocketUdp.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\ConnectAndJoinRandom.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\InRoomChat.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\InputToEvent.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\ManualPhotonViewAllocator.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\MoveByKeys.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\OnAwakeUsePhotonView.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\OnClickDestroy.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\OnClickInstantiate.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\OnClickLoadSomething.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\PointedAtGameObjectInfo.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\ServerTime.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\SmoothSyncMovement.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\TestDontDestroyOnLoad.cs" />
+     <Compile Include="Assets\Plugins\PhotonNetwork\UtilityScripts\TimeKeeper.cs" />
      <Compile Include="Assets\Plugins\StringHolder.cs" />
      <Compile Include="Assets\Standard Assets\Character Controllers\Sources\Scripts\MouseLook.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Utility Scripts\CombineChildren.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Utility Scripts\MeshCombineUtility.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
+     <None Include="Assets\Plugins\release_history.txt" />
      <None Include="Assets\ES.txt" />
      <None Include="Assets\Shaders\FX-Water.shader" />
+     <None Include="Assets\Photon Unity Networking\readme.txt" />
+     <None Include="Assets\Plugins\Photon3Unity3D.xml" />
      <None Include="Assets\NewShader.shader" />
+     <None Include="Assets\Photon Unity Networking\changelog.txt" />
+ <Reference Include="Photon3Unity3D">
+ <HintPath>Assets\Plugins\Photon3Unity3D.dll</HintPath>
+ </Reference>
  <Reference Include="OpenNI.Net">
  <HintPath>Assets\ZigFu\Scripts\_Internal\OpenNI.Net.dll</HintPath>
  </Reference>

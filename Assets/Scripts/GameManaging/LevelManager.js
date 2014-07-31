@@ -18,6 +18,7 @@
 //
 // 1.0: - 	Loads scenes.
 // 
+public static class LevelManager extends MonoBehaviour {
 // Stores the name of the current scene
 private static var currentScene : String;
 // Stores the position of the player in the scenes.
@@ -217,4 +218,5 @@ public static function HasItemStateFor(item : GameObject, sceneName : String) : 
 
 public static function HasItemStateInCurrentSceneFor(item : GameObject) : boolean {
 	return LevelManager.HasItemStateFor(item, LevelManager.currentScene);
+}
 }
