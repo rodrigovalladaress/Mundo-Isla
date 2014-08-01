@@ -1,6 +1,16 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\ZigFu\Scripts\UserControls\ZigSkeleton.cs">
+    <Files>
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="20" Column="38" />
+      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="57" Column="29" />
+      <File FileName="Assets\Scripts\GameManaging\Dialog.js" Line="192" Column="70" />
+      <File FileName="Assets\Scripts\Components\Movement.js" Line="81" Column="16" />
+      <File FileName="Assets\Scripts\GameManaging\Player.js" Line="82" Column="15" />
+      <File FileName="Assets\Scripts\Tools\Node.js" Line="447" Column="34" />
+      <File FileName="Assets\ZigFu\Scripts\UserControls\ZigSkeleton.cs" Line="80" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -75,11 +75,6 @@ public class ZigSkeleton : MonoBehaviour
 	public float dificultad = 50; // indica el porcentaje de recorrido que se debe realizar para que se cuente como repeticion
 	Timer timer;
 
-	// Direccion desde la que se descargan y cargan XML desde el web player
-	// TODO Usar un servidor para descargar los archivos
-	public static string localHostPath = "http://localhost/daniel_goniometro";
-
-
 	Resultados medicion = new Resultados();
 	
 	public float minimo, maximo; // maximo y minimo angulo del ejercicio
@@ -300,7 +295,7 @@ public class ZigSkeleton : MonoBehaviour
 			string nameXML = nombreHuesoXML(name);
 
 			// Se guarda el XML mediante un script de PHP.
-			string stringUrl = localHostPath + "/guardarResultado.php/?hueso=" + nameXML + "&fecha=" 
+			string stringUrl = Paths.GetKinect() + "/guardarResultado.php/?hueso=" + nameXML + "&fecha=" 
 				+ WWW.EscapeURL(System.DateTime.Now.ToLongDateString() + " " 
 				                + System.DateTime.Now.ToShortTimeString())
 				+ "&minimo=" + minimo + "&maximo=" + maximo + "&angulo=" + angulo + "&plano=" + Plano.GetX() 
@@ -326,7 +321,7 @@ public class ZigSkeleton : MonoBehaviour
 	{
 		XmlDocument xDoc = new XmlDocument();
 		if(Application.isWebPlayer) {
-			string url = localHostPath + "/ejer.xml";
+			string url = Paths.GetKinect() + "/ejer.xml";
 			WWW www = new WWW(url);
 			while(!www.isDone) {
 				yield return new WaitForSeconds(1);

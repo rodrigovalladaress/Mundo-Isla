@@ -19,6 +19,12 @@ class Server extends MonoBehaviour{
 	static private var _gameType = "IslaSAVEH.Alpha";
 	static private var _scriptsFolder:String = Application.dataPath + "/";
 	
+	private static var instance : Server;
+	
+	function Awake() {
+		instance = this;
+	}
+	
 	/*******************************************************
 	|	Actions taken when this script start
 	*******************************************************/
@@ -682,21 +688,25 @@ class Server extends MonoBehaviour{
 	/******************************
 	|	Server log management
 	******************************/
-	static function Log(_type:String, _message:String){
-		if (Application.isWebPlayer) {
-			// Create a form object for sending log data to the server
-		    var form = new WWWForm();
-		    
-		     // The info
-		    form.AddField( "user", Player.nickname.ToLower() );
-		    form.AddField( "type", _type.ToUpper() );
-		    form.AddField( "text", _message );
-	    
-	        var download = new WWW( _scriptsFolder + "log.pl", form );
-	        download.Dispose();
+	static function WaitForWWW(www : WWW): IEnumerator {
+		yield www;
+		// check for errors
+		if (www.error == null) {
+			Debug.Log("WWW Ok!: " + www.text);
+		} else {
+			Debug.Log("WWW Error: "+ www.error);
 		}
-		else if(Application.isEditor){
-			print(Header(_type) + _message);
+		www.Dispose();
+	}
+	
+	static function Log(_type:String, _message:String) {
+		var header : String = Header(_type);
+	    var stringURL : String = Paths.GetServerLog() + "/writeLog.php/?header=" + WWW.EscapeURL(header)
+	      	+ "&log=" + WWW.EscapeURL(_message);
+	    var www : WWW = new WWW(stringURL);
+		instance.StartCoroutine(WaitForWWW(www));
+		if(Application.isEditor) {
+			Debug.Log(header + _message);
 		}
 	}
 	
