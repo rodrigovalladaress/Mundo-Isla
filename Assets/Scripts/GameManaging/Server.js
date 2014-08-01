@@ -23,6 +23,9 @@ class Server extends MonoBehaviour{
 	|	Actions taken when this script start
 	*******************************************************/
 	function Start() {
+		
+		PhotonNetwork.ConnectUsingSettings("0.1");
+		
 		if(/*Application.isEditor*/true) {
 			Player.nickname = "Admin";
 			Player.skinString = MainGUI.Menu.SkinEditor.savedSkin = "female|eyes|female_eyes_blue|face|female_face-1|hair|"
@@ -37,6 +40,10 @@ class Server extends MonoBehaviour{
 		while (!Player.isPlaying()) yield;
 		Server.StartCoroutine( TrackInventory("item", Inventory.items) );
 		Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
+	}
+	
+	function OnGUI() {
+		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
 	}
 	
 	/******************************
