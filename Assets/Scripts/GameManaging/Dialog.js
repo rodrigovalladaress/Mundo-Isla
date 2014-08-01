@@ -189,6 +189,7 @@ static class Dialog extends MonoBehaviour{
 		case "journal":
 			switch(_node["@function"] as String){
 			case "SetMission":
+					// TODO No puede ser llamado SetMission desde un metodo estatico
 					Journal.SetMission( _node["@mission"] as String, _node["@status"] as String );
 					break;
 			case "SetMissionToEveryone":

@@ -228,7 +228,7 @@ static function Root():DialogEditor{
 // Write the GUI line to interact with the node, recursively
 public function NodeLine(indent:int){
 
-	if (gameObject.active){
+	if (gameObject.activeSelf){
 		if ( _goTo != null ){
 			if ( _id.Split("."[0]).Length %2 != 0 ){
 				GUILayout.BeginHorizontal();
@@ -444,7 +444,7 @@ function toogleChildrensButton(){
 function ToogleChildrens(){
 	for (var child in transform ){
 		var childType:Transform = child as Transform;
-		if (childType.gameObject.active) childType.gameObject.active = false;
-		else childType.gameObject.active = true;
+		if (childType.gameObject.activeSelf) childType.gameObject.SetActive(false);
+		else childType.gameObject.SetActive(true);
 	}
 }

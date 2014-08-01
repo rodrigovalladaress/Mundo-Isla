@@ -19,8 +19,8 @@ function Start () {
 		rot = LevelManager.GetPlayerRotationForCurrentScene();
 	}*/
 	if(spawnPoint == null) {
-		Debug.Log("Searching SpawnPoint");
-		spawnPoint = GameObject.Find("SpawnPoint");
+		//Debug.Log("Searching SpawnPoint");
+		//spawnPoint = GameObject.Find("SpawnPoint");
 	}
 	if(rot == null) {
 		rot = Quaternion.identity;
