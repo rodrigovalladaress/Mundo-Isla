@@ -74,12 +74,12 @@ static class Player extends MonoBehaviour{
 	|	Attach the camera to a game object (usually the player)
 	*******************************************************/
 	function AttachCamera(parent:GameObject){
-		Camera.main.transform.parent = parent.transform;
-		Camera.main.transform.position = parent.transform.position + Vector3(0,4,-5);
+		Camera.mainCamera.transform.parent = parent.transform;
+		Camera.mainCamera.transform.position = parent.transform.position + Vector3(0,4,-5);
 		/*if(LevelManager.HasCameraRotationForCurrentScene()) { 
 			Camera.mainCamera.transform.rotation = LevelManager.GetCameraRotationForCurrentScene().transform.rotation;
 		} else {*/
-			Camera.main.transform.rotation = Quaternion.AngleAxis(25, Vector3.right);
+			Camera.mainCamera.transform.rotation = Quaternion.AngleAxis(25, Vector3.right);
 		//}
 	}
 	

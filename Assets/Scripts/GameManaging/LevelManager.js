@@ -17,7 +17,7 @@
 // 1.1: - 	Stores the position of the player in the main scene.
 //
 // 1.0: - 	Loads scenes.
-//
+// 
 // Stores the name of the current scene
 private static var currentScene : String;
 // Stores the position of the player in the scenes.

@@ -51,7 +51,7 @@ function Update () {
 	if (moveDirection.y > -gravity && !cc.isGrounded) moveDirection.y -= gravity * Time.deltaTime;
 	
 	// Rotate the controller
-	cc.transform.Rotate (cc.transform.up, rotationAmount);
+	cc.transform.RotateAround (cc.transform.up, rotationAmount);
 	
 	// Stop if we are focused on a window that do not allow movement, but sitll apply gravity
 	if (MainGUI.Menu.show || MainGUI.DialogInterface.show || MainGUI.JournalInterface.show) {
@@ -76,9 +76,9 @@ function Update () {
 	if (cc.isGrounded && Input.GetButton ("Jump")) moveDirection.y = jumpSpeed;
 	
 	// Move the controller
-	if (Input.GetMouseButton (1)) cc.Move(Camera.main.transform.right * (Input.GetAxis("Horizontal") * speed * Time.deltaTime));
+	if (Input.GetMouseButton (1)) cc.Move(Camera.mainCamera.transform.right * (Input.GetAxis("Horizontal") * speed * Time.deltaTime));
 	cc.Move	(
-				Camera.main.transform.forward * (Input.GetAxis("Vertical") * speed * Time.deltaTime)
+				Camera.mainCamera.transform.forward * (Input.GetAxis("Vertical") * speed * Time.deltaTime)
 				+
 				Vector3(0,moveDirection.y * Time.deltaTime,0)
 			);

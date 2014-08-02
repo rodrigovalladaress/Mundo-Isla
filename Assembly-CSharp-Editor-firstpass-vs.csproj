@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{BD4D0107-934F-D61D-9E5C-A08E54164F58}</ProjectGuid>
+	<ProjectGuid>{B5C13D1B-0B3A-6C97-1910-C3B7E3B90DB8}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -52,13 +52,13 @@
      <Compile Include="Assets\Plugins\Editor\GenerateMaterials.cs" />
      <Compile Include="Assets\Plugins\Editor\MassMaterialEditor.cs" />
      <Compile Include="Assets\Plugins\Editor\UpdateCharacterElementDatabase.cs" />
+     <None Include="Assets\NewShader.shader" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
      <None Include="Assets\Plugins\release_history.txt" />
      <None Include="Assets\ES.txt" />
      <None Include="Assets\Shaders\FX-Water.shader" />
      <None Include="Assets\Photon Unity Networking\readme.txt" />
      <None Include="Assets\Plugins\Photon3Unity3D.xml" />
-     <None Include="Assets\NewShader.shader" />
      <None Include="Assets\Photon Unity Networking\changelog.txt" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>
@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
-      <Project>{169D8397-2FBA-C19A-2C21-8D3FCF41E3BD}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
+      <Project>{035FFDF9-D19D-A89B-2A03-A73DE9EA6485}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

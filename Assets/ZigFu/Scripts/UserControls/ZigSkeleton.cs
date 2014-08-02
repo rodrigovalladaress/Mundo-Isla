@@ -16,43 +16,43 @@ using System.Timers;
 
 public class ZigSkeleton : MonoBehaviour
 {
-    public Transform Head;
-    public Transform Neck;
-    public Transform Torso;
-    public Transform Waist;
-
-    public Transform LeftCollar;
-    public Transform LeftShoulder;
-    public Transform LeftElbow;
-    public Transform LeftWrist;
-    public Transform LeftHand;
-    public Transform LeftFingertip;
-
-    public Transform RightCollar;
-    public Transform RightShoulder;
-    public Transform RightElbow;
-    public Transform RightWrist;
-    public Transform RightHand;
-    public Transform RightFingertip;
-
-    public Transform LeftHip;
-    public Transform LeftKnee;
-    public Transform LeftAnkle;
-    public Transform LeftFoot;
-
-    public Transform RightHip;
-    public Transform RightKnee;
-    public Transform RightAnkle;
-    public Transform RightFoot;
+	public Transform Head;
+	public Transform Neck;
+	public Transform Torso;
+	public Transform Waist;
 	
-    public bool mirror = false;
-    public bool UpdateJointPositions = false;
-    public bool UpdateRootPosition = false;
-    public bool UpdateOrientation = true;
-    public bool RotateToPsiPose = false;
-    public float RotationDamping = 30.0f;
-    public float Damping = 30.0f;
-    public Vector3 Scale = new Vector3(0.001f, 0.001f, 0.001f);
+	public Transform LeftCollar;
+	public Transform LeftShoulder;
+	public Transform LeftElbow;
+	public Transform LeftWrist;
+	public Transform LeftHand;
+	public Transform LeftFingertip;
+	
+	public Transform RightCollar;
+	public Transform RightShoulder;
+	public Transform RightElbow;
+	public Transform RightWrist;
+	public Transform RightHand;
+	public Transform RightFingertip;
+	
+	public Transform LeftHip;
+	public Transform LeftKnee;
+	public Transform LeftAnkle;
+	public Transform LeftFoot;
+	
+	public Transform RightHip;
+	public Transform RightKnee;
+	public Transform RightAnkle;
+	public Transform RightFoot;
+	
+	public bool mirror = false;
+	public bool UpdateJointPositions = false;
+	public bool UpdateRootPosition = false;
+	public bool UpdateOrientation = true;
+	public bool RotateToPsiPose = false;
+	public float RotationDamping = 30.0f;
+	public float Damping = 30.0f;
+	public Vector3 Scale = new Vector3(0.001f, 0.001f, 0.001f);
 	
 	public bool Angle = false;
 	public bool plano = true;
@@ -74,11 +74,11 @@ public class ZigSkeleton : MonoBehaviour
 	
 	public float dificultad = 50; // indica el porcentaje de recorrido que se debe realizar para que se cuente como repeticion
 	Timer timer;
-
+	
 	Resultados medicion = new Resultados();
 	
 	public float minimo, maximo; // maximo y minimo angulo del ejercicio
-
+	
 	
 	
 	//Clase que define un vector en un espacio tridimensional y como trabajar con él
@@ -88,7 +88,7 @@ public class ZigSkeleton : MonoBehaviour
 		private float Y;
 		private float Z;
 		public string name;
-
+		
 		
 		public vector(){
 			X = 0;
@@ -143,12 +143,12 @@ public class ZigSkeleton : MonoBehaviour
 	vector initBone = new vector(); //posicion inicial del brazo, con respecto a esta posicion se medira
 	
 	
-    public Vector3 PositionBias = Vector3.zero;
-
-    private Transform[] transforms;
-    private Quaternion[] initialRotations;
-    private Vector3 rootPosition;
-
+	public Vector3 PositionBias = Vector3.zero;
+	
+	private Transform[] transforms;
+	private Quaternion[] initialRotations;
+	private Vector3 rootPosition;
+	
 	
 	public class Pose{
 		
@@ -197,12 +197,12 @@ public class ZigSkeleton : MonoBehaviour
 			return grado;
 		}
 		
-
+		
 	}
 	
 	List<Pose> poseList = new List<Pose>();  //Lista de articulaciones a tener en cuenta durante el ejercicio 
 	
-
+	
 	public class Resultados{
 		
 		private float tick;//tiempo transcurrido
@@ -258,7 +258,7 @@ public class ZigSkeleton : MonoBehaviour
 		public float GetLimit(){
 			return limit;
 		}
-
+		
 		public double GetMaxLocal(){
 			return maxLocal;
 		}
@@ -278,7 +278,7 @@ public class ZigSkeleton : MonoBehaviour
 		public double GetRepeticiones(){
 			return repeticiones;
 		}
-
+		
 		// Dado un nombre de Hueso, lo cambia para ser usado en un XML
 		private string nombreHuesoXML(string name) {
 			string nombreHueso;
@@ -293,17 +293,17 @@ public class ZigSkeleton : MonoBehaviour
 			bool found = false;
 			// Nombre del hueso para ser usado en el XML
 			string nameXML = nombreHuesoXML(name);
-
+			
 			// Se guarda el XML mediante un script de PHP.
 			string stringUrl = Paths.GetKinect() + "/guardarResultado.php/?hueso=" + nameXML + "&fecha=" 
 				+ WWW.EscapeURL(System.DateTime.Now.ToLongDateString() + " " 
 				                + System.DateTime.Now.ToShortTimeString())
-				+ "&minimo=" + minimo + "&maximo=" + maximo + "&angulo=" + angulo + "&plano=" + Plano.GetX() 
-				+ "," + Plano.GetY() + "," + Plano.GetZ();
+					+ "&minimo=" + minimo + "&maximo=" + maximo + "&angulo=" + angulo + "&plano=" + Plano.GetX() 
+					+ "," + Plano.GetY() + "," + Plano.GetZ();
 			WWW www = new WWW(stringUrl);
 			Debug.Log(www.url);
 			yield return www;
-
+			
 			// check for errors
 			if (www.error == null) {
 				Debug.Log("WWW Ok!: " + www.data);
@@ -313,8 +313,8 @@ public class ZigSkeleton : MonoBehaviour
 		}
 	}
 	
-
-	    
+	
+	
 	
 	//carga los datos de un fichero de definiciones de ejercicios
 	public IEnumerator Cargar()
@@ -331,47 +331,47 @@ public class ZigSkeleton : MonoBehaviour
 		} else {
 			xDoc.Load("./ejer.xml");
 		}
-
-		
-	   XmlNodeList exer = xDoc.GetElementsByTagName("EXERCISE");	  
-	   arti = Convert.ToInt16(exer[0].Attributes["art"].InnerText);
-       arti1 = Convert.ToInt16(exer[0].Attributes["art1"].InnerText);
-		
-	   XmlNodeList vector = xDoc.GetElementsByTagName("EJE");
-	   XmlNodeList pos0 = xDoc.GetElementsByTagName("INI");
-	   XmlNodeList angles = xDoc.GetElementsByTagName("ANGLE");
- 	   XmlNodeList frames = ((XmlElement)exer[0]).GetElementsByTagName("POSITION");	  
 		
 		
-	   //plano sobre el que se va a realizar la medicion
-       plane.SetX(Convert.ToInt16(vector[0].Attributes["X"].InnerText));
-	   plane.SetY(Convert.ToInt16(vector[0].Attributes["Y"].InnerText));
-	   plane.SetZ(Convert.ToInt16(vector[0].Attributes["Z"].InnerText));
-	  
-				
-
-	   //posicion de inicio del ejercicio
-	   initBone.SetX(Convert.ToInt16(pos0[0].Attributes["x"].InnerText));
-	   initBone.SetY(Convert.ToInt16(pos0[0].Attributes["y"].InnerText));
-	   initBone.SetZ(Convert.ToInt16(pos0[0].Attributes["z"].InnerText));
+		XmlNodeList exer = xDoc.GetElementsByTagName("EXERCISE");	  
+		arti = Convert.ToInt16(exer[0].Attributes["art"].InnerText);
+		arti1 = Convert.ToInt16(exer[0].Attributes["art1"].InnerText);
 		
-	   //Angulos maximo y minimo de ejercicio
-	   maximo = Convert.ToInt16(angles[0].Attributes["MAX"].InnerText);
-	   minimo = Convert.ToInt16(angles[0].Attributes["MIN"].InnerText);
+		XmlNodeList vector = xDoc.GetElementsByTagName("EJE");
+		XmlNodeList pos0 = xDoc.GetElementsByTagName("INI");
+		XmlNodeList angles = xDoc.GetElementsByTagName("ANGLE");
+		XmlNodeList frames = ((XmlElement)exer[0]).GetElementsByTagName("POSITION");	  
 		
-	   
-	   XmlNodeList ID;
-	   XmlNodeList ID1;		
-	   XmlNodeList FX;
-	   XmlNodeList FY;
-	   XmlNodeList FZ;
-	   XmlNodeList G;
-	 			
-	   foreach (XmlElement frame in frames)
-	   {
-
-          int i = 0;
-   	      Pose pose = new Pose();	
+		
+		//plano sobre el que se va a realizar la medicion
+		plane.SetX(Convert.ToInt16(vector[0].Attributes["X"].InnerText));
+		plane.SetY(Convert.ToInt16(vector[0].Attributes["Y"].InnerText));
+		plane.SetZ(Convert.ToInt16(vector[0].Attributes["Z"].InnerText));
+		
+		
+		
+		//posicion de inicio del ejercicio
+		initBone.SetX(Convert.ToInt16(pos0[0].Attributes["x"].InnerText));
+		initBone.SetY(Convert.ToInt16(pos0[0].Attributes["y"].InnerText));
+		initBone.SetZ(Convert.ToInt16(pos0[0].Attributes["z"].InnerText));
+		
+		//Angulos maximo y minimo de ejercicio
+		maximo = Convert.ToInt16(angles[0].Attributes["MAX"].InnerText);
+		minimo = Convert.ToInt16(angles[0].Attributes["MIN"].InnerText);
+		
+		
+		XmlNodeList ID;
+		XmlNodeList ID1;		
+		XmlNodeList FX;
+		XmlNodeList FY;
+		XmlNodeList FZ;
+		XmlNodeList G;
+		
+		foreach (XmlElement frame in frames)
+		{
+			
+			int i = 0;
+			Pose pose = new Pose();	
 			ID = frame.GetElementsByTagName("ID");
 			ID1 = frame.GetElementsByTagName("ID1");
 			FX = frame.GetElementsByTagName("X");
@@ -390,22 +390,22 @@ public class ZigSkeleton : MonoBehaviour
 			aux.SetY(Convert.ToInt16(FY[i].InnerText));
 			aux.SetZ(Convert.ToInt16(FZ[i].InnerText));
 			pose.Setbone(aux);
-
+			
 			//define las restricciones en angulos con respecto a la posicion correcta
 			pose.Setgrado(Convert.ToInt16(G[i].InnerText));
-							
+			
 			//Lista de restricciones del ejercicio
 			poseList.Add (pose);
 			i++; 
-	   }
+		}
 		
-    }
+	}
 	
 	
 	//Traductor entre los joints del fichero de definicion y el skeleton de kinect
 	public Transform art(int op){
 		switch (op)
-        {
+		{
 		case 1:	return Head;
 		case 2: return Neck;
 		case 3: return Torso;
@@ -413,132 +413,132 @@ public class ZigSkeleton : MonoBehaviour
 		case 5: return LeftCollar;
 		case 6: return LeftShoulder;
 		case 7: return LeftElbow;
-        case 8: return LeftWrist;
-        case 9: return LeftHand;
-        case 10: return LeftFingertip;
-        case 11: return RightCollar;
-        case 12: return RightShoulder;
-        case 13: return RightElbow;
-        case 14: return RightWrist;
-        case 15: return RightHand;
-        case 16: return RightFingertip;
-        case 17: return LeftHip;
-        case 18: return LeftKnee;
-        case 19: return LeftAnkle;
-        case 20: return LeftFoot;
-        case 21: return RightHip;
-        case 22: return RightKnee;
-        case 23: return RightAnkle;
-        case 24: return RightFoot;
+		case 8: return LeftWrist;
+		case 9: return LeftHand;
+		case 10: return LeftFingertip;
+		case 11: return RightCollar;
+		case 12: return RightShoulder;
+		case 13: return RightElbow;
+		case 14: return RightWrist;
+		case 15: return RightHand;
+		case 16: return RightFingertip;
+		case 17: return LeftHip;
+		case 18: return LeftKnee;
+		case 19: return LeftAnkle;
+		case 20: return LeftFoot;
+		case 21: return RightHip;
+		case 22: return RightKnee;
+		case 23: return RightAnkle;
+		case 24: return RightFoot;
 		default: return RightKnee;
 		}
 	}
-
+	
 	
 	//Efecto espejo
-    ZigJointId mirrorJoint(ZigJointId joint)
-    {
-        switch (joint)
-        {
-            case ZigJointId.LeftCollar:
-                return ZigJointId.RightCollar;
-            case ZigJointId.LeftShoulder:
-                return ZigJointId.RightShoulder;
-            case ZigJointId.LeftElbow:
-                return ZigJointId.RightElbow;
-            case ZigJointId.LeftWrist:
-                return ZigJointId.RightWrist;
-            case ZigJointId.LeftHand:
-                return ZigJointId.RightHand;
-            case ZigJointId.LeftFingertip:
-                return ZigJointId.RightFingertip;
-            case ZigJointId.LeftHip:
-                return ZigJointId.RightHip;
-            case ZigJointId.LeftKnee:
-                return ZigJointId.RightKnee;
-            case ZigJointId.LeftAnkle:
-                return ZigJointId.RightAnkle;
-            case ZigJointId.LeftFoot:
-                return ZigJointId.RightFoot;
-
-            case ZigJointId.RightCollar:
-                return ZigJointId.LeftCollar;
-            case ZigJointId.RightShoulder:
-                return ZigJointId.LeftShoulder;
-            case ZigJointId.RightElbow:
-                return ZigJointId.LeftElbow;
-            case ZigJointId.RightWrist:
-                return ZigJointId.LeftWrist;
-            case ZigJointId.RightHand:
-                return ZigJointId.LeftHand;
-            case ZigJointId.RightFingertip:
-                return ZigJointId.LeftFingertip;
-            case ZigJointId.RightHip:
-                return ZigJointId.LeftHip;
-            case ZigJointId.RightKnee:
-                return ZigJointId.LeftKnee;
-            case ZigJointId.RightAnkle:
-                return ZigJointId.LeftAnkle;
-            case ZigJointId.RightFoot:
-                return ZigJointId.LeftFoot;
-
-
-            default:
-                return joint;
-        }
-    }
-
-    
-    public void Awake()
-    {
-        int jointCount = Enum.GetNames(typeof(ZigJointId)).Length;
-
-        transforms = new Transform[jointCount];
-        initialRotations = new Quaternion[jointCount];
-
-        transforms[(int)ZigJointId.Head] = Head;
-        transforms[(int)ZigJointId.Neck] = Neck;
-        transforms[(int)ZigJointId.Torso] = Torso;
-        transforms[(int)ZigJointId.Waist] = Waist;
-        transforms[(int)ZigJointId.LeftCollar] = LeftCollar;
-        transforms[(int)ZigJointId.LeftShoulder] = LeftShoulder;
-        transforms[(int)ZigJointId.LeftElbow] = LeftElbow;
-        transforms[(int)ZigJointId.LeftWrist] = LeftWrist;
-        transforms[(int)ZigJointId.LeftHand] = LeftHand;
-        transforms[(int)ZigJointId.LeftFingertip] = LeftFingertip;
-        transforms[(int)ZigJointId.RightCollar] = RightCollar;
-        transforms[(int)ZigJointId.RightShoulder] = RightShoulder;
-        transforms[(int)ZigJointId.RightElbow] = RightElbow;
-        transforms[(int)ZigJointId.RightWrist] = RightWrist;
-        transforms[(int)ZigJointId.RightHand] = RightHand;
-        transforms[(int)ZigJointId.RightFingertip] = RightFingertip;
-        transforms[(int)ZigJointId.LeftHip] = LeftHip;
-        transforms[(int)ZigJointId.LeftKnee] = LeftKnee;
-        transforms[(int)ZigJointId.LeftAnkle] = LeftAnkle;
-        transforms[(int)ZigJointId.LeftFoot] = LeftFoot;
-        transforms[(int)ZigJointId.RightHip] = RightHip;
-        transforms[(int)ZigJointId.RightKnee] = RightKnee;
-        transforms[(int)ZigJointId.RightAnkle] = RightAnkle;
-        transforms[(int)ZigJointId.RightFoot] = RightFoot;
-
-
-
-        // save all initial rotations
-        // NOTE: Assumes skeleton model is in "T" pose since all rotations are relative to that pose
-        foreach (ZigJointId j in Enum.GetValues(typeof(ZigJointId)))
-        {
-            if (transforms[(int)j])
-            {
-                // we will store the relative rotation of each joint from the gameobject rotation
-                // we need this since we will be setting the joint's rotation (not localRotation) but we 
-                // still want the rotations to be relative to our game object
-                initialRotations[(int)j] = Quaternion.Inverse(transform.rotation) * transforms[(int)j].rotation;
-            }
-        }
-    }
-
-    void Start()
-    {
+	ZigJointId mirrorJoint(ZigJointId joint)
+	{
+		switch (joint)
+		{
+		case ZigJointId.LeftCollar:
+			return ZigJointId.RightCollar;
+		case ZigJointId.LeftShoulder:
+			return ZigJointId.RightShoulder;
+		case ZigJointId.LeftElbow:
+			return ZigJointId.RightElbow;
+		case ZigJointId.LeftWrist:
+			return ZigJointId.RightWrist;
+		case ZigJointId.LeftHand:
+			return ZigJointId.RightHand;
+		case ZigJointId.LeftFingertip:
+			return ZigJointId.RightFingertip;
+		case ZigJointId.LeftHip:
+			return ZigJointId.RightHip;
+		case ZigJointId.LeftKnee:
+			return ZigJointId.RightKnee;
+		case ZigJointId.LeftAnkle:
+			return ZigJointId.RightAnkle;
+		case ZigJointId.LeftFoot:
+			return ZigJointId.RightFoot;
+			
+		case ZigJointId.RightCollar:
+			return ZigJointId.LeftCollar;
+		case ZigJointId.RightShoulder:
+			return ZigJointId.LeftShoulder;
+		case ZigJointId.RightElbow:
+			return ZigJointId.LeftElbow;
+		case ZigJointId.RightWrist:
+			return ZigJointId.LeftWrist;
+		case ZigJointId.RightHand:
+			return ZigJointId.LeftHand;
+		case ZigJointId.RightFingertip:
+			return ZigJointId.LeftFingertip;
+		case ZigJointId.RightHip:
+			return ZigJointId.LeftHip;
+		case ZigJointId.RightKnee:
+			return ZigJointId.LeftKnee;
+		case ZigJointId.RightAnkle:
+			return ZigJointId.LeftAnkle;
+		case ZigJointId.RightFoot:
+			return ZigJointId.LeftFoot;
+			
+			
+		default:
+			return joint;
+		}
+	}
+	
+	
+	public void Awake()
+	{
+		int jointCount = Enum.GetNames(typeof(ZigJointId)).Length;
+		
+		transforms = new Transform[jointCount];
+		initialRotations = new Quaternion[jointCount];
+		
+		transforms[(int)ZigJointId.Head] = Head;
+		transforms[(int)ZigJointId.Neck] = Neck;
+		transforms[(int)ZigJointId.Torso] = Torso;
+		transforms[(int)ZigJointId.Waist] = Waist;
+		transforms[(int)ZigJointId.LeftCollar] = LeftCollar;
+		transforms[(int)ZigJointId.LeftShoulder] = LeftShoulder;
+		transforms[(int)ZigJointId.LeftElbow] = LeftElbow;
+		transforms[(int)ZigJointId.LeftWrist] = LeftWrist;
+		transforms[(int)ZigJointId.LeftHand] = LeftHand;
+		transforms[(int)ZigJointId.LeftFingertip] = LeftFingertip;
+		transforms[(int)ZigJointId.RightCollar] = RightCollar;
+		transforms[(int)ZigJointId.RightShoulder] = RightShoulder;
+		transforms[(int)ZigJointId.RightElbow] = RightElbow;
+		transforms[(int)ZigJointId.RightWrist] = RightWrist;
+		transforms[(int)ZigJointId.RightHand] = RightHand;
+		transforms[(int)ZigJointId.RightFingertip] = RightFingertip;
+		transforms[(int)ZigJointId.LeftHip] = LeftHip;
+		transforms[(int)ZigJointId.LeftKnee] = LeftKnee;
+		transforms[(int)ZigJointId.LeftAnkle] = LeftAnkle;
+		transforms[(int)ZigJointId.LeftFoot] = LeftFoot;
+		transforms[(int)ZigJointId.RightHip] = RightHip;
+		transforms[(int)ZigJointId.RightKnee] = RightKnee;
+		transforms[(int)ZigJointId.RightAnkle] = RightAnkle;
+		transforms[(int)ZigJointId.RightFoot] = RightFoot;
+		
+		
+		
+		// save all initial rotations
+		// NOTE: Assumes skeleton model is in "T" pose since all rotations are relative to that pose
+		foreach (ZigJointId j in Enum.GetValues(typeof(ZigJointId)))
+		{
+			if (transforms[(int)j])
+			{
+				// we will store the relative rotation of each joint from the gameobject rotation
+				// we need this since we will be setting the joint's rotation (not localRotation) but we 
+				// still want the rotations to be relative to our game object
+				initialRotations[(int)j] = Quaternion.Inverse(transform.rotation) * transforms[(int)j].rotation;
+			}
+		}
+	}
+	
+	void Start()
+	{
 		Plano = GameObject.CreatePrimitive(PrimitiveType.Plane);
 		Plano.name = "plano";
 		Plano.transform.localScale = new Vector3(0.09f,0,0.09f);
@@ -550,103 +550,103 @@ public class ZigSkeleton : MonoBehaviour
 		Barra.renderer.enabled = barra;
 		
 		
-			
+		
 		// start out in calibration pose
-        if (RotateToPsiPose)
-        {
-            RotateToCalibrationPose();
-        }
-    }
-
-    void UpdateRoot(Vector3 skelRoot)
-    {
-        // +Z is backwards in OpenNI coordinates, so reverse it
-        rootPosition = Vector3.Scale(new Vector3(skelRoot.x, skelRoot.y, skelRoot.z), doMirror(Scale)) + PositionBias;
-        if (UpdateRootPosition)
-        {
-            transform.localPosition = (transform.rotation * rootPosition);
-        }
-    }
-
-    void UpdateRotation(ZigJointId joint, Quaternion orientation)
-    {
-        joint = mirror ? mirrorJoint(joint) : joint;
-        // make sure something is hooked up to this joint
-        if (!transforms[(int)joint])
-        {
-            return;
-        }
-
-        if (UpdateOrientation)
-        {
-            Quaternion newRotation = transform.rotation * orientation * initialRotations[(int)joint];
-            if (mirror)
-            {
-                newRotation.y = -newRotation.y;
-                newRotation.z = -newRotation.z;
-            }
-            transforms[(int)joint].rotation = Quaternion.Slerp(transforms[(int)joint].rotation, newRotation, Time.deltaTime * RotationDamping);
-        }
-    }
-    Vector3 doMirror(Vector3 vec)
-    {
-        return new Vector3(mirror ? -vec.x : vec.x, vec.y, vec.z);
-    }
-    void UpdatePosition(ZigJointId joint, Vector3 position)
-    {
-        joint = mirror ? mirrorJoint(joint) : joint;
-        // make sure something is hooked up to this joint
-        if (!transforms[(int)joint])
-        {
-            return;
-        }
-
-        if (UpdateJointPositions)
-        {
-            Vector3 dest = Vector3.Scale(position, doMirror(Scale)) - rootPosition;
-            transforms[(int)joint].localPosition = Vector3.Lerp(transforms[(int)joint].localPosition, dest, Time.deltaTime * Damping);
-        }
-    }
-
-    public void RotateToCalibrationPose()
-    {
-        foreach (ZigJointId j in Enum.GetValues(typeof(ZigJointId)))
-        {
-            if (null != transforms[(int)j])
-            {
-                transforms[(int)j].rotation = transform.rotation * initialRotations[(int)j];
-            }
-        }
-
-        // calibration pose is skeleton base pose ("T") with both elbows bent in 90 degrees
-        if (null != RightElbow)
-        {
-            RightElbow.rotation = transform.rotation * Quaternion.Euler(0, -90, 90) * initialRotations[(int)ZigJointId.RightElbow];
-        }
-        if (null != LeftElbow)
-        {
-            LeftElbow.rotation = transform.rotation * Quaternion.Euler(0, 90, -90) * initialRotations[(int)ZigJointId.LeftElbow];
-        }
-    }
-
-    public void SetRootPositionBias()
-    {
-        this.PositionBias = -rootPosition;
-    }
-
-    public void SetRootPositionBias(Vector3 bias)
-    {
-        this.PositionBias = bias;
-    }
-
+		if (RotateToPsiPose)
+		{
+			RotateToCalibrationPose();
+		}
+	}
 	
-    float distance(float right, float left)
-    {
-       if ((right < 0 && left < 0) || (right > 0 && left > 0))
-          return (right - left);
-       else
-          return (right + left);
-    }
+	void UpdateRoot(Vector3 skelRoot)
+	{
+		// +Z is backwards in OpenNI coordinates, so reverse it
+		rootPosition = Vector3.Scale(new Vector3(skelRoot.x, skelRoot.y, skelRoot.z), doMirror(Scale)) + PositionBias;
+		if (UpdateRootPosition)
+		{
+			transform.localPosition = (transform.rotation * rootPosition);
+		}
+	}
+	
+	void UpdateRotation(ZigJointId joint, Quaternion orientation)
+	{
+		joint = mirror ? mirrorJoint(joint) : joint;
+		// make sure something is hooked up to this joint
+		if (!transforms[(int)joint])
+		{
+			return;
+		}
+		
+		if (UpdateOrientation)
+		{
+			Quaternion newRotation = transform.rotation * orientation * initialRotations[(int)joint];
+			if (mirror)
+			{
+				newRotation.y = -newRotation.y;
+				newRotation.z = -newRotation.z;
+			}
+			transforms[(int)joint].rotation = Quaternion.Slerp(transforms[(int)joint].rotation, newRotation, Time.deltaTime * RotationDamping);
+		}
+	}
+	Vector3 doMirror(Vector3 vec)
+	{
+		return new Vector3(mirror ? -vec.x : vec.x, vec.y, vec.z);
+	}
+	void UpdatePosition(ZigJointId joint, Vector3 position)
+	{
+		joint = mirror ? mirrorJoint(joint) : joint;
+		// make sure something is hooked up to this joint
+		if (!transforms[(int)joint])
+		{
+			return;
+		}
+		
+		if (UpdateJointPositions)
+		{
+			Vector3 dest = Vector3.Scale(position, doMirror(Scale)) - rootPosition;
+			transforms[(int)joint].localPosition = Vector3.Lerp(transforms[(int)joint].localPosition, dest, Time.deltaTime * Damping);
+		}
+	}
+	
+	public void RotateToCalibrationPose()
+	{
+		foreach (ZigJointId j in Enum.GetValues(typeof(ZigJointId)))
+		{
+			if (null != transforms[(int)j])
+			{
+				transforms[(int)j].rotation = transform.rotation * initialRotations[(int)j];
+			}
+		}
+		
+		// calibration pose is skeleton base pose ("T") with both elbows bent in 90 degrees
+		if (null != RightElbow)
+		{
+			RightElbow.rotation = transform.rotation * Quaternion.Euler(0, -90, 90) * initialRotations[(int)ZigJointId.RightElbow];
+		}
+		if (null != LeftElbow)
+		{
+			LeftElbow.rotation = transform.rotation * Quaternion.Euler(0, 90, -90) * initialRotations[(int)ZigJointId.LeftElbow];
+		}
+	}
+	
+	public void SetRootPositionBias()
+	{
+		this.PositionBias = -rootPosition;
+	}
+	
+	public void SetRootPositionBias(Vector3 bias)
+	{
+		this.PositionBias = bias;
+	}
+	
+	
+	float distance(float right, float left)
+	{
+		if ((right < 0 && left < 0) || (right > 0 && left > 0))
+			return (right - left);
+		else
+			return (right + left);
+	}
 	
 	
 	public double angulo( vector bone, vector initBone){
@@ -683,7 +683,7 @@ public class ZigSkeleton : MonoBehaviour
 		
 		productVect = prod_vec(bone, plane);
 		proyectBone = prod_vec(plane, productVect); //proyeccion sobre el plano del vector a medir
-					
+		
 		productVect = prod_vec(initBone, plane);
 		proyectBone1 = prod_vec(plane, productVect);// proyeccion sobre el plano del vector de inicio
 		
@@ -697,7 +697,7 @@ public class ZigSkeleton : MonoBehaviour
 		
 		productVect1 =prod_vec(plane, proyectBone);
 		double scalarProduct1 = proyectBone1.GetX() * productVect1.GetX() + proyectBone1.GetY() * productVect1.GetY() + proyectBone1.GetZ() * productVect1.GetZ();		
-
+		
 		if(scalarProduct1 < 0)
 			angulo = -angulo;
 		
@@ -729,23 +729,23 @@ public class ZigSkeleton : MonoBehaviour
 		}
 	}
 	
-    public void medir()
-    {       
+	public void medir()
+	{       
 		Transform aux = art(arti);
 		Transform aux1 = art(arti1);
-
+		
 		vector joint = new vector();
 		joint.SetX(aux.position.x);
 		joint.SetY(aux.position.y);
 		joint.SetZ(aux.position.z);
 		joint.SetName(aux.ToString());
-				
+		
 		vector joint1 = new vector();
 		joint1.SetX(aux1.position.x);
 		joint1.SetY(aux1.position.y);
 		joint1.SetZ(aux1.position.z);
 		joint1.SetName(aux1.ToString());
-				
+		
 		//Representa el hueso de la articulacion a medir
 		vector bone = new vector();
 		bone.SetX(distance(joint1.GetX(), joint.GetX()));
@@ -767,7 +767,7 @@ public class ZigSkeleton : MonoBehaviour
 		
 		//calcula las restricciones
 		restricciones();
-
+		
 		double ang = angulo_proyeccion(bone, plane, initBone);
 		texto.text = (Math.Truncate(ang)).ToString();
 		//texto.text = bone.GetX().ToString()+" "+bone.GetY().ToString()+" "+bone.GetZ().ToString();
@@ -815,32 +815,32 @@ public class ZigSkeleton : MonoBehaviour
 			}
 			medicion.SetTick(0);
 		}
-
-    }
+		
+	}
 	
-
+	
 	
 	
 	
 	//actualiza el usuario que está siendo seguido.
-    void Zig_UpdateUser(ZigTrackedUser user)
-    {
-        UpdateRoot(user.Position);
-        if (user.SkeletonTracked)
-        {
-            foreach (ZigInputJoint joint in user.Skeleton)
-            {
-                if (joint.GoodPosition) UpdatePosition(joint.Id, joint.Position);
-                if (joint.GoodRotation) UpdateRotation(joint.Id, joint.Rotation);
-            }
+	void Zig_UpdateUser(ZigTrackedUser user)
+	{
+		UpdateRoot(user.Position);
+		if (user.SkeletonTracked)
+		{
+			foreach (ZigInputJoint joint in user.Skeleton)
+			{
+				if (joint.GoodPosition) UpdatePosition(joint.Id, joint.Position);
+				if (joint.GoodRotation) UpdateRotation(joint.Id, joint.Rotation);
+			}
 			if(Angle)
 			{		
 				
 				StartCoroutine("Cargar"); //lee el fichero de definiciones
 				medir();
-			
+				
 			}
-        }
-    }
-
+		}
+	}
+	
 }
