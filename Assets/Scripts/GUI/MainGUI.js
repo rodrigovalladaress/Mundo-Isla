@@ -79,7 +79,7 @@ class MainGUI extends MonoBehaviour {
 	}
 	
 	static function SetLanguage( _file : String ){
-		Server.StartCoroutine( Server.Retrieve.TXT( "SetLanguage", _file ) );
+		Server.StartCoroutine( Server.Retrieve.TXT( "SetLanguage", "Language/" + _file ) );
 		
 		while ( !_languageFile ) yield;
 		

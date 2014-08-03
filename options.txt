@@ -1,8 +1,0 @@
-﻿NatFacilitatorIp|127.0.0.1:50005;
-MasterServerIp|127.0.0.1:23466;
-
-Language|ES;
-
-//ScriptsFolder|http://www.saveh.es/perl/;
-
-Session|01;

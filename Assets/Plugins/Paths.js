@@ -20,3 +20,13 @@ private static var kinect : String = Paths.localHost + "/daniel_goniometro";
 public static function GetKinect() : String {
 	return kinect;
 }
+
+private static var configuration : String = Paths.localHost + "/Configuration";
+public static function GetConfiguration() : String {
+	return configuration;
+}
+
+private static var language : String = Paths.localHost + "/Language";
+public static function GetLanguage() : String {
+	return language;
+}

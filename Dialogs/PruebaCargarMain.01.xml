@@ -1,7 +1,0 @@
-<n>¡Hola!
-	<n>Cargar escena Main
-		<then>
-			<loadMain></loadMain>
-		</then>
-	</n>
-</n>

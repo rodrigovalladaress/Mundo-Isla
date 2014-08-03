@@ -56,7 +56,7 @@ class Server extends MonoBehaviour{
 			MainGUI.Content.current = "";
 		}
 		
-		StartCoroutine( Retrieve.TXT( "ServerOptions", "options" ) );
+		StartCoroutine( Retrieve.TXT( "ServerOptions", "Configuration/" + "options" ) );
 		
 		while (!Player.isPlaying()) yield;
 		Server.StartCoroutine( TrackInventory("item", Inventory.items) );
@@ -411,23 +411,42 @@ class Server extends MonoBehaviour{
 			return System.DateTime.Now.ToString("yyyy-MM-dd")+ " " + System.DateTime.Now.ToString("hh:mm:ss");
 		}
 		function CurrentTime(option:String):String{
-			if (option == "all") return System.DateTime.Now.ToString("yyyy-MM-dd")+ " " + System.DateTime.Now.ToString("hh:mm:ss");
-			else if (option == "time") return System.DateTime.Now.ToString("hh:mm:ss");
-			else if (option == "date") return System.DateTime.Now.ToString("yyyy-MM-dd");
-			else Debug.LogError("Unknow option \"" + option + "\"");
+			if (option == "all") {
+				return System.DateTime.Now.ToString("yyyy-MM-dd")+ " " + System.DateTime.Now.ToString("hh:mm:ss");
+			}
+			else if(option == "time") {
+				return System.DateTime.Now.ToString("hh:mm:ss");
+			}
+			else if(option == "date") {
+				return System.DateTime.Now.ToString("yyyy-MM-dd");
+			}
+			else { 
+				Debug.LogError("Unknow option \"" + option + "\"");
+			}
 			return;
 		}
 		/******************************
 		|	XML retrieving
 		******************************/
-		function XML(scriptTarget:String, path:String):IEnumerator{
+		// This is used to escape urls like "Thiago, el Pirata"
+		private function EscapeXMLPath(path : String) : String {
+			var slashPosition = path.LastIndexOf("/") + 1;
+			var firstPart : String;
+			var lastPart : String;
+			if(slashPosition >= 0) {
+				firstPart = path.Substring(0, slashPosition);
+				// Error -> WWW.EscapeURL doesn't escape well the space
+				lastPart = path.Substring(slashPosition).Replace(" ", "%20");
+				return firstPart + lastPart;
+			} else {
+				return path;
+			}
+		}
 		
-			var file:String;
+		function XML(scriptTarget:String, path:String):IEnumerator{
+			var file:String = Paths.GetLocalHost() + "/" + EscapeXMLPath(path) + ".xml";
 			var XML:XMLParser = new XMLParser();
-			
-			if (Application.platform == RuntimePlatform.WindowsWebPlayer || Application.platform == RuntimePlatform.OSXWebPlayer) file = Application.dataPath + "/" + path + ".xml" + "?time=" + Server.Retrieve.CurrentTime();	
-		    else file = "file://" + Application.dataPath + "/../" + path + ".xml";
-			
+		    
 			// Downloads the XML file and waits until it has finished download
 			var www:WWW = new WWW(file);
 			while (!www.isDone) yield;
@@ -458,10 +477,7 @@ class Server extends MonoBehaviour{
 		******************************/
 		function TXT(scriptTarget:String, path:String):IEnumerator{
 		
-			var file:String;
-			
-			if (Application.platform == RuntimePlatform.WindowsWebPlayer || Application.platform == RuntimePlatform.OSXWebPlayer) file = Application.dataPath + "/" + path + ".txt" + "?time=" + Server.Retrieve.CurrentTime();	
-		    else file = "file://" + Application.dataPath + "/../" + path + ".txt";
+			var file:String = Paths.GetLocalHost() + "/" + path + ".txt";
 			
 			// Downloads the TXT file and waits until it has finished download
 			var www:WWW = new WWW(file);
@@ -731,11 +747,11 @@ class Server extends MonoBehaviour{
 	static function WaitForWWW(www : WWW): IEnumerator {
 		yield www;
 		// check for errors
-		if (www.error == null) {
+		/*if (www.error == null) {
 			Debug.Log("WWW Ok!: " + www.text);
 		} else {
 			Debug.Log("WWW Error: "+ www.error);
-		}
+		}*/
 		www.Dispose();
 	}
 	
