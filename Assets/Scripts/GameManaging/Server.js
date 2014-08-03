@@ -30,7 +30,11 @@ class Server extends MonoBehaviour{
 	*******************************************************/
 	function Start() {
 		
-		PhotonNetwork.ConnectUsingSettings("0.1");
+		if(PhotonNetwork.connectionStateDetailed == PeerState.Uninitialized ||
+			PhotonNetwork.connectionStateDetailed == PeerState.Disconnected ||
+			PhotonNetwork.connectionStateDetailed == PeerState.PeerCreated) {
+			PhotonNetwork.ConnectUsingSettings("0.1");
+		}
 		
 		if(/*Application.isEditor*/true) {
 			Player.nickname = "Admin";

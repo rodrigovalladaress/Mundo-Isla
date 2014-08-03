@@ -46,7 +46,7 @@ static class Player extends MonoBehaviour{
 		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
 		if (!GameObject.Find(_name)){
 			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, rotation, 0) as GameObject;
-			// Añadido para evitar error en el Log
+			
 			if(newPlayer != null && _name != null && _skinString != null) {
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
 				

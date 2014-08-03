@@ -82,24 +82,26 @@ class Item extends MonoBehaviour{
 	function OnGUI() {
 		GUI.skin = Resources.Load("Skin") as GUISkin;
 		GUI.depth = 1;
-		// We reorient the object to be always looking at the camera (actually, at the opposite direction, it's just the way billboards work)
-		this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90, Camera.main.transform.rotation.eulerAngles.y - 180, 0);
-		
-		if (Player.exist()){
-			if (_player == null) _player = Player.object;
-			// If the object hasn't been obtained and the player is at a certain distance, it shows the name of the object
-			if (!(_hasBeenObtained) && (Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {
-				var screenPosition:Vector3 = Camera.main.WorldToScreenPoint(transform.position);
-				var _rect:Rect = new Rect	(	screenPosition.x - gameObject.name.ToString().Length * 4,
-												Screen.height - screenPosition.y - _labelOffset,
-												gameObject.name.ToString().Length * 9,
-												25
-											);
-				GUILayout.BeginArea(_rect);
-				GUI.color.a = 0.5;
-				GUILayout.Box(gameObject.name.Split("."[0])[0]);
-				GUI.color.a = 1;
-				GUILayout.EndArea();
+		if(Camera.main != null) {
+			// We reorient the object to be always looking at the camera (actually, at the opposite direction, it's just the way billboards work)
+			this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90, Camera.main.transform.rotation.eulerAngles.y - 180, 0);
+			
+			if (Player.exist()){
+				if (_player == null) _player = Player.object;
+				// If the object hasn't been obtained and the player is at a certain distance, it shows the name of the object
+				if (!(_hasBeenObtained) && (Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {
+					var screenPosition:Vector3 = Camera.main.WorldToScreenPoint(transform.position);
+					var _rect:Rect = new Rect	(	screenPosition.x - gameObject.name.ToString().Length * 4,
+													Screen.height - screenPosition.y - _labelOffset,
+													gameObject.name.ToString().Length * 9,
+													25
+												);
+					GUILayout.BeginArea(_rect);
+					GUI.color.a = 0.5;
+					GUILayout.Box(gameObject.name.Split("."[0])[0]);
+					GUI.color.a = 1;
+					GUILayout.EndArea();
+				}
 			}
 		}
 	}

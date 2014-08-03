@@ -80,7 +80,11 @@ public static function LoadScene(name : String) {
 	//LevelManager.rotationHash[RotationHashKeyForCurrentScene()] = Player.object.transform.rotation;
 	//LevelManager.cameraRotationHash[CameraRotationHashKeyForCurrentScene()] = Camera.main;//ThirdPersonCamera.camera;
 	Debug.Log("LevelManager LoadScene " + name);
-	Application.LoadLevel(name);
+	// Destroy the player before loading a new scene
+	if(Player.object != null) {
+		PhotonNetwork.Destroy(Player.object);
+	}
+	PhotonNetwork.LoadLevel(name);
 	LevelManager.currentScene = name;
 }
 
