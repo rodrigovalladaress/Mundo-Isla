@@ -108,6 +108,7 @@ class Item extends MonoBehaviour{
 	
 	public function setItemToObtained() {
 		_hasBeenObtained = true;
+		// TODO Set invisible to all players
 		renderer.enabled = false;
 	}
 	

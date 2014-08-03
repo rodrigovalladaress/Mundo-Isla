@@ -32,11 +32,11 @@ class Server extends MonoBehaviour{
 	
 	// Used to call coroutines from static methods. 
 	// <http://answers.unity3d.com/questions/423019/coroutines-and-static-function.html>
-	private static var instance : Server;
+	//private static var instance : Server;
 	
-	function Awake() {
-		instance = this;
-	}
+	//function Awake() {
+	//	instance = this;
+	//}
 	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
@@ -744,7 +744,7 @@ class Server extends MonoBehaviour{
 	    var stringURL : String = Paths.GetServerLog() + "/writeLog.php/?header=" + WWW.EscapeURL(header)
 	      	+ "&log=" + WWW.EscapeURL(_message);
 	    var www : WWW = new WWW(stringURL);
-		instance.StartCoroutine(WaitForWWW(www));
+		Server.StartCoroutine(WaitForWWW(www));
 		if(Application.isEditor) {
 			Debug.Log(header + _message);
 		}
