@@ -105,7 +105,6 @@ class Item extends MonoBehaviour{
 	}
 	
 	public function setItemToObtained() {
-		Debug.Log("item has been obtained");
 		_hasBeenObtained = true;
 		renderer.enabled = false;
 	}

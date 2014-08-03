@@ -26,6 +26,11 @@ function Start () {
 		rot = Quaternion.identity;
 	}
 	pos = spawnPoint.transform.position;
+	Debug.Log("aaaaaaaaaarf");
+	while(PhotonNetwork.connectionStateDetailed != PeerState.Joined) {
+		Debug.Log("aaaaaaaaaaaaaaaaaaah");
+		yield;
+	}
 	Player.Spawn(Player.nickname, pos, rot, Player.skinString);
-	Debug.Log("SpawnManager " + Player.nickname + " spawned at " + pos + " in " + LevelManager.getCurrentScene());
+	Server.Log("debug", "SpawnManager " + Player.nickname + " spawned at " + pos + " in " + LevelManager.getCurrentScene());
 }

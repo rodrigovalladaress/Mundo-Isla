@@ -50,6 +50,25 @@ class Server extends MonoBehaviour{
 	
 	function OnGUI() {
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+		if(PhotonNetwork.room != null) {
+			GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
+		}
+	}
+	
+	function OnJoinedLobby()
+	{
+    	PhotonNetwork.JoinRandomRoom();
+	}
+	
+	function OnPhotonRandomJoinFailed()
+	{
+    	Debug.Log("Can't join random room!");
+    	PhotonNetwork.CreateRoom(null);
+	}
+	
+	function OnJoinedRoom() {
+		Server.Log("server", Player.nickname + " connected.");
+		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
 	}
 	
 	/******************************
@@ -148,18 +167,18 @@ class Server extends MonoBehaviour{
 	/*******************************************************
 	|	Actions taken wen we start a server
 	*******************************************************/
-	function OnServerInitialized(){
+	/*function OnServerInitialized(){
 		Server.Log("server", "Server initialized!");
 		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
-	}
+	}*/
 	
 	/*******************************************************
 	|	Actions taken wen we connect to a server
 	*******************************************************/
-	function OnConnectedToServer(){
+	/*function OnConnectedToServer(){
 		Server.Log("server", Player.nickname + " connected.");
 		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
-	}
+	}*/
 	
 	/*******************************************************
 	|	Actions taken wen a player connect
@@ -331,6 +350,10 @@ class Server extends MonoBehaviour{
 	/******************************
 	|	Holder elements
 	******************************/
+	static function GetPhotonView() : PhotonView {
+		return GameObject.Find("GameManager").GetComponent("PhotonView") as PhotonView;
+	}
+	
 	static function _networkView():NetworkView {
 		return GameObject.Find("GameManager").networkView;
 	}

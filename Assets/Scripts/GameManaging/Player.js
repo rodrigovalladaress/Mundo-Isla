@@ -43,14 +43,17 @@ static class Player extends MonoBehaviour{
 	
 	// Spawns a player at the given spawnPoint with the given rotation
 	function Spawn(_name:String, spawnPoint:Vector3, rotation:Quaternion, _skinString:String) {
-		Debug.Log("Spawning " + _name + " at " + spawnPoint);
+		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
 		if (!GameObject.Find(_name)){
-			var newPlayer:GameObject = Network.Instantiate(Resources.Load("Prefabs/player"), spawnPoint, rotation, 0) as GameObject;
+			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, rotation, 0) as GameObject;
 			// Añadido para evitar error en el Log
 			if(newPlayer != null && _name != null && _skinString != null) {
-				var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
-				Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerName", _name);
-				Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerSkin", _skinString);
+				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
+				
+				Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, 
+					newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerName", _name);
+				Server.GetPhotonView().RPC("SyncObject", 
+					PhotonTargets.All, newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerSkin", _skinString);
 			
 				if (newPlayer.networkView.isMine){
 					// Debug.Log("Attaching camera.");
@@ -63,7 +66,9 @@ static class Player extends MonoBehaviour{
 					// Debug.Log("Disabling label.");
 					GameObject.Destroy(newPlayer.GetComponent("Label"));
 					// Debug.Log("Enabling local components.");
-					for (var component:String in localPlayerComponents) newPlayer.AddComponent(component);
+					for (var component:String in localPlayerComponents) {
+						newPlayer.AddComponent(component);
+					}
 				}
 				Server.Log("Game event", _name + " spawned.");
 			}
