@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\NewBehaviourScript.cs" />
+     <Compile Include="Assets\Scripts\Components\NetworkCharacter.cs" />
      <Compile Include="Assets\Scripts\Components\ThirdPersonCamera.cs" />
      <Compile Include="Assets\Scripts\FX\Water.cs" />
      <Compile Include="Assets\SkinTest.cs" />
