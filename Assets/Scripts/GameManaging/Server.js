@@ -1,4 +1,15 @@
 #pragma strict
+//////////////////////////////////////////////////////////////////
+// Edited by Rodrigo Valladares Santana <rodriv_tf@hotmail.com> //
+//                                                              //
+// Version 2.0                                                  //
+//                                                              //
+// Changes in 2.0 version:                                      //
+// 	- 	Connection to Photon in Start()                         //
+//	-	OnGUI shows the connection state to Photon (debug)      //
+//	- 	Connection to a random room                             //
+//                                                              //
+//////////////////////////////////////////////////////////////////
 /*******************************************************
 |	Server Script
 |
@@ -19,6 +30,8 @@ class Server extends MonoBehaviour{
 	static private var _gameType = "IslaSAVEH.Alpha";
 	static private var _scriptsFolder:String = Application.dataPath + "/";
 	
+	// Used to call coroutines from static methods. 
+	// <http://answers.unity3d.com/questions/423019/coroutines-and-static-function.html>
 	private static var instance : Server;
 	
 	function Awake() {
@@ -282,7 +295,7 @@ class Server extends MonoBehaviour{
 		*******************************************************/
 		case "drop":
 			for (_item in _items)
-				if (_item.networkView.viewID.ToString() == _networkviewid)
+				if (_item.GetComponent(PhotonView).viewID.ToString() == _networkviewid)
 					_target = _item;
 			_target.name = _string;
 			_target.GetComponent(Item).enabled = true;
@@ -293,7 +306,7 @@ class Server extends MonoBehaviour{
 		*******************************************************/
 		case "playerName":
 			for (_player in _players)
-				if (_player.networkView.viewID.ToString() == _networkviewid)
+				if (_player.GetComponent(PhotonView).viewID.ToString() == _networkviewid)
 					_target = _player;
 			_target.name = _string;
 			break;
@@ -303,7 +316,7 @@ class Server extends MonoBehaviour{
 		*******************************************************/
 		case "playerSkin":
 			for (_player in _players)
-				if (_player.networkView.viewID.ToString() == _networkviewid)
+				if (_player.GetComponent(PhotonView).viewID.ToString() == _networkviewid)
 					_target = _player;
 			// Initializes the CharacterGenerator and load a saved config if any.
 			var generator:CharacterGenerator;

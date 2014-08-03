@@ -1,22 +1,29 @@
 ﻿#pragma strict
 #pragma downcast
-// Loads new scenes and stores the position where the player will spawn
-// in each scene.
-// Version: 1.3
+// Loads new scenes and stores some data of the scene.
+//
+// Version: 1.4
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
 //
-// 1.3: - 	Stores the states of the items in the scene.
+// Changes in 1.4 version:
+//	 -	Scene loading using Photon
+//
+// Changes in 1.3 version:
+//	 - 	Stores the states of the items in the scene.
 // 
-// 1.2: - 	Stores the position of the player in a Hash.
-//			Hash[sceneName] = position of the player in that scene.
-//		- 	Whenever a new scene is loaded, LevelManager stores the
-//			position of the player in that scene. Whenever that scene
-//			is loaded again, LevelManager spawns the player in that
-//			position.
+// Changes in 1.2 version:
+//	 - 	Stores the position of the player in a Hash.
+//		Hash[sceneName] = position of the player in that scene.
+//	 - 	Whenever a new scene is loaded, LevelManager stores the
+//		position of the player in that scene. Whenever that scene
+//		is loaded again, LevelManager spawns the player in that
+//		position.
 //
-// 1.1: - 	Stores the position of the player in the main scene.
+// Changes in 1.1 version:
+//	 - 	Stores the position of the player in the main scene.
 //
-// 1.0: - 	Loads scenes.
+// Changes in 1.0 version:
+//	 - 	Loads scenes.
 // 
 // Stores the name of the current scene
 private static var currentScene : String;

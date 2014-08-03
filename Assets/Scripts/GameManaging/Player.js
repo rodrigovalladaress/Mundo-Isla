@@ -1,8 +1,13 @@
 // Edited by Rodrigo Valladares Santana
 // <rodriv_tf@hotmail.com>
-// Version: 1.1
+// Version: 1.2
 //
-// 1.1: It's possible to spawn the player with a given rotation 
+// Changes in 1.2 version:
+// 	-	Instantiation of player using Photon.
+//	-	SyncObject using Photon.
+//
+// Changes in 1.1 version: 
+// 	-	It's possible to spawn the player with a given rotation 
 //		and change the camera rotation to a certain value.
 /*******************************************************
 |	Player Script
@@ -51,11 +56,12 @@ static class Player extends MonoBehaviour{
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
 				
 				Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, 
-					newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerName", _name);
+					newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerName", _name);
 				Server.GetPhotonView().RPC("SyncObject", 
-					PhotonTargets.All, newPlayer.GetComponent(NetworkView).viewID.ToString(), "playerSkin", _skinString);
+					PhotonTargets.All, newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerSkin", _skinString);
 			
-				if (newPlayer.networkView.isMine){
+				//if (newPlayer.networkView.isMine){
+				if (newPlayer.GetPhotonView().isMine) {
 					// Debug.Log("Attaching camera.");
 					Player.AttachCamera(newPlayer);
 					// Debug.Log("Instancing minimap.");
