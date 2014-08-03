@@ -1,8 +1,11 @@
 #pragma strict
 // Edited by Rodrigo Valladares Santana
-// Version: 1.1
-// 1.1: Added two XML nodes to load a new scene and to
-// load the main scene.
+// Version: 1.2
+// Changes of 1.2 version:
+//	-	Use of PhotonView instead of NetworkView.
+// Changes of 1.1 version: 
+//	-	Added two XML nodes to load a new scene and to
+// 		load the main scene.
 /*******************************************************
 |	XML Dialog Script
 |
@@ -192,19 +195,22 @@ static class Dialog extends MonoBehaviour{
 					Journal.SetMission( _node["@mission"] as String, _node["@status"] as String );
 					break;
 			case "SetMissionToEveryone":
-					Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, Server._networkView().viewID.ToString(), "mission", _node["@mission"] + "|" + _node["@status"] );
+					Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 
+						"mission", _node["@mission"] + "|" + _node["@status"] );
 					break;
 			case "UpdateMission":
 					Journal.UpdateMission( _node["@mission"] as String );
 					break;
 			case "UpdateMissionToEveryone":
-					Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, Server._networkView().viewID.ToString(), "mission", _node["@mission"] );
+					Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 
+						"mission", _node["@mission"] );
 					break;
 			case "DelMission":
 					Journal.DelMission( _node["@mission"] as String );
 					break;
 			case "DelMissionToEveryone":
-					Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, Server._networkView().viewID.ToString(), "mission", _node["@mission"], "delete" );
+					Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 
+						"mission", _node["@mission"], "delete" );
 					break;
 			}
 			break;
@@ -218,8 +224,10 @@ static class Dialog extends MonoBehaviour{
 				break;
 				
 			case "AddItemToEveryone":
-				if (_node["@amount"]) Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, Server._networkView().viewID.ToString(), "item", _node["@item"] + "|" + _node["@amount"] );
-				else Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, Server._networkView().viewID.ToString(), "item", _node["@item"] + "|" + "1" );
+				if (_node["@amount"]) Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 
+					"item", _node["@item"] + "|" + _node["@amount"] );
+				else Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 
+					"item", _node["@item"] + "|" + "1" );
 				break;
 				
 			}
@@ -255,11 +263,6 @@ static class Dialog extends MonoBehaviour{
 		// Loads a new level
 		case "load": case "loadScene": case "loadLevel":
 			var _level:String = _node["@name"] as String;
-			/*if(_level != "Main") {
-				LevelManager.LoadScene(_level);
-			} else {
-				LevelManager.LoadMainScene();
-			}*/
 			LevelManager.LoadScene(_level);
 			break;
 			

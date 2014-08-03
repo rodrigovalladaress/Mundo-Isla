@@ -48,8 +48,8 @@ static class Inventory extends MonoBehaviour{
 	
 	function DropItem(item:String){
 		AddItem(item, -1);
-		var drop:GameObject = Network.Instantiate(Resources.Load("Prefabs/Item"), Player.position() + Vector3.forward, Quaternion.identity, 0) as GameObject;
-		Server._networkView().RPC("SyncObject", RPCMode.AllBuffered, drop.GetComponent(NetworkView).viewID.ToString(), "drop", item);
+		var drop:GameObject = PhotonNetwork.Instantiate("Prefabs/Item", Player.position() + Vector3.forward, Quaternion.identity, 0) as GameObject;
+		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, drop.GetComponent(PhotonView).viewID.ToString(), "drop", item);
 		Server.Log("game event","Player " + Player.nickname + " dropped " + item);
 		
 	}

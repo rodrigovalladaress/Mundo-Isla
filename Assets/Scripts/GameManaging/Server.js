@@ -38,16 +38,14 @@ class Server extends MonoBehaviour{
 		instance = this;
 	}
 	
+	private static function ConnectToPhoton() {
+		PhotonNetwork.ConnectUsingSettings("0.1");
+	}
+	
 	/*******************************************************
 	|	Actions taken when this script start
 	*******************************************************/
 	function Start() {
-		
-		if(PhotonNetwork.connectionStateDetailed == PeerState.Uninitialized ||
-			PhotonNetwork.connectionStateDetailed == PeerState.Disconnected ||
-			PhotonNetwork.connectionStateDetailed == PeerState.PeerCreated) {
-			PhotonNetwork.ConnectUsingSettings("0.1");
-		}
 		
 		if(/*Application.isEditor*/true) {
 			Player.nickname = "Admin";
@@ -65,6 +63,7 @@ class Server extends MonoBehaviour{
 		Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
 	}
 	
+	// State of the connection to Photon (debug)
 	function OnGUI() {
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
 		if(PhotonNetwork.room != null) {
@@ -72,6 +71,7 @@ class Server extends MonoBehaviour{
 		}
 	}
 	
+	// Join a random room
 	function OnJoinedLobby()
 	{
     	PhotonNetwork.JoinRandomRoom();
@@ -85,6 +85,7 @@ class Server extends MonoBehaviour{
 	
 	function OnJoinedRoom() {
 		Server.Log("server", Player.nickname + " connected.");
+		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null)
 		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
 	}
 	
@@ -134,17 +135,20 @@ class Server extends MonoBehaviour{
 	|	Start and register a server
 	*******************************************************/
 	static function Host(maxPlayers:int, port:int, gameName:String, gameDescription:String){
-			Server.Log("server", "Starting Public Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
-			Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
-			MasterServer.RegisterHost(_gameType, gameName, gameDescription);
+			//Server.Log("server", "Starting Public Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
+			//Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
+			//MasterServer.RegisterHost(_gameType, gameName, gameDescription);
+			ConnectToPhoton();
 	}
 	static function Host(maxPlayers:int, port:int){
-			Server.Log("server", "Starting Private Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
-			Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
+			//Server.Log("server", "Starting Private Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
+			//Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
+			ConnectToPhoton();
 	}
 	static function Host(){
-			Server.Log("server", "Starting Offline Server...");
-			Network.InitializeServer(0, 0, false);
+			//Server.Log("server", "Starting Offline Server...");
+			//Network.InitializeServer(0, 0, false);
+			ConnectToPhoton();
 	}
 	
 	/*******************************************************
@@ -369,10 +373,6 @@ class Server extends MonoBehaviour{
 	******************************/
 	static function GetPhotonView() : PhotonView {
 		return GameObject.Find("GameManager").GetComponent("PhotonView") as PhotonView;
-	}
-	
-	static function _networkView():NetworkView {
-		return GameObject.Find("GameManager").networkView;
 	}
 	
 	static function _gameObject():GameObject {

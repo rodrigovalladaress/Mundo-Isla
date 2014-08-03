@@ -1,4 +1,8 @@
 #pragma strict
+// Edited by Rodrigo Valladares Santana
+// Version: 1.1
+// Changes of 1.1 version:
+//	-	Use of PhotonView instead of NetworkView
 /*******************************************************
 |	Chat object
 |
@@ -17,7 +21,8 @@ static class Chat extends MonoBehaviour{
 	
 	function Send(){
 		Server.Log("chat", Player.nickname + ": " + inputBoxValue);
-		Server._networkView().RPC("SyncObject", RPCMode.All, Server._networkView().viewID.ToString(), "chat", Player.nickname + ": " + inputBoxValue);
+		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.nickname + ": " 
+			+ inputBoxValue);
 		inputBoxValue = "";
 		// We unfocus the text input field with a hack on lack of a GUI.UnfocusControl() by focusing on the disabled send button
 		GUI.FocusControl("Disabled Send button");
@@ -25,6 +30,6 @@ static class Chat extends MonoBehaviour{
 	
 	function Send(string:String){
 		Server.Log("chat", Player.nickname + ": " + string);
-		Server._networkView().RPC("SyncObject", RPCMode.All, Server._networkView().viewID.ToString(), "chat", Player.nickname + ": " + string);
+		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.nickname + ": " + string);
 	}
 }
