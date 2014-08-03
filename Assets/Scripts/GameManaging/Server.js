@@ -56,7 +56,7 @@ class Server extends MonoBehaviour{
 			MainGUI.Content.current = "";
 		}
 		
-		StartCoroutine( Retrieve.TXT( "ServerOptions", "Configuration/" + "options" ) );
+		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
 		
 		while (!Player.isPlaying()) yield;
 		Server.StartCoroutine( TrackInventory("item", Inventory.items) );
@@ -429,7 +429,7 @@ class Server extends MonoBehaviour{
 		|	XML retrieving
 		******************************/
 		// This is used to escape urls like "Thiago, el Pirata"
-		private function EscapeXMLPath(path : String) : String {
+		private function EscapePath(path : String) : String {
 			var slashPosition = path.LastIndexOf("/") + 1;
 			var firstPart : String;
 			var lastPart : String;
@@ -439,12 +439,12 @@ class Server extends MonoBehaviour{
 				lastPart = path.Substring(slashPosition).Replace(" ", "%20");
 				return firstPart + lastPart;
 			} else {
-				return path;
+				return path.Replace(" ", "%20");
 			}
 		}
 		
 		function XML(scriptTarget:String, path:String):IEnumerator{
-			var file:String = Paths.GetLocalHost() + "/" + EscapeXMLPath(path) + ".xml";
+			var file:String = Paths.GetLocalHost() + "/" + EscapePath(path) + ".xml";
 			var XML:XMLParser = new XMLParser();
 		    
 			// Downloads the XML file and waits until it has finished download
@@ -553,10 +553,7 @@ class Server extends MonoBehaviour{
 		|	Texture retrieving
 		******************************/
 		function ItemTexture(textureName:String){
-			var file:String;
-			if (Application.platform == RuntimePlatform.WindowsWebPlayer || Application.platform == RuntimePlatform.OSXWebPlayer) file = Application.dataPath + "/Textures/" + textureName + ".png";	
-		    else file = "file://" + Application.dataPath + "/../Textures/" + textureName + ".png";
-		    
+			var file:String = Paths.GetTextures() + "/" + EscapePath(textureName) + ".png";;		    
 			var www:WWW = new WWW(file);
 			var image:Texture2D = new Texture2D(64, 64);
 			

@@ -21,12 +21,25 @@ public static function GetKinect() : String {
 	return kinect;
 }
 
-private static var configuration : String = Paths.localHost + "/Configuration";
+private static var configurationFromRoot : String = "Configuration";
+private static var configuration : String = Paths.localHost + "/" + configurationFromRoot;
 public static function GetConfiguration() : String {
 	return configuration;
 }
+public static function GetConfigurationFromRoot() : String {
+	return configurationFromRoot;
+}
 
-private static var language : String = Paths.localHost + "/Language";
+private static var languageFromRoot : String = "Language";
+private static var language : String = Paths.localHost + "/" + languageFromRoot;
 public static function GetLanguage() : String {
 	return language;
+}
+public static function GetLanguageFromRoot() : String {
+	return languageFromRoot;
+}
+
+private static var textures : String = Paths.localHost + "/Textures";
+public static function GetTextures() : String {
+	return textures;
 }
