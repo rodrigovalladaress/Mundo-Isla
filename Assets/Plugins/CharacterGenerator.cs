@@ -327,10 +327,13 @@ public class CharacterGenerator
     {
         get
         {
-            if (Application.platform == RuntimePlatform.WindowsWebPlayer || Application.platform == RuntimePlatform.OSXWebPlayer)
+            /*if (Application.platform == RuntimePlatform.WindowsWebPlayer || Application.platform == RuntimePlatform.OSXWebPlayer) {
                 return Application.dataPath+"/assetbundles/";
-            else
+			}
+            else {
                 return "file://" + Application.dataPath + "/../assetbundles/";
+			}*/
+			return "http://localhost/assetbundles/";
         }
     }
 

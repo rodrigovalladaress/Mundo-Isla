@@ -43,3 +43,8 @@ private static var textures : String = Paths.localHost + "/Textures";
 public static function GetTextures() : String {
 	return textures;
 }
+
+private static var assetBundles : String = Paths.localHost + "/assetbundles";
+public static function GetAssetBundles() : String {
+	return assetBundles;
+}

@@ -570,7 +570,7 @@ class Server extends MonoBehaviour{
 		******************************/
 		function PlayerSkin(){
 		
-			if(/*Application.isEditor*/true){
+			if(Application.isEditor){
 				// Override
 				Server.Log("server", "Editor mode, overriding skin.");
 				Player.skinString = "";

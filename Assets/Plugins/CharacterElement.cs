@@ -81,6 +81,7 @@ public class CharacterElement
 
     public SkinnedMeshRenderer GetSkinnedMeshRenderer()
     {
+		// TODO Cambiar por Photon
 		GameObject go = (GameObject)Object.Instantiate(gameObjectDownloaded);
         go.renderer.material = (Material)materialDownloaded;
         return (SkinnedMeshRenderer)go.renderer;
