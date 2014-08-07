@@ -5,10 +5,6 @@
 // Changes in 1.2 version:
 // 	-	Instantiation of player using Photon.
 //	-	SyncObject using Photon.
-//
-// Changes in 1.1 version: 
-// 	-	It's possible to spawn the player with a given rotation 
-//		and change the camera rotation to a certain value.
 /*******************************************************
 |	Player Script
 |
@@ -60,7 +56,6 @@ static class Player extends MonoBehaviour{
 				Server.GetPhotonView().RPC("SyncObject", 
 					PhotonTargets.All, newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerSkin", _skinString);
 			
-				//if (newPlayer.networkView.isMine){
 				if (newPlayer.GetPhotonView().isMine) {
 					// Debug.Log("Attaching camera.");
 					Player.AttachCamera(newPlayer);
@@ -87,11 +82,7 @@ static class Player extends MonoBehaviour{
 	function AttachCamera(parent:GameObject){
 		Camera.mainCamera.transform.parent = parent.transform;
 		Camera.mainCamera.transform.position = parent.transform.position + Vector3(0,4,-5);
-		/*if(LevelManager.HasCameraRotationForCurrentScene()) { 
-			Camera.mainCamera.transform.rotation = LevelManager.GetCameraRotationForCurrentScene().transform.rotation;
-		} else {*/
-			Camera.mainCamera.transform.rotation = Quaternion.AngleAxis(25, Vector3.right);
-		//}
+		Camera.mainCamera.transform.rotation = Quaternion.AngleAxis(25, Vector3.right);
 	}
 	
 	/*******************************************************

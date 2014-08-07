@@ -2,12 +2,16 @@
 //////////////////////////////////////////////////////////////////
 // Edited by Rodrigo Valladares Santana <rodriv_tf@hotmail.com> //
 //                                                              //
-// Version 2.0                                                  //
+// Version 2.1                                                  //
+//                                                              //
+// Changes in 2.1 version:                                      //
+// 	-	File retrieving using local server						//
 //                                                              //
 // Changes in 2.0 version:                                      //
 // 	- 	Connection to Photon in Start()                         //
 //	-	OnGUI shows the connection state to Photon (debug)      //
 //	- 	Connection to a random room                             //
+//	-	Server Log is printed to a server file					//
 //                                                              //
 //////////////////////////////////////////////////////////////////
 /*******************************************************
@@ -29,14 +33,6 @@ class Server extends MonoBehaviour{
 	static var SecondsForTimeout:float = 5.0;
 	static private var _gameType = "IslaSAVEH.Alpha";
 	static private var _scriptsFolder:String = Application.dataPath + "/";
-	
-	// Used to call coroutines from static methods. 
-	// <http://answers.unity3d.com/questions/423019/coroutines-and-static-function.html>
-	//private static var instance : Server;
-	
-	//function Awake() {
-	//	instance = this;
-	//}
 	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
@@ -743,12 +739,6 @@ class Server extends MonoBehaviour{
 	******************************/
 	static function WaitForWWW(www : WWW): IEnumerator {
 		yield www;
-		// check for errors
-		/*if (www.error == null) {
-			Debug.Log("WWW Ok!: " + www.text);
-		} else {
-			Debug.Log("WWW Error: "+ www.error);
-		}*/
 		www.Dispose();
 	}
 	

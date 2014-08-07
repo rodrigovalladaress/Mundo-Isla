@@ -27,18 +27,6 @@
 // 
 // Stores the name of the current scene
 private static var currentScene : String;
-// Stores the position of the player in the scenes.
-// key -> Player.nickname + "/" + name_of_scene
-// value -> position
-private static var positionsHash : Hashtable;
-// Stores the rotation of the player in the scenes.
-// key -> Player.nickname + "/" + name_of_scene
-// value -> rotation
-private static var rotationHash : Hashtable;
-// Stores the rotation of the cameara attached to the player in the scenes.
-// key -> Player.nickname + "/" + name_of_scene
-// value -> rotation
-private static var cameraRotationHash : Hashtable;
 // Stores the state of the item in the scenes (if they have been obtained 
 // by the player or not).
 // key -> Player.nickname + "/" + name_of_scene_ + "/" + position_of_item
@@ -60,17 +48,6 @@ public static function LoadScene(name : String) {
 	if(LevelManager.currentScene == null) {
 		LevelManager.currentScene = "Main";
 	}
-	// Initialization of positionsHash
-	if(positionsHash == null) {
-		LevelManager.positionsHash = new Hashtable();
-	}
-	// Initialization of rotationHash
-	/*if(rotationHash == null) {
-		LevelManager.rotationHash = new Hashtable();
-	}*/
-	/*if(cameraRotationHash == null) {
-		LevelManager.cameraRotationHash = new Hashtable();
-	}*/
 	// Initialization of itemHash
 	if(itemHash == null) {
 		LevelManager.itemHash = new Hashtable();
@@ -78,14 +55,6 @@ public static function LoadScene(name : String) {
 	LevelManager.hasBeenInitialized = true;
 	// Stores the states of the items in the current scene.
 	LevelManager.ReloadItemHash();
-	// The first scene should set SpawnManager.active to false, but when this scene is 
-	// loaded again, SpawnManager.active must be setted to true in order to work.
-	//GameObject.Find("GameManager").GetComponent("SpawnManager").active = true;
-	// Stores the position of the Player in the current scene.
-	if(Player.object != null)
-		LevelManager.positionsHash[PositionHashKeyForCurrentScene()] = Player.object.transform.position;
-	//LevelManager.rotationHash[RotationHashKeyForCurrentScene()] = Player.object.transform.rotation;
-	//LevelManager.cameraRotationHash[CameraRotationHashKeyForCurrentScene()] = Camera.main;//ThirdPersonCamera.camera;
 	Debug.Log("LevelManager LoadScene " + name);
 	// Destroy the player before loading a new scene
 	if(Player.object != null) {
@@ -103,92 +72,6 @@ public static function getCurrentScene() : String {
 	var strRet : String = currentScene + "";
 	return strRet;
 }
-/*
-* Methods to manage the hash of positions
-*/
-public static function PositionHashKeyFor(sceneName : String) : String {
-	return Player.nickname + "/" + sceneName;
-}
-
-public static function PositionHashKeyForCurrentScene() : String {
-	return PositionHashKeyFor(currentScene);
-}
-
-// Gets the position of the player in the given scene
-public static function GetPlayerPositionFor(sceneName : String) : Vector3 {
-	return LevelManager.positionsHash[PositionHashKeyFor(sceneName)];
-}
-
-public static function GetPlayerPositionForCurrentScene() : Vector3 {
-	return LevelManager.GetPlayerPositionFor(LevelManager.currentScene);
-}
-
-// Returns true if ther's a player position for the given scene
-public static function HasPlayerPositionFor(sceneName : String) : boolean {
-	return LevelManager.positionsHash.Contains(LevelManager.PositionHashKeyFor(sceneName));
-}
-
-public static function HasPlayerPositionForCurrentScene() : boolean {
-	return LevelManager.HasPlayerPositionFor(LevelManager.currentScene);
-}
-
-/*
-* Methods to manage the hash of rotations
-*/
-/*public static function RotationHashKeyFor(sceneName : String) : String {
-	return Player.nickname + "/" + sceneName;
-}
-
-public static function RotationHashKeyForCurrentScene() : String {
-	return RotationHashKeyFor(LevelManager.currentScene);
-}
-
-// Gets the rotation of the player in the given scene
-public static function GetPlayerRotationFor(sceneName : String) : Quaternion {
-	return LevelManager.rotationHash[RotationHashKeyFor(sceneName)];
-}
-
-public static function GetPlayerRotationForCurrentScene() : Quaternion {
-	return LevelManager.GetPlayerRotationFor(LevelManager.currentScene);
-}
-
-// Returns true if there's a player rotation for the given scene
-public static function HasPlayerRotationFor(sceneName : String) : boolean {
-	return LevelManager.rotationHash.Contains(LevelManager.RotationHashKeyFor(sceneName));
-}
-
-public static function HasPlayerRotationForCurrentScene() : boolean {
-	return LevelManager.HasPlayerRotationFor(LevelManager.currentScene);
-}*/
-
-/*
-* Methods to manage the hash of rotations of camera
-*/
-/*public static function CameraRotationHashKeyFor(sceneName : String) : String {
-	return Player.nickname + "/" + sceneName;
-}
-
-public static function CameraRotationHashKeyForCurrentScene() : String {
-	return CameraRotationHashKeyFor(LevelManager.currentScene);
-}
-
-// Gets the rotation of the player in the given scene
-public static function GetCameraRotationFor(sceneName : String) : Camera {
-	return LevelManager.cameraRotationHash[CameraRotationHashKeyFor(sceneName)];
-}
-
-public static function GetCameraRotationForCurrentScene() : Camera {
-	return LevelManager.GetCameraRotationFor(LevelManager.currentScene);
-}
-
-// Returns true if there's a player rotation for the given scene
-public static function HasCameraRotationFor(sceneName : String) : boolean {
-	return LevelManager.cameraRotationHash.Contains(LevelManager.CameraRotationHashKeyFor(sceneName));
-}
-
-public static function HasCameraRotationForCurrentScene() : boolean {
-	return LevelManager.HasPlayerRotationFor(LevelManager.currentScene);
-}*/
 
 /*
 * Methods to manage the hash of items

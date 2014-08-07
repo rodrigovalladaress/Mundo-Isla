@@ -3,10 +3,6 @@
 // Version: 1.2
 //
 // The item stores if it hass been obtained by the player or not.
-// The position of the item must not be changed in order to not 
-// be shown in the scene when it has been obtained. This is 
-// because the state of the item is stored in LevelManager in 
-// a hash using the position (and more stuff) of the item as a key.
 //
 // 1.2: When the item has been obtained, the texture 
 // of the item is set to null.

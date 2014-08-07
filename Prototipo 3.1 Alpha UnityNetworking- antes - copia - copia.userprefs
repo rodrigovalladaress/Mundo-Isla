@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\ZigFu\Scripts\UserControls\ZigSkeleton.cs">
+    <Files>
+      <File FileName="Assets\Plugins\Paths.js" Line="22" Column="2" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="717" Column="2" />
+      <File FileName="Assets\ZigFu\Scripts\UserControls\ZigSkeleton.cs" Line="846" Column="2" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

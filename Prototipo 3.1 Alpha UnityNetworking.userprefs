@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Player.js">
+    <Files>
+      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="23" Column="2" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="89" Column="23" />
+      <File FileName="Assets\Scripts\pruebaServer.js" Line="7" Column="37" />
+      <File FileName="Assets\Scripts\GameManaging\Player.js" Line="70" Column="3" />
+      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="486" Column="4" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
