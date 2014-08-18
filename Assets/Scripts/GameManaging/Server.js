@@ -598,10 +598,9 @@ class Server extends MonoBehaviour{
 					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			        download.Dispose();
 			    }
-			    
 			}
-			
 		}
+		
 		function PlayerSkin(_skin:String){
 		
 			if(/*Application.isEditor*/true){
@@ -642,7 +641,8 @@ class Server extends MonoBehaviour{
 		/******************************
 		|	Player Inventory Retrieving
 		******************************/
-		
+		// This function loads the data of the inventory stored in the database and stores that
+		// in the Inventory.
 		function PlayerInventory() {
 			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + Player.nickname;
 			Debug.Log(url);

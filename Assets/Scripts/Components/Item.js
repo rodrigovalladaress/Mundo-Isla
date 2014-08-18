@@ -7,6 +7,8 @@
 //			from the database.
 //		-	The state of the item (if it's been obtained or not)
 //			is now stored in the database.
+//		-	When the player obtains an item, we also add the item
+//			onto the database.
 //
 // 1.2: -	The item stores if it has been obtained by the player 
 //			or not.
@@ -126,7 +128,8 @@ class Item extends MonoBehaviour{
 			Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
 			//Network.Destroy(gameObject);
-			RemoveItemFromScene(); // TODO Change to PutItemInInventory
+			RemoveItemFromScene();
+			Server.StartCoroutine(ItemManager.SyncAddItem(_texture, 1));
 			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
 		}
 		else if(collider.transform.GetComponent("Terrain")){

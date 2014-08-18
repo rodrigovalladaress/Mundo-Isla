@@ -6,7 +6,7 @@
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
 //
 // Changes in 1.5 version:
-//	-	The hash of items is no long used.
+//	-	The hash of items is no longer used.
 //
 // Changes in 1.4 version:
 //	 -	Scene loading using Photon

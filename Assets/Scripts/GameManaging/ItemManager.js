@@ -7,6 +7,7 @@
 //		instantiates the items this way.
 //	-	The hash of items is not used.
 //	-	We can remove items from the database.
+//	-	Database synchronization.
 //
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
 
@@ -79,7 +80,7 @@ private function InstantiateItem(id : int, x : float, y : float, z : float, text
 	if(CheckID(id)) {
 		item = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), new Quaternion(90, 0, 0, 0), 0) as GameObject;
 		item.name = texture;
-		(item.GetComponent("Item") as Item).SetTexture(texture);
+		StartCoroutine((item.GetComponent("Item") as Item).SetTexture(texture));
 		(item.GetComponent("PhotonView") as PhotonView).viewID = id;
 	} else {
 		Debug.LogError("Bad id = " + id);
@@ -105,6 +106,14 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 	}
 }
 
-public static function PutItemInInventory(item : Item) {
-	
+// Syncs the amount of items ont the database
+// Adds an amount of items to the original amount of items
+public static function SyncAddItem(item : String, amount : int) {
+	var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname + "&item=" + item + "&amount=" + amount;
+	var www : WWW = new WWW(url);
+	while(!www.isDone) {
+		yield;
+	}
+	Debug.Log(www.text);
+	Inventory.AddItem(item, amount);
 }

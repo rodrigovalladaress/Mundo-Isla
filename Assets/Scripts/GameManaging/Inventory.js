@@ -40,7 +40,8 @@ static class Inventory extends MonoBehaviour{
 		else {
 			items.Add (item, amount);
 		}
-		
+		//Server.StartCoroutine(ItemManager.SyncAddItem(item, amont)); 
+		// -> ERROR This is done in Item.OnTriggerEnter() instead
 	}
 	function AddItem (item:String){
 		AddItem(item, 1);
