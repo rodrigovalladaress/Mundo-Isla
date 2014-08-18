@@ -5,6 +5,8 @@
 // 1.3:	-	The texture can be setted by another script.
 //		-	When the player obtains the item, it is removed
 //			from the database.
+//		-	The state of the item (if it's been obtained or not)
+//			is now stored in the database.
 //
 // 1.2: -	The item stores if it has been obtained by the player 
 //			or not.
@@ -28,15 +30,13 @@
 #pragma strict
 class Item extends MonoBehaviour{
 
-	public static final var INVISIBLE = false;
-	public static final var VISIBLE = true;
+	public static final var Invisible = false;
+	public static final var Visible = true;
 	
 	public 			var _minDistance		:	float 	=	3.5;
 	static	private	var _player				:	GameObject;
 	public			var _labelOffset		:	int 	=	40;
 	public 			var _audioClip			:	AudioClip;
-	// It's true if the item has been obtained by the player
-	public			var _hasBeenObtained 	: 	boolean;
 	public			var _texture			:	String;
 	
 	function Start () {
@@ -62,22 +62,17 @@ class Item extends MonoBehaviour{
 	}
 	
 	function OnBecameVisible () {
-		// If the item has been obtained, it doesn't show the item.
-		if(!_hasBeenObtained) {
-	    	//renderer.enabled = true;
-	    	setVisibility(VISIBLE);
-	    }
+	    setVisibility(Visible);
 	}
 	
 	function OnBecameInvisible () {
-	    //renderer.enabled = false;
-	    setVisibility(INVISIBLE);
+	    setVisibility(Invisible);
 	}
 	
 	function setVisibility(visibility : boolean) {
-		if(visibility == VISIBLE) {
+		if(visibility == Visible) {
 			SetTexture(_texture);
-		} else if(visibility == INVISIBLE) {
+		} else if(visibility == Invisible) {
 			this.gameObject.renderer.material.mainTexture = null;
 		}
 	}
@@ -97,7 +92,7 @@ class Item extends MonoBehaviour{
 			if (Player.exist()){
 				if (_player == null) _player = Player.object;
 				// If the object hasn't been obtained and the player is at a certain distance, it shows the name of the object
-				if (!(_hasBeenObtained) && (Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {
+				if ((Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {
 					var screenPosition:Vector3 = Camera.main.WorldToScreenPoint(transform.position);
 					var _rect:Rect = new Rect	(	screenPosition.x - gameObject.name.ToString().Length * 4,
 													Screen.height - screenPosition.y - _labelOffset,
@@ -125,13 +120,13 @@ class Item extends MonoBehaviour{
 		//Debug.Log("Collision detected with: "+ collider.transform.gameObject.name);
 		// We check if the distance between objects is under our minimum.
 		// Wa also check wether the item has been obtained or not.
-		if (!(_hasBeenObtained) && (collider.transform.GetComponent(CharacterController))) {
+		if (collider.transform.GetComponent(CharacterController)) {
 			// And add one instance of the object to the inventory
 			if ( collider.gameObject != Player.object ) return;
 			Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
 			//Network.Destroy(gameObject);
-			RemoveItemFromScene();
+			RemoveItemFromScene(); // TODO Change to PutItemInInventory
 			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
 		}
 		else if(collider.transform.GetComponent("Terrain")){

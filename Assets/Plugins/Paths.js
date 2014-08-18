@@ -53,3 +53,13 @@ private static var query : String = Paths.localHost + "/query";
 public static function GetQuery() : String {
 	return query;
 }
+
+private static var sceneQuery : String = Paths.query + "/scene";
+public static function GetSceneQuery() : String {
+	return sceneQuery;
+}
+
+private static var playerQuery : String = Paths.query + "/player";
+public static function GetPlayerQuery() : String {
+	return playerQuery;
+}

@@ -53,6 +53,7 @@ class Server extends MonoBehaviour{
 		}
 		
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
+		StartCoroutine(Retrieve.PlayerInventory());
 		
 		while (!Player.isPlaying()) yield;
 		Server.StartCoroutine( TrackInventory("item", Inventory.items) );
@@ -67,6 +68,21 @@ class Server extends MonoBehaviour{
 		}
 	}
 	
+	// This is used to escape urls like "Thiago, el Pirata"
+	private static function EscapePath(path : String) : String {
+		var slashPosition = path.LastIndexOf("/") + 1;
+		var firstPart : String;
+		var lastPart : String;
+		if(slashPosition >= 0) {
+			firstPart = path.Substring(0, slashPosition);
+			// Error -> WWW.EscapeURL doesn't escape well the space
+			lastPart = path.Substring(slashPosition).Replace(" ", "%20");
+			return firstPart + lastPart;
+		} else {
+			return path.Replace(" ", "%20");
+		}
+	}	
+		
 	// Join a random room
 	function OnJoinedLobby()
 	{
@@ -423,22 +439,7 @@ class Server extends MonoBehaviour{
 		}
 		/******************************
 		|	XML retrieving
-		******************************/
-		// This is used to escape urls like "Thiago, el Pirata"
-		private function EscapePath(path : String) : String {
-			var slashPosition = path.LastIndexOf("/") + 1;
-			var firstPart : String;
-			var lastPart : String;
-			if(slashPosition >= 0) {
-				firstPart = path.Substring(0, slashPosition);
-				// Error -> WWW.EscapeURL doesn't escape well the space
-				lastPart = path.Substring(slashPosition).Replace(" ", "%20");
-				return firstPart + lastPart;
-			} else {
-				return path.Replace(" ", "%20");
-			}
-		}
-		
+		******************************/		
 		function XML(scriptTarget:String, path:String):IEnumerator{
 			var file:String = Paths.GetLocalHost() + "/" + EscapePath(path) + ".xml";
 			var XML:XMLParser = new XMLParser();
@@ -641,6 +642,33 @@ class Server extends MonoBehaviour{
 		/******************************
 		|	Player Inventory Retrieving
 		******************************/
+		
+		function PlayerInventory() {
+			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + Player.nickname;
+			Debug.Log(url);
+			var www : WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			Debug.Log(www.text);
+			var xDoc : XmlDocument = new XmlDocument();
+			xDoc.LoadXml(www.text);
+			var result : XmlNodeList = xDoc.GetElementsByTagName("result");
+			var resultElement = result[0] as XmlElement;
+			var row : XmlNodeList = resultElement.ChildNodes;
+			var item : String;
+			var amount : int;
+			while(PhotonNetwork.room == null) {
+				yield;
+			}
+			for(var rowElement : XmlElement in row) {
+				item = rowElement.GetElementsByTagName("item")[0].InnerText;
+				amount = int.Parse(rowElement.GetElementsByTagName("amount")[0].InnerText);
+				Debug.Log(amount + " of " + item);
+				Inventory.AddItem(item, amount);
+			}
+		}
+		
 		function PlayerInventory( type:String ){
 		
 			if(/*Application.isEditor*/true){
@@ -683,6 +711,8 @@ class Server extends MonoBehaviour{
 			}
 			
 		}
+		
+		// Se manda al servidor la cantidad de items que tiene el jugador
 		function PlayerInventory( type:String, name:String, amount:String ){
 		
 			if (Application.isWebPlayer) {
@@ -713,7 +743,10 @@ class Server extends MonoBehaviour{
 			}
 			
 		}
+		
+		// Por cada tipo de elemento en el inventario del jugador, se llama al PlayerInventory de arriba
 		function PlayerInventory( type:String, list:Dictionary.<String, int> ){
+		
 			if (Application.isWebPlayer) {
 				for (var instance in list){
 					Server.StartCoroutine( Server.Retrieve.PlayerInventory( type, instance.Key.ToString(), instance.Value.ToString() ) );

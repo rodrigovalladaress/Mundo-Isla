@@ -21,6 +21,7 @@ public static final var MaxItemID = 199;
 // for debugging.
 public var persistence : boolean = true;
 
+// Acces to non-static members by static functions.
 private static var instance : ItemManager;
 
 // This method checks the validity of the id
@@ -28,11 +29,19 @@ public static function CheckID(id : int) : boolean {
 	return (id >= MinItemID) && (id <= MaxItemID);
 }
 
+function Awake() {
+	instance = this;
+}
+
+function Start () {
+	StartCoroutine(RetrieveItemInformation());
+}
+
 // This retrieves the data of the items on the current scene and
 // instantiates them.
 private function RetrieveItemInformation() : IEnumerator {
 	// TODO Hacer esto solo si es el primer usuario en la escena
-	var url : String = Paths.GetQuery() + "/scene_items.php/?scene=" + 
+	var url : String = Paths.GetSceneQuery() + "/get_items.php/?scene=" + 
 						(LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
 	Debug.Log(url);
 	var www : WWW = new WWW(url);
@@ -64,6 +73,7 @@ private function RetrieveItemInformation() : IEnumerator {
 	}
 }
 
+// Instantiation of an item in a scene
 private function InstantiateItem(id : int, x : float, y : float, z : float, texture : String) {
 	var item : GameObject;
 	if(CheckID(id)) {
@@ -81,7 +91,7 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 	var id : int = item.GetPhotonViewID();
 	if(CheckID(id)) {
 		if(instance.persistence) {
-			var url : String = Paths.GetQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
+			var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
 			Debug.Log(url);
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
@@ -95,10 +105,6 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 	}
 }
 
-function Awake() {
-	instance = this;
-}
-
-function Start () {
-	StartCoroutine(RetrieveItemInformation());
+public static function PutItemInInventory(item : Item) {
+	
 }
