@@ -68,9 +68,8 @@ public static function HasBeenInitialized() : boolean {
 	return hasBeenInitialized;
 }
 
-public static function getCurrentScene() : String {
-	var strRet : String = currentScene + "";
-	return strRet;
+public static function GetCurrentScene() : String {
+	return currentScene;
 }
 
 /*

@@ -48,3 +48,8 @@ private static var assetBundles : String = Paths.localHost + "/assetbundles";
 public static function GetAssetBundles() : String {
 	return assetBundles;
 }
+
+private static var query : String = Paths.localHost + "/query";
+public static function GetQuery() : String {
+	return query;
+}

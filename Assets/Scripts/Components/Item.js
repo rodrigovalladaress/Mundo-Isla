@@ -1,11 +1,13 @@
 // Edited by Rodrigo Valladares Santana
 // <rodriv_tf@hotmail.com>
-// Version: 1.2
+// Version: 1.3
 //
-// The item stores if it hass been obtained by the player or not.
+// 1.3:	-	The texture can be setted by another script.
 //
-// 1.2: When the item has been obtained, the texture 
-// of the item is set to null.
+// 1.2: -	The item stores if it has been obtained by the player 
+//			or not.
+//		- 	When the item has been obtained, the texture 
+// 			of the item is set to null.
 //
 // 1.1: Added a boolean that shows if the item has been 
 // obtained or not.
@@ -33,20 +35,22 @@ class Item extends MonoBehaviour{
 	public 			var _audioClip			:	AudioClip;
 	// It's true if the item has been obtained by the player
 	public			var _hasBeenObtained 	: 	boolean;
+	public			var _texture			:	String;
 	
 	function Start () {
 		var _done:boolean = false;
-		setTexture();
+		SetTexture(this.gameObject.name);
 	}
 	
-	private function setTexture() {
-		if ( Inventory.textures.ContainsKey(this.gameObject.name) == true ){
-			this.gameObject.renderer.material.mainTexture = Inventory.textures[this.gameObject.name];
+	public function SetTexture(texture : String) {
+		_texture = texture;
+		if ( Inventory.textures.ContainsKey(_texture) == true ){
+			this.gameObject.renderer.material.mainTexture = Inventory.textures[_texture];
 		}
 		else{
-			Server.StartCoroutine(Server.Retrieve.ItemTexture(this.gameObject.name));
-			while (Inventory.textures.ContainsKey(this.gameObject.name) == false) yield;
-			this.gameObject.renderer.material.mainTexture = Inventory.textures[this.gameObject.name];
+			Server.StartCoroutine(Server.Retrieve.ItemTexture(_texture));
+			while (Inventory.textures.ContainsKey(_texture) == false) yield;
+			this.gameObject.renderer.material.mainTexture = Inventory.textures[_texture];
 		}
 	}
 	
@@ -65,7 +69,7 @@ class Item extends MonoBehaviour{
 	
 	function setVisibility(visibility : boolean) {
 		if(visibility == VISIBLE) {
-			setTexture();
+			SetTexture(this.gameObject.name);
 		} else if(visibility == INVISIBLE) {
 			this.gameObject.renderer.material.mainTexture = null;
 		}

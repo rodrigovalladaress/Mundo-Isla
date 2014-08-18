@@ -12,5 +12,5 @@ function Start () {
 	rot = Quaternion.identity;
 	pos = spawnPoint.transform.position;
 	Player.Spawn(Player.nickname, pos, rot, Player.skinString);
-	Server.Log("debug", "SpawnManager " + Player.nickname + " spawned at " + pos + " in " + LevelManager.getCurrentScene());
+	Server.Log("debug", "SpawnManager " + Player.nickname + " spawned at " + pos + " in " + LevelManager.GetCurrentScene());
 }
