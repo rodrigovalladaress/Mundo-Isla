@@ -4,7 +4,7 @@
 // Version: 2.0
 // Changes in 2.0 version:
 //	-	This script retrieves information from a database and
-//		instantiates items this way.
+//		instantiates the items this way.
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
 
 import System.Xml;
@@ -13,7 +13,8 @@ public static final var OBTAINED = true;
 
 private function RetrieveItemInformation() : IEnumerator {
 	// TODO Hacer esto solo si es el primer usuario en la escena
-	var url : String = Paths.GetQuery() + "/scene_items.php/?scene=" + (LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
+	var url : String = Paths.GetQuery() + "/scene_items.php/?scene=" + 
+						(LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
 	Debug.Log(url);
 	var www : WWW = new WWW(url);
 	while(!www.isDone) {
@@ -25,17 +26,14 @@ private function RetrieveItemInformation() : IEnumerator {
 	var result : XmlNodeList = xDoc.GetElementsByTagName("result");
 	var resultElement = result[0] as XmlElement;
 	var row : XmlNodeList = resultElement.ChildNodes;
-	
 	var id : int;
 	var x : float;
 	var y : float;
 	var z : float;
 	var texture : String;
-	
 	while(PhotonNetwork.room == null) {
 		yield;
 	}
-	
 	for(var rowElement : XmlElement in row) {
 		id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
 		x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
@@ -55,7 +53,7 @@ private function InstantiateItem(id : int, x : float, y : float, z : float, text
 }
 
 function Start () {
-	var items : GameObject[] = GameObject.FindGameObjectsWithTag("Item");
+	/*var items : GameObject[] = GameObject.FindGameObjectsWithTag("Item");
 	// Checks if the item has an entry in the itemHash of LevelManager
 	if(LevelManager.ItemHashIsInitialized()) {
 		for(var item : GameObject in items) {
@@ -67,6 +65,6 @@ function Start () {
 				}
 			}
 		}
-	}
+	}*/
 	StartCoroutine(RetrieveItemInformation());
 }
