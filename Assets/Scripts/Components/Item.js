@@ -3,6 +3,8 @@
 // Version: 1.3
 //
 // 1.3:	-	The texture can be setted by another script.
+//		-	When the player obtains the item, it is removed
+//			from the database.
 //
 // 1.2: -	The item stores if it has been obtained by the player 
 //			or not.
@@ -28,7 +30,7 @@ class Item extends MonoBehaviour{
 
 	public static final var INVISIBLE = false;
 	public static final var VISIBLE = true;
-
+	
 	public 			var _minDistance		:	float 	=	3.5;
 	static	private	var _player				:	GameObject;
 	public			var _labelOffset		:	int 	=	40;
@@ -42,6 +44,11 @@ class Item extends MonoBehaviour{
 		SetTexture(this.gameObject.name);
 	}
 	
+	public function GetPhotonViewID() : int {
+		return (this.gameObject.GetComponent("PhotonView") as PhotonView).viewID;
+	}
+	
+	// Set the texture of the item. By default is the item's name.
 	public function SetTexture(texture : String) {
 		_texture = texture;
 		if ( Inventory.textures.ContainsKey(_texture) == true ){
@@ -69,7 +76,7 @@ class Item extends MonoBehaviour{
 	
 	function setVisibility(visibility : boolean) {
 		if(visibility == VISIBLE) {
-			SetTexture(this.gameObject.name);
+			SetTexture(_texture);
 		} else if(visibility == INVISIBLE) {
 			this.gameObject.renderer.material.mainTexture = null;
 		}
@@ -84,7 +91,8 @@ class Item extends MonoBehaviour{
 		GUI.depth = 1;
 		if(Camera.main != null) {
 			// We reorient the object to be always looking at the camera (actually, at the opposite direction, it's just the way billboards work)
-			this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90, Camera.main.transform.rotation.eulerAngles.y - 180, 0);
+			this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90,
+																Camera.main.transform.rotation.eulerAngles.y - 180, 0);
 			
 			if (Player.exist()){
 				if (_player == null) _player = Player.object;
@@ -106,10 +114,8 @@ class Item extends MonoBehaviour{
 		}
 	}
 	
-	public function setItemToObtained() {
-		_hasBeenObtained = true;
-		// TODO Set invisible to all players
-		renderer.enabled = false;
+	private function RemoveItemFromScene() {
+		ItemManager.RemoveItemFromScene(this, LevelManager.GetCurrentScene());
 	}
 	
 	/*********************************
@@ -125,7 +131,7 @@ class Item extends MonoBehaviour{
 			Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
 			//Network.Destroy(gameObject);
-			setItemToObtained();
+			RemoveItemFromScene();
 			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
 		}
 		else if(collider.transform.GetComponent("Terrain")){

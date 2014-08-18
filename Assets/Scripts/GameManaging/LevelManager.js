@@ -2,14 +2,17 @@
 #pragma downcast
 // Loads new scenes and stores some data of the scene.
 //
-// Version: 1.4
+// Version: 1.5
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
+//
+// Changes in 1.5 version:
+//	-	The hash of items is no long used.
 //
 // Changes in 1.4 version:
 //	 -	Scene loading using Photon
 //
 // Changes in 1.3 version:
-//	 - 	Stores the states of the items in the scene.
+//	 - 	Stores the states of the items in the scene in a hash.
 // 
 // Changes in 1.2 version:
 //	 - 	Stores the position of the player in a Hash.
@@ -27,15 +30,8 @@
 // 
 // Stores the name of the current scene
 private static var currentScene : String;
-// Stores the state of the item in the scenes (if they have been obtained 
-// by the player or not).
-// key -> Player.nickname + "/" + name_of_scene_ + "/" + position_of_item
-// value -> true | false
-private static var itemHash : Hashtable;
 
 private static var hasBeenInitialized = false;
-
-private static var items : GameObject[];
 
 public static function Load(name : String) {
 	LevelManager.LoadScene(name);
@@ -48,13 +44,7 @@ public static function LoadScene(name : String) {
 	if(LevelManager.currentScene == null) {
 		LevelManager.currentScene = "Main";
 	}
-	// Initialization of itemHash
-	if(itemHash == null) {
-		LevelManager.itemHash = new Hashtable();
-	}
 	LevelManager.hasBeenInitialized = true;
-	// Stores the states of the items in the current scene.
-	LevelManager.ReloadItemHash();
 	Debug.Log("LevelManager LoadScene " + name);
 	// Destroy the player before loading a new scene
 	if(Player.object != null) {
@@ -69,45 +59,8 @@ public static function HasBeenInitialized() : boolean {
 }
 
 public static function GetCurrentScene() : String {
-	return currentScene;
-}
-
-/*
-* Methods to manage the hash of items
-*/
-public static function ItemHashKeyFor(sceneName : String, item : GameObject) {
-	return Player.nickname + "/" + sceneName + "/" + item.transform.position;
-}
-
-public static function ItemHashIsInitialized() : boolean {
-	return itemHash != null;
-}
-
-private static function ReloadItemHash() {
-	items = GameObject.FindGameObjectsWithTag("Item");
-	if(LevelManager.items != null) {
-		for(var item : GameObject in LevelManager.items) {
-			var itemComponent : Item = item.GetComponent("Item");
-			LevelManager.itemHash[ItemHashKeyFor(LevelManager.currentScene, item)] = 
-				itemComponent._hasBeenObtained;
-		}
-	} else {
-		Debug.Log("There are no items on this scene");
+	if(currentScene == null) {
+		currentScene = "Main";
 	}
-}
-
-public static function GetItemStateFor(item : GameObject, sceneName : String) : boolean {
-	return LevelManager.itemHash[ItemHashKeyFor(sceneName, item)];
-}
-
-public static function GetItemStateInCurrentSceneFor(item : GameObject) : boolean {
-	return LevelManager.GetItemStateFor(item, LevelManager.currentScene);
-}
-
-public static function HasItemStateFor(item : GameObject, sceneName : String) : boolean {
-	return LevelManager.itemHash.Contains(ItemHashKeyFor(sceneName, item));
-}
-
-public static function HasItemStateInCurrentSceneFor(item : GameObject) : boolean {
-	return LevelManager.HasItemStateFor(item, LevelManager.currentScene);
+	return currentScene;
 }

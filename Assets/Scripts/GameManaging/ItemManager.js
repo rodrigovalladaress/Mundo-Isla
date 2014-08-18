@@ -5,12 +5,31 @@
 // Changes in 2.0 version:
 //	-	This script retrieves information from a database and
 //		instantiates the items this way.
+//	-	The hash of items is not used.
+//	-	We can remove items from the database.
+//
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
 
 import System.Xml;
 
-public static final var OBTAINED = true;
+// The ID of the items on the scene must be betweeon 100 and 199
+public static final var MinItemID = 100;
+public static final var MaxItemID = 199;
 
+// If it setted as true, when a player obtains an item, the state 
+// of the item is updated in the database. Setted as true only
+// for debugging.
+public var persistence : boolean = true;
+
+private static var instance : ItemManager;
+
+// This method checks the validity of the id
+public static function CheckID(id : int) : boolean {
+	return (id >= MinItemID) && (id <= MaxItemID);
+}
+
+// This retrieves the data of the items on the current scene and
+// instantiates them.
 private function RetrieveItemInformation() : IEnumerator {
 	// TODO Hacer esto solo si es el primer usuario en la escena
 	var url : String = Paths.GetQuery() + "/scene_items.php/?scene=" + 
@@ -46,25 +65,40 @@ private function RetrieveItemInformation() : IEnumerator {
 }
 
 private function InstantiateItem(id : int, x : float, y : float, z : float, texture : String) {
-	var item : GameObject = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), new Quaternion(90, 0, 0, 0), 0) as GameObject;
-	item.name = texture;
-	(item.GetComponent("Item") as Item).SetTexture(texture);
-	(item.GetComponent("PhotonView") as PhotonView).viewID = id;
+	var item : GameObject;
+	if(CheckID(id)) {
+		item = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), new Quaternion(90, 0, 0, 0), 0) as GameObject;
+		item.name = texture;
+		(item.GetComponent("Item") as Item).SetTexture(texture);
+		(item.GetComponent("PhotonView") as PhotonView).viewID = id;
+	} else {
+		Debug.LogError("Bad id = " + id);
+	}
+}
+
+// This removes an item from a scene. 
+public static function RemoveItemFromScene(item : Item, scene : String) {
+	var id : int = item.GetPhotonViewID();
+	if(CheckID(id)) {
+		if(instance.persistence) {
+			var url : String = Paths.GetQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
+			Debug.Log(url);
+			var www : WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			Debug.Log(www.text);
+		}
+		PhotonNetwork.Destroy(item.gameObject);
+	} else {
+		Debug.LogError("Bad id = " + id);
+	}
+}
+
+function Awake() {
+	instance = this;
 }
 
 function Start () {
-	/*var items : GameObject[] = GameObject.FindGameObjectsWithTag("Item");
-	// Checks if the item has an entry in the itemHash of LevelManager
-	if(LevelManager.ItemHashIsInitialized()) {
-		for(var item : GameObject in items) {
-			if(LevelManager.HasItemStateInCurrentSceneFor(item)) {
-				var itemComponent : Item = item.GetComponent("Item");
-				// If the item has been obtained, set its state to obtained
-				if(LevelManager.GetItemStateInCurrentSceneFor(item) == OBTAINED) {
-					itemComponent.setItemToObtained();
-				}
-			}
-		}
-	}*/
 	StartCoroutine(RetrieveItemInformation());
 }
