@@ -31,6 +31,10 @@ public var inventoryPersistence : boolean;
 // Acces to non-static members by static functions.
 private static var instance : ItemManager;
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// Photon View ID Management                                                            //
+//////////////////////////////////////////////////////////////////////////////////////////
+
 // It stores if a PhotonView id is available for an item or not
 private static var availablePhotonViewIDs : boolean[] = new boolean[MaxItemID - MinItemID];
 
@@ -66,6 +70,10 @@ private static function FreePhotonViewID(id : int) {
 	availablePhotonViewIDs[id - MinItemID] = true;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// Initialization                                                                       //
+//////////////////////////////////////////////////////////////////////////////////////////
+
 function Awake() {
 	instance = this;
 }
@@ -90,7 +98,11 @@ private function RetrieveItemInformation() : IEnumerator {
 	// TODO Hacer esto solo si es el primer usuario en la escena
 	var url : String = Paths.GetSceneQuery() + "/get_items.php/?scene=" + 
 						(LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
-	Debug.Log(url);
+	// Wait for the connection to Photon
+	while(PhotonNetwork.room == null) {
+		yield;
+	}
+	
 	var www : WWW = new WWW(url);
 	while(!www.isDone) {
 		yield;
@@ -106,9 +118,7 @@ private function RetrieveItemInformation() : IEnumerator {
 	var y : float;
 	var z : float;
 	var texture : String;
-	while(PhotonNetwork.room == null) {
-		yield;
-	}
+	
 	if(row.Count > 0) {
 		for(var rowElement : XmlElement in row) {
 			id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
@@ -117,20 +127,35 @@ private function RetrieveItemInformation() : IEnumerator {
 			z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
 			texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
 			Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z + ", texture = " + texture);
-			InstantiateItem(id, x, y, z, texture);
+			// If we are the only player on the scene, initialization is necesary
+			if(PhotonNetwork.room.playerCount == 1) { 
+				InstantiateItem(id, x, y, z, texture);
+			} else {
+				// If we aren't the only player, texture retrieving is still necesary
+				Inventory.RetrieveTextureIfNotAvailable(texture);
+			}
+			
 		}
 	} else {
 		Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
 	}
+	
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Item Management                                                                      //
+//////////////////////////////////////////////////////////////////////////////////////////
 
 // Instantiation of an item in a scene
 private static function InstantiateItem(id : int, x : float, y : float, z : float, texture : String) : GameObject {
 	var item : GameObject = null;
 	if(IsIDAvailable(id)) {
-		item = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), new Quaternion(90, 0, 0, 0), 0) as GameObject;
-		item.name = texture;
-		instance.StartCoroutine((item.GetComponent("Item") as Item).SetTexture(texture));
+		// We store the name of the texture in instantiationData. In Item.Start(), this
+		// information is used to set the texture of the item.
+		var instantiationData : Object[] = new Object[1];
+		instantiationData[0] = texture;
+		item = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), 
+				new Quaternion(90, 0, 0, 0), 0, instantiationData) as GameObject;
 		(item.GetComponent("PhotonView") as PhotonView).viewID = id;
 		ReservePhotonViewID(id);
 	} else {
@@ -140,13 +165,16 @@ private static function InstantiateItem(id : int, x : float, y : float, z : floa
 }
 
 // This adds an item to the scene and syncs it.
-public static function AddItemToScene(item : String, scene : String, position : Vector3) {
+public static function AddItemToScene(item : String, scene : String, position : Vector3) : GameObject {
 	var id : int = GetFirstAvailablePhotonViewID();
 	var texture : String = item;
 	var x : float = position.x;
 	var y : float = position.y;
 	var z : float = position.z;
 	var object : GameObject = InstantiateItem(id, x, y, z, texture);
+	
+	Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, 
+								object.GetComponent(PhotonView).viewID.ToString(), "drop", item);
 	
 	if(object != null) {
 		if(instance.sceneItemsPersistence) {
@@ -163,10 +191,11 @@ public static function AddItemToScene(item : String, scene : String, position : 
 	} else {
 		Debug.LogError("Error adding item to scene");
 	}
+	return object;
 }
 
 // This removes an item from a scene. 
-public static function RemoveItemFromScene(item : Item, scene : String) {
+public static function RemoveItemFromScene(item : Item, scene : String) : boolean {
 	var id : int = item.GetPhotonViewID();
 	// We check if the id is being used by the item
 	if(IsIDReserved(id)) {
@@ -185,23 +214,30 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 			}
 		}
 		PhotonNetwork.Destroy(item.gameObject);
+		return true;
 	} else {
 		Debug.LogError("Bad id = " + id + " Check synchronization!");
+		return false;
 	}
 }
 
 // Syncs the amount of items
 // Adds an amount of items to the original amount of items
-public static function SyncAddItem(item : String, amount : int) {
+public static function SyncAddItem(item : String, amount : int) : boolean {
+	var ok : boolean = true;
 	if(instance.inventoryPersistence) {
-		var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname + "&item=" + item + "&amount=" + amount;
+		var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname 
+							+ "&item=" + item + "&amount=" + amount;
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
 			yield;
 		}
 		if(!www.text.Equals("OK")) {
-			Debug.LogError("Error syncing item " + item + " with the database (" + www.text + ") url = " + url);
+			Debug.LogError("Error syncing item " + item + " with the database (" + www.text 
+							+ ") url = " + url);
+			ok = false;
 		}
 	}
 	Inventory.AddItem(item, amount);
+	return ok;
 }

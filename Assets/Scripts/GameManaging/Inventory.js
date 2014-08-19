@@ -1,4 +1,9 @@
 #pragma strict
+// Edited by Rodrigo Valladares Santana
+// <rodriv_tf@hotmail.com>
+// Version: 1.1
+//
+// 1.1: RetrieveTextureIfNotAvailable()
 /*******************************************************
 |	Inventory Script
 |
@@ -20,12 +25,18 @@ static class Inventory extends MonoBehaviour{
 		if(items.ContainsKey(item)) return true;
 		else return false;
 	}
+	
 	function Has(item:String, amount:int):boolean{
 		if(items.ContainsKey(item)){
 			if (items[item] >= amount) return true;
 		}
 		else return false;
 		return;
+	}
+	
+	public function RetrieveTextureIfNotAvailable(item : String) {
+		if ( !textures.ContainsKey( item ) )
+			Server.StartCoroutine(Server.Retrieve.ItemTexture(item));
 	}
 	
 	function AddItem (item:String, amount:int){
@@ -53,6 +64,7 @@ static class Inventory extends MonoBehaviour{
 		Server.Log("game event","Player " + Player.nickname + " dropped " + item);
 		
 		Server.StartCoroutine(ItemManager.AddItemToScene(item, LevelManager.GetCurrentScene(), Player.position() + Vector3.forward));
+		
 	}
 	
 }

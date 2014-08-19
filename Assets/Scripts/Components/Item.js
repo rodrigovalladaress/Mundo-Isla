@@ -41,13 +41,18 @@ class Item extends MonoBehaviour{
 	public 			var _audioClip			:	AudioClip;
 	public			var _texture			:	String;
 	
+	private var photonView : PhotonView;
+	
 	function Start () {
 		var _done:boolean = false;
-		SetTexture(this.gameObject.name);
+		photonView = GetComponent("PhotonView") as PhotonView;
+		// We get the name of the texture passed by instantiationData
+		this.gameObject.name = photonView.instantiationData[0] as String;
+		Server.StartCoroutine(SetTexture(this.gameObject.name));
 	}
 	
 	public function GetPhotonViewID() : int {
-		return (this.gameObject.GetComponent("PhotonView") as PhotonView).viewID;
+		return photonView.viewID;
 	}
 	
 	// Set the texture of the item. By default is the item's name.
