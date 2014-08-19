@@ -50,14 +50,15 @@ public static function LoadScene(name : String) {
 	if(Player.object != null) {
 		PhotonNetwork.Destroy(Player.object);
 	}
-	if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
-		var items : GameObject[] = GameObject.FindGameObjectsWithTag("item");
+	//if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
+		//var items : GameObject[] = GameObject.FindGameObjectsWithTag("item");
 		//Server.GetPhotonView().RPC("FreeAllPhotonViewIDs", PhotonTargets.AllBuffered, GetCurrentScene());
+		ItemManager.FreeAllPhotonViewIDs(GetCurrentScene());
 		/*for(var item : GameObject in items) {
 			PhotonNetwork.Destroy(item);
 		}*/
 		//PhotonNetwork.Destroy(Player.object);
-	}
+	//}
 	PhotonNetwork.LoadLevel(name);
 	LevelManager.currentScene = name;
 }

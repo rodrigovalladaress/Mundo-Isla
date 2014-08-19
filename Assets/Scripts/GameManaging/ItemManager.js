@@ -77,6 +77,8 @@ public class ItemManager extends Photon.MonoBehaviour {
 		editingHash = false;
 	}
 
+	// No hacer RPC -> si se reserva un item y luego entra otro usuario a la escene
+	// e intenta instanciar todos los items, no podra ese item que reservo otro jugador.
 	@RPC
 	public function FreePhotonViewID(scene : String, id : int) {
 		editingHash = true;
@@ -84,8 +86,8 @@ public class ItemManager extends Photon.MonoBehaviour {
 		editingHash = false;
 	}
 	
-	@RPC
-	public function FreeAllPhotonViewIDs(scene : String) {
+	//@RPC
+	public static function FreeAllPhotonViewIDs(scene : String) {
 		editingHash = true;
 		for(var i : int = MinItemID; i <= MaxItemID; i++) {
 			reservedPhotonViewIDs.Set(scene, i, false);
@@ -121,7 +123,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 			yield;
 		}
 		// If we are the only player on the scene, initialization is necesary
-		if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
+		//if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
@@ -154,7 +156,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 			} else {
 				Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
 			}
-		}
+		//}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////
