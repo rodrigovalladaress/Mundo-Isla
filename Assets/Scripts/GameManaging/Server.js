@@ -56,7 +56,7 @@ class Server extends Photon.MonoBehaviour {
 	function Start() {
 		
 		if(!IsPlayerSkinPersistence()) {
-			Debug.LogError("Player skin changes won't sync. Please set playerSkinPersistence true in Server.");
+			Debug.LogWarning("Player skin changes won't sync. Please set playerSkinPersistence true in Server.");
 		}
 		
 		if(/*Application.isEditor*/true) {
@@ -405,7 +405,7 @@ class Server extends Photon.MonoBehaviour {
 	/******************************
 	|	Holder elements
 	******************************/
-	static function GetPhotonView() : PhotonView {
+	public static function GetPhotonView() : PhotonView {
 		return GameObject.Find("GameManager").GetComponent("PhotonView") as PhotonView;
 	}
 	
@@ -669,12 +669,10 @@ class Server extends Photon.MonoBehaviour {
 		// in the Inventory.
 		function PlayerInventory() {
 			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + Player.nickname;
-			Debug.Log(url);
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
 			}
-			Debug.Log(www.text);
 			var xDoc : XmlDocument = new XmlDocument();
 			xDoc.LoadXml(www.text);
 			var result : XmlNodeList = xDoc.GetElementsByTagName("result");

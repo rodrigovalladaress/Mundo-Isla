@@ -24,6 +24,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 	// The ID of the items on the scene must be betweeon 100 and 199
 	public static final var MinItemID = 100;
 	public static final var MaxItemID = 199;
+	public static final var RangeItemID = MaxItemID - MinItemID;
 
 	// If it's setted true, the changes in scene items will be sync ed with database.
 	public var sceneItemsPersistence : boolean;
@@ -33,13 +34,17 @@ public class ItemManager extends Photon.MonoBehaviour {
 
 	// Acces to non-static members by static functions.
 	private static var instance : ItemManager;
+	
+	// When true, the hash of reserved photonview ids is being edited
+	private static var editingHash = false;
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Photon View ID Management                                                            //
 	//////////////////////////////////////////////////////////////////////////////////////////
 
 	// It stores if a PhotonView id is available for an item or not
-	private static var reservedPhotonViewIDs : boolean[] = new boolean[MaxItemID - MinItemID];
+	//private static var reservedPhotonViewIDs : boolean[]; = new boolean[MaxItemID - MinItemID];
+	private static var reservedPhotonViewIDs : ReservedPhotonViewIDHash = new ReservedPhotonViewIDHash();
 
 	// This method checks the validity of the id (is in range)
 	public static function IsIDInRange(id : int) : boolean {
@@ -48,31 +53,44 @@ public class ItemManager extends Photon.MonoBehaviour {
 
 	// This method checks if an ID is available (it is not being used by another item)
 	public static function IsIDAvailable(id : int) : boolean {
-		return IsIDInRange(id) && (!reservedPhotonViewIDs[id - MinItemID]);
+		return IsIDInRange(id) && (!reservedPhotonViewIDs.Get(id));//(!reservedPhotonViewIDs[id - MinItemID]);
 	}
 
 	// This method checks if an ID is available (it is being used by another item)
 	public static function IsIDReserved(id : int) : boolean {
-		return IsIDInRange(id) && (reservedPhotonViewIDs[id - MinItemID]);
+		return IsIDInRange(id) && (reservedPhotonViewIDs.Get(id));//(reservedPhotonViewIDs[id - MinItemID]);
 	}
 
 	// It returns the first PhotonView id that is avaible to use
 	private static function GetFirstAvailablePhotonViewID() : int {
-		var id : int = 0;
-		while((id < reservedPhotonViewIDs.Length) && (reservedPhotonViewIDs[id])) {
+		var id : int = MinItemID;
+		while((id < MaxItemID) && reservedPhotonViewIDs.Get(id)) {//(reservedPhotonViewIDs[id])) {
 			id++;
 		}
-		return id + MinItemID;
+		return id;
 	}
 
 	@RPC
-	public function ReservePhotonViewID(id : int) {
-		reservedPhotonViewIDs[id - MinItemID] = true;
+	public function ReservePhotonViewID(scene : String, id : int) {
+		editingHash = true;
+		reservedPhotonViewIDs.Set(scene, id, true);
+		editingHash = false;
 	}
 
 	@RPC
-	public function FreePhotonViewID(id : int) {
-		reservedPhotonViewIDs[id - MinItemID] = false;
+	public function FreePhotonViewID(scene : String, id : int) {
+		editingHash = true;
+		reservedPhotonViewIDs.Set(scene, id, false);
+		editingHash = false;
+	}
+	
+	@RPC
+	public function FreeAllPhotonViewIDs(scene : String) {
+		editingHash = true;
+		for(var i : int = MinItemID; i <= MaxItemID; i++) {
+			reservedPhotonViewIDs.Set(scene, i, false);
+		}
+		editingHash = false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -86,10 +104,10 @@ public class ItemManager extends Photon.MonoBehaviour {
 	function Start () {
 		StartCoroutine(RetrieveItemInformation());
 		if(!sceneItemsPersistence) {
-			Debug.LogError("Scene items changes won't sync. Please set sceneItemsPersistence true in ItemManager.");
+			Debug.LogWarning("Scene items changes won't sync. Please set sceneItemsPersistence true in ItemManager.");
 		}
 		if(!inventoryPersistence) {
-			Debug.LogError("Inventory changes won't sync. Please set inventoryPersistence true in ItemManager.");
+			Debug.LogWarning("Inventory changes won't sync. Please set inventoryPersistence true in ItemManager.");
 		}
 	}
 
@@ -103,12 +121,11 @@ public class ItemManager extends Photon.MonoBehaviour {
 			yield;
 		}
 		// If we are the only player on the scene, initialization is necesary
-		if(PhotonNetwork.room.playerCount == 1) {
+		if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
 			}
-			Debug.Log(www.text);
 			var xDoc : XmlDocument = new XmlDocument();
 			xDoc.LoadXml(www.text);
 			var result : XmlNodeList = xDoc.GetElementsByTagName("result");
@@ -121,14 +138,17 @@ public class ItemManager extends Photon.MonoBehaviour {
 			var texture : String;
 			
 			if(row.Count > 0) {
+				while(editingHash) {
+					yield;
+				}
 				for(var rowElement : XmlElement in row) {
 					id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
 					x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
 					y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
 					z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
 					texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
-					Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
-								+ ", texture = " + texture);
+					//Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
+					//			+ ", texture = " + texture);
 					InstantiateItem(id, x, y, z, texture);
 				}
 			} else {
@@ -153,7 +173,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 					new Quaternion(90, 0, 0, 0), 0, instantiationData) as GameObject;
 			(item.GetComponent("PhotonView") as PhotonView).viewID = id;
 			// We reserve the id for all players
-			instance.photonView.RPC("ReservePhotonViewID", PhotonTargets.AllBuffered, id);
+			instance.photonView.RPC("ReservePhotonViewID", PhotonTargets.AllBuffered, LevelManager.GetCurrentScene(), id);
 			//ReservePhotonViewID(id);// -> This is done in Item.Start()
 		} else {
 			Debug.LogError("Bad id = " + id);
@@ -197,7 +217,6 @@ public class ItemManager extends Photon.MonoBehaviour {
 		if(IsIDReserved(id)) {
 			if(instance.sceneItemsPersistence) {
 				var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
-				Debug.Log(url);
 				var www : WWW = new WWW(url);
 				while(!www.isDone) {
 					yield;
@@ -208,10 +227,10 @@ public class ItemManager extends Photon.MonoBehaviour {
 				}
 			}
 			PhotonNetwork.Destroy(item.gameObject);
-			Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaah ");
-			instance.photonView.RPC("FreePhotonViewID", PhotonTargets.AllBuffered, id);
+			instance.photonView.RPC("FreePhotonViewID", PhotonTargets.AllBuffered, LevelManager.GetCurrentScene(), id);
 		} else {
-			Debug.LogError("Bad id = " + id + " Check synchronization!");
+			Debug.LogError("Bad id = " + id + " Check synchronization! And don't add items manually to the scene! "
+							+ " Add them using the database.");
 		}
 	}
 
