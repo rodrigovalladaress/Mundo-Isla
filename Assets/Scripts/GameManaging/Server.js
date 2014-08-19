@@ -661,11 +661,14 @@ class Server extends MonoBehaviour{
 			while(PhotonNetwork.room == null) {
 				yield;
 			}
-			for(var rowElement : XmlElement in row) {
-				item = rowElement.GetElementsByTagName("item")[0].InnerText;
-				amount = int.Parse(rowElement.GetElementsByTagName("amount")[0].InnerText);
-				Debug.Log(amount + " of " + item);
-				Inventory.AddItem(item, amount);
+			if(row.Count > 0) {
+				for(var rowElement : XmlElement in row) {
+					item = rowElement.GetElementsByTagName("item")[0].InnerText;
+					amount = int.Parse(rowElement.GetElementsByTagName("amount")[0].InnerText);
+					Inventory.AddItem(item, amount);
+				}
+			} else {
+				Debug.Log(Player.nickname + " doesn't have any item in his or her inventory");
 			}
 		}
 		

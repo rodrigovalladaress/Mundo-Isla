@@ -125,7 +125,7 @@ class Item extends MonoBehaviour{
 		if (collider.transform.GetComponent(CharacterController)) {
 			// And add one instance of the object to the inventory
 			if ( collider.gameObject != Player.object ) return;
-			Inventory.AddItem(this.gameObject.name);
+			//Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
 			//Network.Destroy(gameObject);
 			RemoveItemFromScene();

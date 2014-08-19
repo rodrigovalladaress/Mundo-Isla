@@ -17,10 +17,11 @@ import System.Xml;
 public static final var MinItemID = 100;
 public static final var MaxItemID = 199;
 
-// If it setted as true, when a player obtains an item, the state 
-// of the item is updated in the database. Setted as true only
-// for debugging.
-public var persistence : boolean = true;
+// If it's setted true, the changes in scene items will sync with database.
+public var sceneItemsPersistence : boolean;
+
+// If it's setted true, the changes in the inventory will sync with database.
+public var inventoryPersistence : boolean;
 
 // Acces to non-static members by static functions.
 private static var instance : ItemManager;
@@ -36,6 +37,12 @@ function Awake() {
 
 function Start () {
 	StartCoroutine(RetrieveItemInformation());
+	if(!sceneItemsPersistence) {
+		Debug.LogError("Scene items changes won't sync. Please set sceneItemsPersistence true.");
+	}
+	if(!inventoryPersistence) {
+		Debug.LogError("Inventory changes won't sync. Please set inventoryPersistence true.");
+	}
 }
 
 // This retrieves the data of the items on the current scene and
@@ -63,14 +70,18 @@ private function RetrieveItemInformation() : IEnumerator {
 	while(PhotonNetwork.room == null) {
 		yield;
 	}
-	for(var rowElement : XmlElement in row) {
-		id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
-		x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
-		y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
-		z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
-		texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
-		Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z + ", texture = " + texture);
-		InstantiateItem(id, x, y, z, texture);
+	if(row.Count > 0) {
+		for(var rowElement : XmlElement in row) {
+			id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
+			x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
+			y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
+			z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
+			texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
+			Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z + ", texture = " + texture);
+			InstantiateItem(id, x, y, z, texture);
+		}
+	} else {
+		Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
 	}
 }
 
@@ -91,14 +102,16 @@ private function InstantiateItem(id : int, x : float, y : float, z : float, text
 public static function RemoveItemFromScene(item : Item, scene : String) {
 	var id : int = item.GetPhotonViewID();
 	if(CheckID(id)) {
-		if(instance.persistence) {
+		if(instance.sceneItemsPersistence) {
 			var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
 			Debug.Log(url);
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
 			}
-			Debug.Log(www.text);
+			if(www.text != "OK") {
+				Debug.LogError("Error deleting item " + id + " from scene " + scene + " on the database (" + www.text + ") url = " + url);
+			}
 		}
 		PhotonNetwork.Destroy(item.gameObject);
 	} else {
@@ -109,11 +122,15 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 // Syncs the amount of items ont the database
 // Adds an amount of items to the original amount of items
 public static function SyncAddItem(item : String, amount : int) {
-	var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname + "&item=" + item + "&amount=" + amount;
-	var www : WWW = new WWW(url);
-	while(!www.isDone) {
-		yield;
+	if(instance.inventoryPersistence) {
+		var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname + "&item=" + item + "&amount=" + amount;
+		var www : WWW = new WWW(url);
+		while(!www.isDone) {
+			yield;
+		}
+		if(www.text != "OK") {
+			Debug.LogError("Error syncing item " + item + " with the database (" + www.text + ") url = " + url);
+		}
 	}
-	Debug.Log(www.text);
 	Inventory.AddItem(item, amount);
 }
