@@ -40,19 +40,19 @@ static class Inventory extends MonoBehaviour{
 		else {
 			items.Add (item, amount);
 		}
-		//Server.StartCoroutine(ItemManager.SyncAddItem(item, amont)); 
-		// -> ERROR This is done in Item.OnTriggerEnter() instead
 	}
+	
 	function AddItem (item:String){
 		AddItem(item, 1);
 	}
 	
 	function DropItem(item:String){
 		AddItem(item, -1);
-		var drop:GameObject = PhotonNetwork.Instantiate("Prefabs/Item", Player.position() + Vector3.forward, Quaternion.identity, 0) as GameObject;
-		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, drop.GetComponent(PhotonView).viewID.ToString(), "drop", item);
+		//var drop:GameObject = PhotonNetwork.Instantiate("Prefabs/Item", Player.position() + Vector3.forward, Quaternion.identity, 0) as GameObject;
+		//Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, drop.GetComponent(PhotonView).viewID.ToString(), "drop", item);
 		Server.Log("game event","Player " + Player.nickname + " dropped " + item);
 		
+		Server.StartCoroutine(ItemManager.AddItemToScene(item, LevelManager.GetCurrentScene(), Player.position() + Vector3.forward));
 	}
 	
 }

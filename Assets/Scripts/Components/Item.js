@@ -51,7 +51,7 @@ class Item extends MonoBehaviour{
 	}
 	
 	// Set the texture of the item. By default is the item's name.
-	public function SetTexture(texture : String) {
+	public function SetTexture(texture : String) : IEnumerator {
 		_texture = texture;
 		if ( Inventory.textures.ContainsKey(_texture) == true ){
 			this.gameObject.renderer.material.mainTexture = Inventory.textures[_texture];

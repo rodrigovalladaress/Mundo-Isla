@@ -1,7 +1,12 @@
 ﻿#pragma strict
 #pragma downcast
 // It enables or disables the items on the map.
-// Version: 2.0
+// Version: 2.1
+//
+// Changes in 2.1 version:
+//	-	Storage of an array of available PhotonView ids.
+//	-	Synchronization of drop item.
+//
 // Changes in 2.0 version:
 //	-	This script retrieves information from a database and
 //		instantiates the items this way.
@@ -26,9 +31,39 @@ public var inventoryPersistence : boolean;
 // Acces to non-static members by static functions.
 private static var instance : ItemManager;
 
-// This method checks the validity of the id
-public static function CheckID(id : int) : boolean {
+// It stores if a PhotonView id is available for an item or not
+private static var availablePhotonViewIDs : boolean[] = new boolean[MaxItemID - MinItemID];
+
+// This method checks the validity of the id (is in range)
+public static function IsIDInRange(id : int) : boolean {
 	return (id >= MinItemID) && (id <= MaxItemID);
+}
+
+// This method checks if an ID is available (it is not being used by another item)
+public static function IsIDAvailable(id : int) : boolean {
+	return IsIDInRange(id) && (availablePhotonViewIDs[id - MinItemID]);
+}
+
+// This method checks if an ID is available (it is being used by another item)
+public static function IsIDReserved(id : int) : boolean {
+	return IsIDInRange(id) && (!availablePhotonViewIDs[id - MinItemID]);
+}
+
+// It returns the first PhotonView id that is avaible to use
+private static function GetFirstAvailablePhotonViewID() : int {
+	var id : int = 0;
+	while((id < availablePhotonViewIDs.Length) && (!availablePhotonViewIDs[id])) {
+		id++;
+	}
+	return id + MinItemID;
+}
+
+private static function ReservePhotonViewID(id : int) {
+	availablePhotonViewIDs[id - MinItemID] = false;
+}
+
+private static function FreePhotonViewID(id : int) {
+	availablePhotonViewIDs[id - MinItemID] = true;
 }
 
 function Awake() {
@@ -36,6 +71,10 @@ function Awake() {
 }
 
 function Start () {
+	// Initialization of availablePhotonViewIDs
+	for(var i : int = 0; i < availablePhotonViewIDs.Length; i++) {
+		availablePhotonViewIDs[i] = true;
+	}
 	StartCoroutine(RetrieveItemInformation());
 	if(!sceneItemsPersistence) {
 		Debug.LogError("Scene items changes won't sync. Please set sceneItemsPersistence true.");
@@ -86,22 +125,51 @@ private function RetrieveItemInformation() : IEnumerator {
 }
 
 // Instantiation of an item in a scene
-private function InstantiateItem(id : int, x : float, y : float, z : float, texture : String) {
-	var item : GameObject;
-	if(CheckID(id)) {
+private static function InstantiateItem(id : int, x : float, y : float, z : float, texture : String) : GameObject {
+	var item : GameObject = null;
+	if(IsIDAvailable(id)) {
 		item = PhotonNetwork.Instantiate("Prefabs/item", new Vector3(x, y, z), new Quaternion(90, 0, 0, 0), 0) as GameObject;
 		item.name = texture;
-		StartCoroutine((item.GetComponent("Item") as Item).SetTexture(texture));
+		instance.StartCoroutine((item.GetComponent("Item") as Item).SetTexture(texture));
 		(item.GetComponent("PhotonView") as PhotonView).viewID = id;
+		ReservePhotonViewID(id);
 	} else {
 		Debug.LogError("Bad id = " + id);
+	}
+	return item;
+}
+
+// This adds an item to the scene and syncs it.
+public static function AddItemToScene(item : String, scene : String, position : Vector3) {
+	var id : int = GetFirstAvailablePhotonViewID();
+	var texture : String = item;
+	var x : float = position.x;
+	var y : float = position.y;
+	var z : float = position.z;
+	var object : GameObject = InstantiateItem(id, x, y, z, texture);
+	
+	if(object != null) {
+		if(instance.sceneItemsPersistence) {
+			var url : String = Paths.GetSceneQuery() + "/add_item.php/?id=" + id + "&scene=" + scene
+								+ "&texture=" + texture + "&x=" + x + "&y=" + y + "&z=" + z;
+			var www : WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			if(!www.text.Equals("OK")) {
+				Debug.LogError("Error syncing adding item to scene (" + www.text + ") url = " + url);
+			}
+		}
+	} else {
+		Debug.LogError("Error adding item to scene");
 	}
 }
 
 // This removes an item from a scene. 
 public static function RemoveItemFromScene(item : Item, scene : String) {
 	var id : int = item.GetPhotonViewID();
-	if(CheckID(id)) {
+	// We check if the id is being used by the item
+	if(IsIDReserved(id)) {
 		if(instance.sceneItemsPersistence) {
 			var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
 			Debug.Log(url);
@@ -109,17 +177,20 @@ public static function RemoveItemFromScene(item : Item, scene : String) {
 			while(!www.isDone) {
 				yield;
 			}
-			if(www.text != "OK") {
-				Debug.LogError("Error deleting item " + id + " from scene " + scene + " on the database (" + www.text + ") url = " + url);
+			if(!www.text.Equals("OK")) {
+				Debug.LogError("Error deleting item " + id + " from scene " + scene + " on the database (" 
+								+ www.text + ") url = " + url);
+			} else {
+				FreePhotonViewID(id);
 			}
 		}
 		PhotonNetwork.Destroy(item.gameObject);
 	} else {
-		Debug.LogError("Bad id = " + id);
+		Debug.LogError("Bad id = " + id + " Check synchronization!");
 	}
 }
 
-// Syncs the amount of items ont the database
+// Syncs the amount of items
 // Adds an amount of items to the original amount of items
 public static function SyncAddItem(item : String, amount : int) {
 	if(instance.inventoryPersistence) {
@@ -128,7 +199,7 @@ public static function SyncAddItem(item : String, amount : int) {
 		while(!www.isDone) {
 			yield;
 		}
-		if(www.text != "OK") {
+		if(!www.text.Equals("OK")) {
 			Debug.LogError("Error syncing item " + item + " with the database (" + www.text + ") url = " + url);
 		}
 	}
