@@ -25,7 +25,7 @@
 |
 |	Proyecto SAVEH
 *******************************************************/
-class Server extends MonoBehaviour{
+class Server extends Photon.MonoBehaviour {	
 
 	static var session:String;
 	static var saveDelay:float = 30.0;

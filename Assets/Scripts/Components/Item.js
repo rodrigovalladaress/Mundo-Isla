@@ -49,6 +49,7 @@ class Item extends MonoBehaviour{
 		// We get the name of the texture passed by instantiationData
 		this.gameObject.name = photonView.instantiationData[0] as String;
 		Server.StartCoroutine(SetTexture(this.gameObject.name));
+		//ItemManager.ReservePhotonViewID(GetPhotonViewID());
 	}
 	
 	public function GetPhotonViewID() : int {

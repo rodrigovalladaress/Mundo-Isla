@@ -1,11 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Inventory.js">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\ItemManager.js">
     <Files>
-      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="151" Column="39" />
-      <File FileName="Assets\Scripts\Components\Item.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManaging\Inventory.js" Line="55" Column="126" />
+      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="110" Column="3" />
+      <File FileName="Assets\Scripts\Components\Item.js" Line="120" Column="29" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="788" Column="1" />
+      <File FileName="Assets\Scripts\GameManaging\Inventory.js" Line="63" Column="71" />
       <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="749" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
