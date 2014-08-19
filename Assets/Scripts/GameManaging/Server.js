@@ -21,21 +21,33 @@
 |
 |	Versión: 		1.0
 |	
-|	Autor: Manlio Joaquín García González <manliojoaquin@gmail.com>
+|	Autor: Manlio Joaquín García González 
+|			<manliojoaquin@gmail.com>
 |
 |	Proyecto SAVEH
 *******************************************************/
-class Server extends Photon.MonoBehaviour {	
-
+class Server extends Photon.MonoBehaviour {
 	static var session:String;
 	static var saveDelay:float = 30.0;
 	static var hostData:HostData[];
 	static var SecondsForTimeout:float = 5.0;
 	static private var _gameType = "IslaSAVEH.Alpha";
 	static private var _scriptsFolder:String = Application.dataPath + "/";
+	// Instance used to access non static members from static methods, and starting coroutines
+	private static var instance : Server;
+	
+	// If it's setted true, the changes in the skin of the player will be synced with the database.
+	public var playerSkinPersistence : boolean;
+	public static function IsPlayerSkinPersistence() : boolean {
+		return instance.playerSkinPersistence;
+	}
 	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
+	}
+	
+	function Awake() {
+		instance = this;
 	}
 	
 	/*******************************************************
@@ -43,10 +55,20 @@ class Server extends Photon.MonoBehaviour {
 	*******************************************************/
 	function Start() {
 		
+		if(!IsPlayerSkinPersistence()) {
+			Debug.LogError("Player skin changes won't sync. Please set playerSkinPersistence true in Server.");
+		}
+		
 		if(/*Application.isEditor*/true) {
 			Player.nickname = "Admin";
-			Player.skinString = MainGUI.Menu.SkinEditor.savedSkin = "female|eyes|female_eyes_blue|face|female_face-1|hair|"
-			+ "female_hair-2_dark|pants|female_pants-2_black|shoes|female_shoes-1_blue|top|female_top-2_orange";
+			StartCoroutine(Player.RetrieveSkinString());
+			// Wait until the skin of the player is downloaded
+			while(Player.GetSkinString() == null) {
+				yield;
+			}
+			MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
+			//Player.GetSkinString() = MainGUI.Menu.SkinEditor.savedSkin = "female|eyes|female_eyes_blue|face|female_face-1|hair|"
+			//+ "female_hair-2_dark|pants|female_pants-2_black|shoes|female_shoes-1_blue|top|female_top-2_orange";
 		    GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			MainGUI.Menu.current = "Menu";
 			MainGUI.Content.current = "";
@@ -56,8 +78,8 @@ class Server extends Photon.MonoBehaviour {
 		StartCoroutine(Retrieve.PlayerInventory());
 		
 		while (!Player.isPlaying()) yield;
-		Server.StartCoroutine( TrackInventory("item", Inventory.items) );
-		Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
+		//Server.StartCoroutine( TrackInventory("item", Inventory.items) );
+		//Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
 	}
 	
 	// State of the connection to Photon (debug)
@@ -98,7 +120,7 @@ class Server extends Photon.MonoBehaviour {
 	function OnJoinedRoom() {
 		Server.Log("server", Player.nickname + " connected.");
 		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null)
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
+		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
 	}
 	
 	/******************************
@@ -202,7 +224,7 @@ class Server extends Photon.MonoBehaviour {
 	*******************************************************/
 	/*function OnServerInitialized(){
 		Server.Log("server", "Server initialized!");
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
+		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
 	}*/
 	
 	/*******************************************************
@@ -210,7 +232,7 @@ class Server extends Photon.MonoBehaviour {
 	*******************************************************/
 	/*function OnConnectedToServer(){
 		Server.Log("server", Player.nickname + " connected.");
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
+		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
 	}*/
 	
 	/*******************************************************
@@ -399,11 +421,11 @@ class Server extends Photon.MonoBehaviour {
 	|	Save to database, delayed
 	******************************/
 	
-	static function TrackInventory( type:String, list:Dictionary.<String, int> ):IEnumerator {
+	/*static function TrackInventory( type:String, list:Dictionary.<String, int> ):IEnumerator {
 		Server.Retrieve.PlayerInventory( type, list );
 		yield WaitForSeconds(saveDelay);
 		Server.StartCoroutine( TrackInventory(type, list) );
-	}
+	}*/
 	
 	/******************************
 	|	Start Coroutines
@@ -570,7 +592,7 @@ class Server extends Photon.MonoBehaviour {
 			if(Application.isEditor){
 				// Override
 				Server.Log("server", "Editor mode, overriding skin.");
-				Player.skinString = "";
+				Player.SetSkinString("");
 				GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			}
 			else if (Application.isWebPlayer) {
@@ -587,14 +609,16 @@ class Server extends Photon.MonoBehaviour {
 				
 			    if(download.error) {
 			        print( "Error downloading: " + download.error );
-			        Player.skinString = MainGUI.Menu.SkinEditor.savedSkin = "";
+			        Player.SetSkinString("");
+			        MainGUI.Menu.SkinEditor.savedSkin = "";
 					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			        download.Dispose();
 			        return;
 			    }
 			    else{
 			        // get the anwser, and act on it
-			        Player.skinString = MainGUI.Menu.SkinEditor.savedSkin = download.text;
+			        Player.SetSkinString(download.text);
+			        MainGUI.Menu.SkinEditor.savedSkin = download.text;
 					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			        download.Dispose();
 			    }
@@ -606,7 +630,7 @@ class Server extends Photon.MonoBehaviour {
 			if(/*Application.isEditor*/true){
 				// Override
 				Server.Log("server", "Editor mode, overriding skin.");
-				Player.skinString = _skin;
+				Player.SetSkinString(_skin);
 				GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			}
 			else if (Application.isWebPlayer) {
@@ -624,14 +648,14 @@ class Server extends Photon.MonoBehaviour {
 				
 			    if(download.error) {
 			        print( "Error downloading: " + download.error );
-			        Player.skinString = "";
+			        Player.SetSkinString("");
 					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			        download.Dispose();
 			        return;
 			    }
 			    else{
 			        // get the anwser, and act on it
-			        Player.skinString = download.text;
+			        Player.SetSkinString(download.text);
 					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			        download.Dispose();
 			    }
@@ -716,7 +740,7 @@ class Server extends Photon.MonoBehaviour {
 		}
 		
 		// Se manda al servidor la cantidad de items que tiene el jugador
-		function PlayerInventory( type:String, name:String, amount:String ){
+		/*function PlayerInventory( type:String, name:String, amount:String ){
 		
 			if (Application.isWebPlayer) {
 				// Create a form object for sending data to the server
@@ -745,10 +769,10 @@ class Server extends Photon.MonoBehaviour {
 			    download.Dispose();
 			}
 			
-		}
+		}*/
 		
 		// Por cada tipo de elemento en el inventario del jugador, se llama al PlayerInventory de arriba
-		function PlayerInventory( type:String, list:Dictionary.<String, int> ){
+		/*function PlayerInventory( type:String, list:Dictionary.<String, int> ){
 		
 			if (Application.isWebPlayer) {
 				for (var instance in list){
@@ -766,7 +790,7 @@ class Server extends Photon.MonoBehaviour {
 				
 			}
 			
-		}
+		}*/
 		
 	}
 	

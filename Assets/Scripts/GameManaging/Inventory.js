@@ -3,7 +3,7 @@
 // <rodriv_tf@hotmail.com>
 // Version: 1.1
 //
-// 1.1: RetrieveTextureIfNotAvailable()
+// 1.1: DropItem sync.
 /*******************************************************
 |	Inventory Script
 |
@@ -32,11 +32,6 @@ static class Inventory extends MonoBehaviour{
 		}
 		else return false;
 		return;
-	}
-	
-	public function RetrieveTextureIfNotAvailable(item : String) {
-		if ( !textures.ContainsKey( item ) )
-			Server.StartCoroutine(Server.Retrieve.ItemTexture(item));
 	}
 	
 	function AddItem (item:String, amount:int){

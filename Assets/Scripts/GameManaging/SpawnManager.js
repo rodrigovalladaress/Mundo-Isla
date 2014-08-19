@@ -11,6 +11,6 @@ function Start () {
 	spawnPoint = GameObject.Find("SpawnPoint");
 	rot = Quaternion.identity;
 	pos = spawnPoint.transform.position;
-	Player.Spawn(Player.nickname, pos, rot, Player.skinString);
+	Player.Spawn(Player.nickname, pos, rot, Player.GetSkinString());
 	Server.Log("debug", "SpawnManager " + Player.nickname + " spawned at " + pos + " in " + LevelManager.GetCurrentScene());
 }

@@ -27,11 +27,11 @@ class Skin extends MonoBehaviour{
 	|	Actions taken when this script start
 	*******************************************************/
 	function Start(){
-		while ( Player.skinString == null ) yield;
+		while ( Player.GetSkinString() == null ) yield;
 		// Initializes the CharacterGenerator and load a saved config if any.
 	    while (!CharacterGenerator.ReadyToUse) yield;
-	    if (Player.skinString != "")
-	        generator = CharacterGenerator.CreateWithConfig(Player.skinString);
+	    if (Player.GetSkinString() != "")
+	        generator = CharacterGenerator.CreateWithConfig(Player.GetSkinString());
 	    else{
 	        generator = CharacterGenerator.CreateWithRandomConfig("Female");
 	        while (!generator.ConfigReady) yield;

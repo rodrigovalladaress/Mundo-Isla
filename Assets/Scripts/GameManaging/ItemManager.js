@@ -6,6 +6,7 @@
 // Changes in 2.1 version:
 //	-	Storage of an array of available PhotonView ids.
 //	-	Synchronization of drop item.
+//	-	Reserve and free PhotonView IDs by RPC.
 //
 // Changes in 2.0 version:
 //	-	This script retrieves information from a database and
@@ -24,10 +25,10 @@ public class ItemManager extends Photon.MonoBehaviour {
 	public static final var MinItemID = 100;
 	public static final var MaxItemID = 199;
 
-	// If it's setted true, the changes in scene items will sync with database.
+	// If it's setted true, the changes in scene items will be sync ed with database.
 	public var sceneItemsPersistence : boolean;
 
-	// If it's setted true, the changes in the inventory will sync with database.
+	// If it's setted true, the changes in the inventory will be synced with database.
 	public var inventoryPersistence : boolean;
 
 	// Acces to non-static members by static functions.
@@ -65,12 +66,12 @@ public class ItemManager extends Photon.MonoBehaviour {
 	}
 
 	@RPC
-	private function ReservePhotonViewID(id : int) {
+	public function ReservePhotonViewID(id : int) {
 		reservedPhotonViewIDs[id - MinItemID] = true;
 	}
 
 	@RPC
-	private function FreePhotonViewID(id : int) {
+	public function FreePhotonViewID(id : int) {
 		reservedPhotonViewIDs[id - MinItemID] = false;
 	}
 
@@ -85,62 +86,54 @@ public class ItemManager extends Photon.MonoBehaviour {
 	function Start () {
 		StartCoroutine(RetrieveItemInformation());
 		if(!sceneItemsPersistence) {
-			Debug.LogError("Scene items changes won't sync. Please set sceneItemsPersistence true.");
+			Debug.LogError("Scene items changes won't sync. Please set sceneItemsPersistence true in ItemManager.");
 		}
 		if(!inventoryPersistence) {
-			Debug.LogError("Inventory changes won't sync. Please set inventoryPersistence true.");
+			Debug.LogError("Inventory changes won't sync. Please set inventoryPersistence true in ItemManager.");
 		}
 	}
 
 	// This retrieves the data of the items on the current scene and
 	// instantiates them.
 	private function RetrieveItemInformation() : IEnumerator {
-		// TODO Hacer esto solo si es el primer usuario en la escena
 		var url : String = Paths.GetSceneQuery() + "/get_items.php/?scene=" + 
 							(LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
-		// Wait for the connection to Photon
+		// Wait for the connection to a room
 		while(PhotonNetwork.room == null) {
 			yield;
 		}
 		// If we are the only player on the scene, initialization is necesary
 		if(PhotonNetwork.room.playerCount == 1) {
-		
-		var www : WWW = new WWW(url);
-		while(!www.isDone) {
-			yield;
-		}
-		Debug.Log(www.text);
-		var xDoc : XmlDocument = new XmlDocument();
-		xDoc.LoadXml(www.text);
-		var result : XmlNodeList = xDoc.GetElementsByTagName("result");
-		var resultElement = result[0] as XmlElement;
-		var row : XmlNodeList = resultElement.ChildNodes;
-		var id : int;
-		var x : float;
-		var y : float;
-		var z : float;
-		var texture : String;
-		
-		if(row.Count > 0) {
-			for(var rowElement : XmlElement in row) {
-				id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
-				x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
-				y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
-				z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
-				texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
-				Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z + ", texture = " + texture);
-				// If we are the only player on the scene, initialization is necesary
-				if(PhotonNetwork.room.playerCount == 1) { 
-					InstantiateItem(id, x, y, z, texture);
-				} else {
-					// If we aren't the only player, texture retrieving is still necesary
-					Inventory.RetrieveTextureIfNotAvailable(texture);
-				}
-				
+			var www : WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
 			}
-		} else {
-			Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
-		}
+			Debug.Log(www.text);
+			var xDoc : XmlDocument = new XmlDocument();
+			xDoc.LoadXml(www.text);
+			var result : XmlNodeList = xDoc.GetElementsByTagName("result");
+			var resultElement = result[0] as XmlElement;
+			var row : XmlNodeList = resultElement.ChildNodes;
+			var id : int;
+			var x : float;
+			var y : float;
+			var z : float;
+			var texture : String;
+			
+			if(row.Count > 0) {
+				for(var rowElement : XmlElement in row) {
+					id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
+					x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
+					y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
+					z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
+					texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
+					Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
+								+ ", texture = " + texture);
+					InstantiateItem(id, x, y, z, texture);
+				}
+			} else {
+				Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
+			}
 		}
 	}
 

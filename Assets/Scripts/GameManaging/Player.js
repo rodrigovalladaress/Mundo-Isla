@@ -1,6 +1,10 @@
 // Edited by Rodrigo Valladares Santana
 // <rodriv_tf@hotmail.com>
-// Version: 1.2
+// Version: 1.3
+//
+// Changes in 1.3 version:
+//	-	skinString retrieving.
+//	-	skinString syncing.
 //
 // Changes in 1.2 version:
 // 	-	Instantiation of player using Photon.
@@ -20,10 +24,23 @@
 |	Proyecto SAVEH
 *******************************************************/
 #pragma strict
+
+import System.Text.RegularExpressions;
+
 static class Player extends MonoBehaviour{
 	var nickname:String = "";
 	var password:String = "";
-	var skinString:String;
+	private var skinString:String;
+	public function GetSkinString() : String {
+		return skinString;
+	}
+	public function SetSkinString(skinString : String) {
+		this.skinString = skinString;
+		if(Server.IsPlayerSkinPersistence()) {
+			Server.StartCoroutine(ChangeSkinString(skinString));
+		}
+	}
+	
 	var localPlayerComponents:String[] = ["ThirdPersonCamera", "Movement"];
 	
 	var isPlaying = function():boolean{if(Network.isClient || Network.isServer)return true; else return false;};
@@ -42,7 +59,6 @@ static class Player extends MonoBehaviour{
 		Spawn(_name, spawnPoint, Quaternion.identity, _skinString);
 	}
 	
-	// Spawns a player at the given spawnPoint with the given rotation
 	function Spawn(_name:String, spawnPoint:Vector3, rotation:Quaternion, _skinString:String) {
 		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
 		if (!GameObject.Find(_name)){
@@ -90,6 +106,38 @@ static class Player extends MonoBehaviour{
 	*******************************************************/
 	function reposition(newPosition:Vector3){
 		GameObject.Find(nickname).transform.position = newPosition;
+	}
+	
+	
+	/*******************************************************
+	|	skinString retrieving and syncing
+	*******************************************************/
+	// Downloading of the database's skinString
+	public function RetrieveSkinString() : IEnumerator {
+		var url : String = Paths.GetPlayerQuery() + "/get_skin.php/?player=" + nickname;
+		var www : WWW = new WWW(url);
+		while(!www.isDone) {
+			yield;
+		}
+		if(Regex.Matches(www.text, ".*ERROR.*", RegexOptions.IgnoreCase).Count > 0) {
+			Debug.LogError("Error in skinstring retrieven (" + www.text + ")");
+			skinString = "";
+		} else {
+			skinString = www.text;
+		}
+	}
+	
+	// Syncing database's skinString
+	private function ChangeSkinString(skinString : String) : IEnumerator {
+		var url : String = Paths.GetPlayerQuery() + "/set_skin.php/?player=" 
+							+ nickname + "&skinstring=" + skinString;
+		var www : WWW = new WWW(url);
+		while(!www.isDone) {
+			yield;
+		}
+		if(!www.text.Equals("OK")) {
+			Debug.LogError("Change skin string error (" + www.text + ") url = " + url);
+		}
 	}
 
 }

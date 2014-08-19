@@ -23,7 +23,7 @@ class GameSelectionGUI extends MonoBehaviour {
 		/*Player.skinString =
 		"female|eyes|female_eyes_blue|face|female_face-1|hair|female_hair-2_dark|pants|" + 
 		"female_pants-2_black|shoes|female_shoes-1_blue|top|female_top-2_orange";*/
-		Player.skinString = "";
+		//Player.skinString = "";
 	}
 	
 	function OnGUI () {

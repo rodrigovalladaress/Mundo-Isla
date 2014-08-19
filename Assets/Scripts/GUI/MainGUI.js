@@ -12,7 +12,7 @@
 class MainGUI extends MonoBehaviour {
 	
 	public var _dropItemAudioClip:AudioClip;
-	public var kinect:boolean;
+	public var isKinectScene:boolean;
 	
 	static var lastScreenSize:Vector2 = new Vector2(0,0);
 	static private var _textDictionary:Dictionary.<String,String> = new Dictionary.<String, String>();
@@ -26,14 +26,14 @@ class MainGUI extends MonoBehaviour {
 		
 		Area.Reload();
 		
-		// The GUI showed when we are using a Kinect activity
-		if(kinect) {
+		// The GUI showed when we are using a isKinectScene activity
+		if(isKinectScene) {
 			Menu.current = "Menu";
 			Content.current = "";
 			Menu.show = false;
 		} // Spawning the player in Main when we are entering from other level
 		else if(!Menu.show && GameObject.Find(Player.nickname) == null) {
-			Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.skinString);
+			Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
 		}
 	}
 	
@@ -271,7 +271,7 @@ class MainGUI extends MonoBehaviour {
 			    
 			    GUI.enabled = true;
 			    if ( GUILayout.Button( Text("Cancel") ) ){
-			    	Skin.generator = CharacterGenerator.CreateWithConfig(Player.skinString);
+			    	Skin.generator = CharacterGenerator.CreateWithConfig(Player.GetSkinString());
 			    	Skin.usingLatestConfig = false;
 	    			Skin.newCharacterRequested = true;
 			    	Menu.current = "Menu";
