@@ -120,7 +120,7 @@ static class Player extends MonoBehaviour{
 			yield;
 		}
 		if(Regex.Matches(www.text, ".*ERROR.*", RegexOptions.IgnoreCase).Count > 0) {
-			Debug.LogError("Error in skinstring retrieven (" + www.text + ")");
+			Debug.LogError("Error in skinstring retrieve (" + www.text + ")");
 			skinString = "";
 		} else {
 			skinString = www.text;

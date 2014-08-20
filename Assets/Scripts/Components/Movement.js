@@ -63,10 +63,8 @@ function Update () {
 		if(Input.GetKeyDown ("v")) {
 			if(isNormalSpeed) {
 				speed = HIGH_SPEED;
-				print("Player speed = HIG_SPEED");
 			} else {
 				speed = NORMAL_SPEED;
-				print("Player speed = NORMAL_SPEED");
 			}
 			isNormalSpeed = !isNormalSpeed;
 		}

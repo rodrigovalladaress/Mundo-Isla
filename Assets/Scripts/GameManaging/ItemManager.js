@@ -53,18 +53,18 @@ public class ItemManager extends Photon.MonoBehaviour {
 
 	// This method checks if an ID is available (it is not being used by another item)
 	public static function IsIDAvailable(id : int) : boolean {
-		return IsIDInRange(id) && (!reservedPhotonViewIDs.Get(id));//(!reservedPhotonViewIDs[id - MinItemID]);
+		return IsIDInRange(id) && (!reservedPhotonViewIDs.Get(id));
 	}
 
 	// This method checks if an ID is available (it is being used by another item)
 	public static function IsIDReserved(id : int) : boolean {
-		return IsIDInRange(id) && (reservedPhotonViewIDs.Get(id));//(reservedPhotonViewIDs[id - MinItemID]);
+		return IsIDInRange(id) && (reservedPhotonViewIDs.Get(id));
 	}
 
 	// It returns the first PhotonView id that is avaible to use
 	private static function GetFirstAvailablePhotonViewID() : int {
 		var id : int = MinItemID;
-		while((id < MaxItemID) && reservedPhotonViewIDs.Get(id)) {//(reservedPhotonViewIDs[id])) {
+		while((id < MaxItemID) && reservedPhotonViewIDs.Get(id)) {
 			id++;
 		}
 		return id;
@@ -72,27 +72,26 @@ public class ItemManager extends Photon.MonoBehaviour {
 
 	@RPC
 	public function ReservePhotonViewID(scene : String, id : int) {
-		editingHash = true;
-		reservedPhotonViewIDs.Set(scene, id, true);
-		editingHash = false;
-	}
-
-	// No hacer RPC -> si se reserva un item y luego entra otro usuario a la escene
-	// e intenta instanciar todos los items, no podra ese item que reservo otro jugador.
-	@RPC
-	public function FreePhotonViewID(scene : String, id : int) {
-		editingHash = true;
-		reservedPhotonViewIDs.Set(scene, id, false);
-		editingHash = false;
+		// The PhotonView IDs are reserved if the player is in the same scene
+		// as the player who sent the RPC
+		if(LevelManager.GetCurrentScene() == scene) {
+			reservedPhotonViewIDs.Set(scene, id, true);
+		}
 	}
 	
-	//@RPC
+	@RPC
+	public function FreePhotonViewID(scene : String, id : int) {
+		// The PhotonView IDs are freed if the player is in the same scene as
+		// the player who sent the RPC
+		if(LevelManager.GetCurrentScene() == scene) {
+			reservedPhotonViewIDs.Set(scene, id, false);
+		}
+	}
+	
 	public static function FreeAllPhotonViewIDs(scene : String) {
-		editingHash = true;
 		for(var i : int = MinItemID; i <= MaxItemID; i++) {
 			reservedPhotonViewIDs.Set(scene, i, false);
 		}
-		editingHash = false;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -123,40 +122,38 @@ public class ItemManager extends Photon.MonoBehaviour {
 			yield;
 		}
 		// If we are the only player on the scene, initialization is necesary
-		//if(PhotonNetwork.room.playerCount == 1) { // TODO Cambiar para comprobar escena, no sala
-			var www : WWW = new WWW(url);
-			while(!www.isDone) {
+		var www : WWW = new WWW(url);
+		while(!www.isDone) {
+			yield;
+		}
+		var xDoc : XmlDocument = new XmlDocument();
+		xDoc.LoadXml(www.text);
+		var result : XmlNodeList = xDoc.GetElementsByTagName("result");
+		var resultElement = result[0] as XmlElement;
+		var row : XmlNodeList = resultElement.ChildNodes;
+		var id : int;
+		var x : float;
+		var y : float;
+		var z : float;
+		var texture : String;
+		
+		if(row.Count > 0) {
+			while(editingHash) {
 				yield;
 			}
-			var xDoc : XmlDocument = new XmlDocument();
-			xDoc.LoadXml(www.text);
-			var result : XmlNodeList = xDoc.GetElementsByTagName("result");
-			var resultElement = result[0] as XmlElement;
-			var row : XmlNodeList = resultElement.ChildNodes;
-			var id : int;
-			var x : float;
-			var y : float;
-			var z : float;
-			var texture : String;
-			
-			if(row.Count > 0) {
-				while(editingHash) {
-					yield;
-				}
-				for(var rowElement : XmlElement in row) {
-					id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
-					x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
-					y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
-					z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
-					texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
-					//Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
-					//			+ ", texture = " + texture);
-					InstantiateItem(id, x, y, z, texture);
-				}
-			} else {
-				Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
+			for(var rowElement : XmlElement in row) {
+				id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
+				x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
+				y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
+				z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
+				texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
+				//Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
+				//			+ ", texture = " + texture);
+				InstantiateItem(id, x, y, z, texture);
 			}
-		//}
+		} else {
+			Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +172,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 					new Quaternion(90, 0, 0, 0), 0, instantiationData) as GameObject;
 			(item.GetComponent("PhotonView") as PhotonView).viewID = id;
 			// We reserve the id for all players
-			instance.photonView.RPC("ReservePhotonViewID", PhotonTargets.AllBuffered, LevelManager.GetCurrentScene(), id);
+			instance.photonView.RPC("ReservePhotonViewID", PhotonTargets.All, LevelManager.GetCurrentScene(), id);
 			//ReservePhotonViewID(id);// -> This is done in Item.Start()
 		} else {
 			Debug.LogError("Bad id = " + id);
@@ -229,7 +226,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 				}
 			}
 			PhotonNetwork.Destroy(item.gameObject);
-			instance.photonView.RPC("FreePhotonViewID", PhotonTargets.AllBuffered, LevelManager.GetCurrentScene(), id);
+			instance.photonView.RPC("FreePhotonViewID", PhotonTargets.All, LevelManager.GetCurrentScene(), id);
 		} else {
 			Debug.LogError("Bad id = " + id + " Check synchronization! And don't add items manually to the scene! "
 							+ " Add them using the database.");

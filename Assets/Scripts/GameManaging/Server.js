@@ -91,7 +91,7 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	// This is used to escape urls like "Thiago, el Pirata"
-	private static function EscapePath(path : String) : String {
+	public static function EscapePath(path : String) : String {
 		var slashPosition = path.LastIndexOf("/") + 1;
 		var firstPart : String;
 		var lastPart : String;
@@ -726,6 +726,9 @@ class Server extends Photon.MonoBehaviour {
 				        	Inventory.AddItem( line.Split("|"[0])[0], int.Parse(line.Split("|"[0])[1]) );
 				        	break;
 			        	case "mission":
+			        	
+			        		Debug.Log("Server set miiiiiiiiiiiiiiisssssssssssssssssssssssion");
+			        	
 				        	Journal.SetMission( line.Split("|"[0])[0], line.Split("|"[0])[1] );
 				        	break;
 			        	}

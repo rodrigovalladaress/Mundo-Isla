@@ -1,4 +1,5 @@
 ﻿#pragma strict
+#pragma downcast
 public class ReservedPhotonViewIDHash {
 	
 	private var hash = new Hashtable();

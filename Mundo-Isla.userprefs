@@ -1,12 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\ItemManager.js">
     <Files>
-      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="42" Column="92" />
-      <File FileName="Assets\Scripts\Components\Item.js" Line="120" Column="29" />
-      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="810" Column="1" />
-      <File FileName="Assets\Scripts\GameManaging\Player.js" Line="39" Column="41" />
-      <File FileName="Assets\Scripts\GameManaging\SpawnManager.js" Line="14" Column="4" />
+      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="80" Column="21" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="408" Column="9" />
+      <File FileName="Assets\Scripts\GameManaging\ReservedPhotonViewIDHash.js" Line="33" Column="3" />
+      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="56" Column="55" />
+      <File FileName="Assets\Scripts\Components\Item.js" Line="50" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
