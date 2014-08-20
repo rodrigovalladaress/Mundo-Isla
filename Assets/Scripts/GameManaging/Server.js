@@ -59,8 +59,14 @@ class Server extends Photon.MonoBehaviour {
 			Debug.LogWarning("Player skin changes won't sync. Please set playerSkinPersistence true in Server.");
 		}
 		
-		if(/*Application.isEditor*/true) {
+		if(Application.isEditor) {
 			Player.nickname = "Admin";
+		} else {
+			Player.nickname = "Admin_web";
+		}
+		
+		if(/*Application.isEditor*/true) {
+			
 			StartCoroutine(Player.RetrieveSkinString());
 			// Wait until the skin of the player is downloaded
 			while(Player.GetSkinString() == null) {
@@ -120,7 +126,7 @@ class Server extends Photon.MonoBehaviour {
 	function OnJoinedRoom() {
 		Server.Log("server", Player.nickname + " connected.");
 		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null)
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
+		StartCoroutine(Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString()));
 	}
 	
 	/******************************
@@ -346,7 +352,9 @@ class Server extends Photon.MonoBehaviour {
 			for (_player in _players)
 				if (_player.GetComponent(PhotonView).viewID.ToString() == _networkviewid)
 					_target = _player;
-			_target.name = _string;
+			if(_target != null) {
+				_target.name = _string;
+			}
 			break;
 			
 		/*******************************************************
@@ -382,8 +390,10 @@ class Server extends Photon.MonoBehaviour {
 		    localSkin.AddComponent("SkinAnimator");
 //			localSkin.AddComponent(NetworkView);
 			localSkin.name = "Skin";
-			localSkin.transform.parent = _target.transform;
-			localSkin.transform.rotation = _target.transform.rotation;
+			if(_target != null) {
+				localSkin.transform.parent = _target.transform;
+				localSkin.transform.rotation = _target.transform.rotation;
+			}
 			localSkin.transform.localPosition = Vector3(0, -0.57, 0);
 			localSkin.transform.localScale = Vector3.one;
 		    localSkin.animation.Play("idle1");

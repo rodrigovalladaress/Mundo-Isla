@@ -50,20 +50,24 @@ static class Player extends MonoBehaviour{
 	var position = function():Vector3{return Player.object.transform.position;};
 	var SpawnPoint = function():Vector3{return GameObject.Find("SpawnPoint").transform.position;};
 	
-	private var player:GameObject;
+	//private var player:GameObject;
 	
 	/*******************************************************
 	|	Makes a player spawns
 	*******************************************************/
-	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String){
+	/*function Spawn(_name:String, spawnPoint:Vector3, _skinString:String){
 		Spawn(_name, spawnPoint, Quaternion.identity, _skinString);
-	}
+	}*/
 	
-	function Spawn(_name:String, spawnPoint:Vector3, rotation:Quaternion, _skinString:String) {
+	
+	
+	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) : IEnumerator {
 		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
+		object = null;
 		if (!GameObject.Find(_name)){
-			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, rotation, 0) as GameObject;
-			
+			var objects : Object[] = [LevelManager.GetCurrentScene()];
+			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, Quaternion.identity, 0, objects) as GameObject;
+
 			if(newPlayer != null && _name != null && _skinString != null) {
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
 				

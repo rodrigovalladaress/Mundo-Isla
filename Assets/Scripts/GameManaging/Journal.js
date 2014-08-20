@@ -112,7 +112,6 @@ static class Journal extends MonoBehaviour{
 			Debug.LogError(mission + " has more than " + MaxCharsMission + " characters! Please change the name of the mission " 
 							+ "to fit this restriction.");
 		}
-		// TODO Sincronizar con base de datos
 	}
 	
 	// Synchronization of the mission
@@ -129,15 +128,13 @@ static class Journal extends MonoBehaviour{
 	}
 	
 	function UpdateMission (mission:String){
-	
-		Debug.Log("Update " + mission + " -----------");
-	
 		// if we have that mission...
 		if (Journal.Has(mission)){
 			var missionStatus:int = Journal.missions[mission];
 			// and it's active, we go to the next step of that mission
 			if (missionStatus > 0) {
 				Journal.missions[mission] = missionStatus + 1;
+				Server.StartCoroutine(SetMissionSync(mission, missionStatus));
 				Server.Log("Game event", "The mission, \"" + mission + "\" stage is now \"" + missionStatus + "\"");
 			}
 		}

@@ -27,10 +27,7 @@
 //
 // Changes in 1.0 version:
 //	 - 	Loads scenes.
-// 
-// Stores the name of the current scene
-private static var currentScene : String;
-
+//
 private static var hasBeenInitialized = false;
 
 public static function Load(name : String) {
@@ -41,18 +38,22 @@ public static function Load(name : String) {
 public static function LoadScene(name : String) {
 	// The first scene that invokes this method is setted as the 
 	// "Main" scene
-	if(LevelManager.currentScene == null) {
+	/*if(LevelManager.currentScene == null) {
 		LevelManager.currentScene = "Main";
-	}
+	}*/
 	LevelManager.hasBeenInitialized = true;
 	Debug.Log("LevelManager LoadScene " + name);
 	// Destroy the player before loading a new scene
+	var objects : GameObject[] = GameObject.FindGameObjectsWithTag("Item");
+	for(var item : GameObject in objects) {
+		PhotonNetwork.Destroy(item);
+	}
 	if(Player.object != null) {
 		PhotonNetwork.Destroy(Player.object);
 	}
 	ItemManager.FreeAllPhotonViewIDs(GetCurrentScene());
 	PhotonNetwork.LoadLevel(name);
-	LevelManager.currentScene = name;
+	SetCurrentScene(name);
 }
 
 public static function HasBeenInitialized() : boolean {
@@ -60,8 +61,8 @@ public static function HasBeenInitialized() : boolean {
 }
 
 public static function GetCurrentScene() : String {
-	if(currentScene == null) {
-		currentScene = "Main";
-	}
-	return currentScene;
+	return GlobalData.GetCurrentScene();
+}
+public static function SetCurrentScene(currentScene : String) : String {
+	GlobalData.SetCurrentScene(currentScene);
 }
