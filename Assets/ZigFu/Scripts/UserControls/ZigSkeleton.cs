@@ -547,7 +547,7 @@ public class ZigSkeleton : MonoBehaviour
 		Plano.renderer.enabled = plano; //visibilidad
 		
 		Barra = GameObject.Find("barra");
-		Barra.renderer.enabled = barra;
+//		Barra.renderer.enabled = barra;
 		
 		
 		
