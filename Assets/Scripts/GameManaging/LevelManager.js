@@ -2,8 +2,11 @@
 #pragma downcast
 // Loads new scenes and stores some data of the scene.
 //
-// Version: 1.5
+// Version: 2.0
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
+//
+// Changes in 2.0 version:
+// -	There's only one scene with many subscenes.
 //
 // Changes in 1.5 version:
 //	-	The hash of items is no longer used.
@@ -30,30 +33,18 @@
 //
 private static var hasBeenInitialized = false;
 
+private static var currentScene:String;
+
 public static function Load(name : String) {
 	LevelManager.LoadScene(name);
 }
 
 // Loads the given level
 public static function LoadScene(name : String) {
-	// The first scene that invokes this method is setted as the 
-	// "Main" scene
-	/*if(LevelManager.currentScene == null) {
-		LevelManager.currentScene = "Main";
-	}*/
 	LevelManager.hasBeenInitialized = true;
-	Debug.Log("LevelManager LoadScene " + name);
-	// Destroy the player before loading a new scene
-	var objects : GameObject[] = GameObject.FindGameObjectsWithTag("Item");
-	for(var item : GameObject in objects) {
-		PhotonNetwork.Destroy(item);
-	}
-	if(Player.object != null) {
-		PhotonNetwork.Destroy(Player.object);
-	}
-	ItemManager.FreeAllPhotonViewIDs(GetCurrentScene());
-	PhotonNetwork.LoadLevel(name);
+	Player.Reposition(GameObject.Find("SpawnPoint" + name).transform.position);
 	SetCurrentScene(name);
+	Server.Log("server", Player.nickname + " is now in " + name);
 }
 
 public static function HasBeenInitialized() : boolean {
@@ -61,8 +52,11 @@ public static function HasBeenInitialized() : boolean {
 }
 
 public static function GetCurrentScene() : String {
-	return GlobalData.GetCurrentScene();
+	if(currentScene == null || currentScene.Equals("")) {
+		SetCurrentScene("Main");
+	}
+	return currentScene;
 }
 public static function SetCurrentScene(currentScene : String) : String {
-	GlobalData.SetCurrentScene(currentScene);
+	this.currentScene = currentScene;
 }

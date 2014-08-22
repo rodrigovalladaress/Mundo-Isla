@@ -1,4 +1,5 @@
 #pragma strict
+#pragma downcast
 //////////////////////////////////////////////////////////////////
 // Edited by Rodrigo Valladares Santana <rodriv_tf@hotmail.com> //
 //                                                              //
@@ -125,8 +126,9 @@ class Server extends Photon.MonoBehaviour {
 	
 	function OnJoinedRoom() {
 		Server.Log("server", Player.nickname + " connected.");
-		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null)
-		StartCoroutine(Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString()));
+		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null) {
+			Player.Spawn(Player.nickname, Player.GetSpawnPoint(), Player.GetSkinString());
+		}
 	}
 	
 	/******************************
@@ -599,7 +601,7 @@ class Server extends Photon.MonoBehaviour {
 		******************************/
 		function PlayerSkin(){
 		
-			if(Application.isEditor){
+			if(true) {//Application.isEditor){
 				// Override
 				Server.Log("server", "Editor mode, overriding skin.");
 				Player.SetSkinString("");

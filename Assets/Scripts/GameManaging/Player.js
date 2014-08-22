@@ -48,9 +48,14 @@ static class Player extends MonoBehaviour{
 //	var object = function():GameObject{var _players:GameObject[] = GameObject.FindGameObjectsWithTag("Player"); for (var _player:GameObject in _players) if (_player.networkView.isMine) return _player;return;};
 	public var object:GameObject;
 	var position = function():Vector3{return Player.object.transform.position;};
-	var SpawnPoint = function():Vector3{return GameObject.Find("SpawnPoint").transform.position;};
 	
-	//private var player:GameObject;
+	function GetSpawnPoint(scene:String):Vector3 {
+		return GameObject.Find("SpawnPoint" + scene).transform.position;
+	}
+	
+	function GetSpawnPoint():Vector3 {
+		return GetSpawnPoint(LevelManager.GetCurrentScene());
+	}
 	
 	/*******************************************************
 	|	Makes a player spawns
@@ -61,12 +66,11 @@ static class Player extends MonoBehaviour{
 	
 	
 	
-	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) : IEnumerator {
+	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) {//: IEnumerator {
 		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
 		object = null;
 		if (!GameObject.Find(_name)){
-			var objects : Object[] = [LevelManager.GetCurrentScene()];
-			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, Quaternion.identity, 0, objects) as GameObject;
+			var newPlayer:GameObject = PhotonNetwork.Instantiate("Prefabs/player", spawnPoint, Quaternion.identity, 0) as GameObject;
 
 			if(newPlayer != null && _name != null && _skinString != null) {
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
@@ -91,6 +95,7 @@ static class Player extends MonoBehaviour{
 						newPlayer.AddComponent(component);
 					}
 				}
+				//DontDestroyOnLoad(Player.object);
 				Server.Log("Game event", _name + " spawned.");
 			}
 		}
@@ -108,7 +113,7 @@ static class Player extends MonoBehaviour{
 	/*******************************************************
 	|	sets the player position
 	*******************************************************/
-	function reposition(newPosition:Vector3){
+	function Reposition(newPosition:Vector3){
 		GameObject.Find(nickname).transform.position = newPosition;
 	}
 	
