@@ -212,6 +212,11 @@ public class ItemManager extends Photon.MonoBehaviour {
 			Debug.LogError("Error adding item to scene");
 		}
 	}
+	
+	@RPC
+	public function DestroyItem(id:int) {
+		PhotonNetwork.Destroy(PhotonView.Find(id));
+	}
 
 	// This removes an item from a scene. 
 	public static function RemoveItemFromScene(item : Item, scene : String) : IEnumerator {
@@ -229,7 +234,12 @@ public class ItemManager extends Photon.MonoBehaviour {
 									+ www.text + ") url = " + url);
 				}
 			}
-			PhotonNetwork.Destroy(item.gameObject);
+			var owner:PhotonPlayer = (item.GetComponent("PhotonView") as PhotonView).owner;
+			if(owner != null) {
+				instance.photonView.RPC("DestroyItem", owner, id);
+			} else {
+				PhotonNetwork.Destroy(item.GetComponent("PhotonView") as PhotonView);
+			}
 			//instance.photonView.RPC("FreePhotonViewID", PhotonTargets.AllBuffered, id);
 		/*} else {
 			Debug.LogError("Bad id = " + id + " Check synchronization! And don't add items manually to the scene! "
