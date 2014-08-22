@@ -149,20 +149,18 @@ class MainGUI extends MonoBehaviour {
 					GUILayout.FlexibleSpace();
 					MenuSwitch(Text("Player options"), "SkinEditor");
 					GUILayout.FlexibleSpace();
-					if (GUILayout.Button( Text("Play") )){
-						Server.Host();
-						Toogle();
-					}
-					GUILayout.FlexibleSpace();
 					// TODO if (Player.nickname == "Admin"){
 					
 						GUILayout.FlexibleSpace();
-						if (GUILayout.Button( Text("Singleplayer") )){
-							Server.Host();
-							Toogle();
+						if(Player.nickname.Equals("Admin") || Player.nickname.Equals("Admin_web")) {
+							if (GUILayout.Button( Text("Random room") )){
+								//Server.Host();
+								Server.CreateOrJoinRandomRoom();
+								Toogle();
+							}
+							GUILayout.FlexibleSpace();
 						}
 						
-						GUILayout.FlexibleSpace();
 						MenuSwitch(Text("Multiplayer"), "Multiplayer");
 					// }
 					GUILayout.FlexibleSpace();
@@ -207,11 +205,11 @@ class MainGUI extends MonoBehaviour {
 			function Box(){
 				GUILayout.FlexibleSpace();
 				GUILayout.FlexibleSpace();
-				ContentSwitch( Text("Host Server"), "Host" );
+				ContentSwitch( Text("Host room"), "Host" );
 				GUILayout.FlexibleSpace();
-				ContentSwitch( Text("Find Hosts"), "Servers", Server.RefreshHostList() );
+				ContentSwitch( Text("Find rooms"), "Servers", Server.RefreshHostList() );
 				GUILayout.FlexibleSpace();
-				ContentSwitch( Text("Direct Connect"), "Direct Connect" );
+				//ContentSwitch( Text("Direct Connect"), "Direct Connect" );
 				GUILayout.FlexibleSpace();
 				GUILayout.FlexibleSpace();
 				GUILayout.FlexibleSpace();
@@ -399,8 +397,8 @@ class MainGUI extends MonoBehaviour {
 		
 		static class Host{
 		
-			private var serverIP:String = "127.0.0.1";
-			private var port:int = 25001;
+			//private var serverIP:String = "127.0.0.1";
+			//private var port:int = 25001;
 			private var maxPlayers:int = 5;
 			
 			var SP:Vector2 = Vector2.zero;
@@ -412,12 +410,12 @@ class MainGUI extends MonoBehaviour {
 			
 			function Box(){
 				// Port input field
-					GUILayout.BeginHorizontal();
+					/*GUILayout.BeginHorizontal();
 						GUILayout.Label(Text("Port") + ": ", GUILayout.ExpandWidth(false));
 						var portString = GUILayout.TextField (port.ToString());
 						if(portString == "") port = 0;
 						else try port = int.Parse(portString); catch(FormatException) Server.Log("server", "Bad input in port field");
-					GUILayout.EndHorizontal();
+					GUILayout.EndHorizontal();*/
 				
 				// Max Players input scroll
 					GUILayout.BeginHorizontal();
@@ -439,7 +437,7 @@ class MainGUI extends MonoBehaviour {
 					// Name input field
 						GUILayout.BeginHorizontal();
 							GUI.SetNextControlName("New server name box");
-							GUILayout.Label(Text("Game Name") + ": ", GUILayout.ExpandWidth(false));
+							GUILayout.Label(Text("Room Name") + ": ", GUILayout.ExpandWidth(false));
 							gameName = GUILayout.TextField (gameName);
 						GUILayout.EndHorizontal();
 					
@@ -463,12 +461,13 @@ class MainGUI extends MonoBehaviour {
 						}
 					else{
 						if(GUILayout.Button( Text("Start") )){
-							Server.Host(maxPlayers, port, gameName, gameDescription);
+							//Server.Host(maxPlayers, port, gameName, gameDescription);
+							Server.CreateRoom(gameName, maxPlayers, true, gameDescription);
 							Menu.Toogle();
 						}
 						// Execute the startServer function if return is pressed and the box has focus
 						if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' && GUI.GetNameOfFocusedControl() == "New server name box"){
-							Server.Host(maxPlayers, port, gameName, gameDescription);
+							//Server.Host(maxPlayers, port, gameName, gameDescription);
 							Menu.Toogle();
 						}
 					}
@@ -480,7 +479,7 @@ class MainGUI extends MonoBehaviour {
 					
 					// Start button
 					if(GUILayout.Button( Text("Start") )){
-						Server.Host(maxPlayers, port);
+						//Server.Host(maxPlayers, port);
 						Menu.Toogle();
 					}
 				}

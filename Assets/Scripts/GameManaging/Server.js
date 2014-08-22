@@ -53,6 +53,21 @@ class Server extends Photon.MonoBehaviour {
 		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
 	
+	//OnJoinedLobby or OnConnectedToMaster
+	public static function CreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, gameDescription:String) {
+		var hash:ExitGames.Client.Photon.Hashtable = new ExitGames.Client.Photon.Hashtable();
+		hash.Add("gameDescription", gameDescription);
+		PhotonNetwork.CreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
+	}
+	
+	public static function CreateOrJoinRandomRoom() {
+		if(PhotonNetwork.GetRoomList().Length > 0) {
+			PhotonNetwork.JoinRandomRoom();
+		} else {
+			PhotonNetwork.CreateRoom(null);
+		}
+	}
+	
 	function Awake() {
 		instance = this;
 	}
@@ -74,7 +89,7 @@ class Server extends Photon.MonoBehaviour {
 		} else {
 			Player.nickname = "Admin_web";
 		}
-		
+		ConnectToPhoton();
 		StartCoroutine(Journal.RetrieveMissions());
 		StartCoroutine(ItemManager.RetrieveItemInformation());
 		StartCoroutine(Inventory.Retrieve());
@@ -106,7 +121,11 @@ class Server extends Photon.MonoBehaviour {
 	function OnGUI() {
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
 		if(PhotonNetwork.room != null) {
+			GUILayout.Label("Room name = " + PhotonNetwork.room.name);
 			GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
+			if(PhotonNetwork.room.customProperties != null) {
+				GUILayout.Label("Description: " + PhotonNetwork.room.customProperties["gameDescription"]);
+			}
 		}
 	}
 	
@@ -128,13 +147,13 @@ class Server extends Photon.MonoBehaviour {
 	// Join a random room
 	function OnJoinedLobby()
 	{
-    	PhotonNetwork.JoinRandomRoom();
+    	//PhotonNetwork.JoinRandomRoom();
 	}
 	
 	function OnPhotonRandomJoinFailed()
 	{
     	Debug.Log("Can't join random room!");
-    	PhotonNetwork.CreateRoom(null);
+    	//PhotonNetwork.CreateRoom(null);
 	}
 	
 	function OnJoinedRoom() {
