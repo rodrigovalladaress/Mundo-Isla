@@ -5,7 +5,7 @@ class MissionZone extends MonoBehaviour{
 	
 	function OnTriggerEnter (c : Collider) {
 		if (c.gameObject == Player.object){
-			Journal.SetMission(mission, status);
+			Journal.SetMissionAndSync(mission, status);
 			Debug.Log("set " + mission + " as " + status);
 			Destroy(this.gameObject);
 		}

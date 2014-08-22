@@ -43,6 +43,12 @@ class Server extends Photon.MonoBehaviour {
 		return instance.playerSkinPersistence;
 	}
 	
+	// If it's setted true, the changes in the journal will be synced with the database.
+	public var missionPersistence:boolean;
+	public static function IsMissionPersistence():boolean {
+		return instance.missionPersistence;
+	}
+	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
@@ -59,12 +65,17 @@ class Server extends Photon.MonoBehaviour {
 		if(!IsPlayerSkinPersistence()) {
 			Debug.LogWarning("Player skin changes won't sync. Please set playerSkinPersistence true in Server.");
 		}
+		if(!IsMissionPersistence()) {
+			Debug.LogWarning("Mission progresss won't sync. Please set missionPersistence true in Server.");
+		}
 		
 		if(Application.isEditor) {
 			Player.nickname = "Admin";
 		} else {
 			Player.nickname = "Admin_web";
 		}
+		
+		Journal.MissionRetrieving();
 		
 		if(/*Application.isEditor*/true) {
 			
@@ -327,7 +338,7 @@ class Server extends Photon.MonoBehaviour {
 		case "mission":
 			if (_string.Split("|"[0]).Length > 1){
 				if (_string.Split("|"[0])[1] != "delete" )
-					Journal.SetMission( _string.Split("|"[0])[0], _string.Split("|"[0])[1] );
+					Journal.SetMissionAndSync( _string.Split("|"[0])[0], _string.Split("|"[0])[1] );
 				else
 					Journal.DelMission( _string.Split("|"[0])[0] );
 			}
@@ -680,7 +691,7 @@ class Server extends Photon.MonoBehaviour {
 		// This function loads the data of the inventory stored in the database and stores that
 		// in the Inventory.
 		function PlayerInventory() {
-			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + Player.nickname;
+			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + WWW.EscapeURL(Player.nickname);
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
@@ -741,7 +752,7 @@ class Server extends Photon.MonoBehaviour {
 			        	
 			        		Debug.Log("Server set miiiiiiiiiiiiiiisssssssssssssssssssssssion");
 			        	
-				        	Journal.SetMission( line.Split("|"[0])[0], line.Split("|"[0])[1] );
+				        	Journal.SetMissionAndSync( line.Split("|"[0])[0], line.Split("|"[0])[1] );
 				        	break;
 			        	}
 			        }

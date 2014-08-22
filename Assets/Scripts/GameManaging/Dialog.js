@@ -192,7 +192,7 @@ static class Dialog extends MonoBehaviour{
 		case "journal":
 			switch(_node["@function"] as String){
 			case "SetMission":
-					Journal.SetMission( _node["@mission"] as String, _node["@status"] as String );
+					Journal.SetMissionAndSync( _node["@mission"] as String, _node["@status"] as String );
 					break;
 			case "SetMissionToEveryone":
 					Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, Server.GetPhotonView().viewID.ToString(), 

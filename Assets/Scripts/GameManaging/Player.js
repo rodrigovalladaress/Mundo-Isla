@@ -123,7 +123,7 @@ static class Player extends MonoBehaviour{
 	*******************************************************/
 	// Downloading of the database's skinString
 	public function RetrieveSkinString() : IEnumerator {
-		var url : String = Paths.GetPlayerQuery() + "/get_skin.php/?player=" + nickname;
+		var url : String = Paths.GetPlayerQuery() + "/get_skin.php/?player=" + WWW.EscapeURL(nickname);
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
 			yield;
@@ -139,7 +139,7 @@ static class Player extends MonoBehaviour{
 	// Syncing database's skinString
 	private function ChangeSkinString(skinString : String) : IEnumerator {
 		var url : String = Paths.GetPlayerQuery() + "/set_skin.php/?player=" 
-							+ nickname + "&skinstring=" + skinString;
+							+ WWW.EscapeURL(nickname) + "&skinstring=" + skinString;
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
 			yield;

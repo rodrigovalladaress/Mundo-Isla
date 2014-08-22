@@ -116,7 +116,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 	// instantiates them.
 	private function RetrieveItemInformation() : IEnumerator {
 		var url : String = Paths.GetSceneQuery() + "/get_items.php/?scene=" + 
-							(LevelManager.GetCurrentScene() != null ? LevelManager.GetCurrentScene() : "Main");
+							WWW.EscapeURL(LevelManager.GetCurrentScene());
 		// Wait for the connection to a room
 		while(PhotonNetwork.room == null) {
 			yield;
@@ -138,17 +138,12 @@ public class ItemManager extends Photon.MonoBehaviour {
 		var texture : String;
 		
 		if(row.Count > 0) {
-			while(editingHash) {
-				yield;
-			}
 			for(var rowElement : XmlElement in row) {
 				id = int.Parse(rowElement.GetElementsByTagName("id")[0].InnerText);
 				x = float.Parse(rowElement.GetElementsByTagName("x")[0].InnerText);
 				y = float.Parse(rowElement.GetElementsByTagName("y")[0].InnerText);
 				z = float.Parse(rowElement.GetElementsByTagName("z")[0].InnerText);
 				texture = rowElement.GetElementsByTagName("texture")[0].InnerText;
-				//Debug.Log("id = " + id + ", x = " + x + ", y = " + y + ", z = " + z 
-				//			+ ", texture = " + texture);
 				InstantiateItem(id, x, y, z, texture);
 			}
 		} else {
@@ -194,8 +189,8 @@ public class ItemManager extends Photon.MonoBehaviour {
 		
 		if(object != null) {
 			if(instance.sceneItemsPersistence) {
-				var url : String = Paths.GetSceneQuery() + "/add_item.php/?id=" + id + "&scene=" + scene
-									+ "&texture=" + texture + "&x=" + x + "&y=" + y + "&z=" + z;
+				var url : String = Paths.GetSceneQuery() + "/add_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(scene)
+									+ "&texture=" + WWW.EscapeURL(texture) + "&x=" + x + "&y=" + y + "&z=" + z;
 				var www : WWW = new WWW(url);
 				while(!www.isDone) {
 					yield;
@@ -215,7 +210,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 		// We check if the id is being used by the item
 		if(IsIDReserved(id)) {
 			if(instance.sceneItemsPersistence) {
-				var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + scene;
+				var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(scene);
 				var www : WWW = new WWW(url);
 				while(!www.isDone) {
 					yield;
@@ -237,8 +232,8 @@ public class ItemManager extends Photon.MonoBehaviour {
 	// Adds an amount of items to the original amount of items
 	public static function SyncAddItem(item : String, amount : int) : IEnumerator {
 		if(instance.inventoryPersistence) {
-			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + Player.nickname 
-								+ "&item=" + item + "&amount=" + amount;
+			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + WWW.EscapeURL(Player.nickname) 
+								+ "&item=" + WWW.EscapeURL(item) + "&amount=" + amount;
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {
 				yield;
