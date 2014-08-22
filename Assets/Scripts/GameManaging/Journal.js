@@ -209,7 +209,7 @@ static class Journal extends MonoBehaviour{
 		}
 	}
 	
-	function MissionRetrieving() : IEnumerator {
+	function RetrieveMissions() : IEnumerator {
 		var url:String = Paths.GetPlayerQuery() + "/get_missions.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.nickname));
 		// If we are the only player on the scene, initialization is necesary
 		var www : WWW = new WWW(url);

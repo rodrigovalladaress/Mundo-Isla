@@ -75,7 +75,9 @@ class Server extends Photon.MonoBehaviour {
 			Player.nickname = "Admin_web";
 		}
 		
-		Journal.MissionRetrieving();
+		StartCoroutine(Journal.RetrieveMissions());
+		StartCoroutine(ItemManager.RetrieveItemInformation());
+		StartCoroutine(Inventory.Retrieve());
 		
 		if(/*Application.isEditor*/true) {
 			
@@ -93,7 +95,7 @@ class Server extends Photon.MonoBehaviour {
 		}
 		
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
-		StartCoroutine(Retrieve.PlayerInventory());
+		//StartCoroutine(Retrieve.PlayerInventory());
 		
 		while (!Player.isPlaying()) yield;
 		//Server.StartCoroutine( TrackInventory("item", Inventory.items) );
@@ -688,34 +690,7 @@ class Server extends Photon.MonoBehaviour {
 		/******************************
 		|	Player Inventory Retrieving
 		******************************/
-		// This function loads the data of the inventory stored in the database and stores that
-		// in the Inventory.
-		function PlayerInventory() {
-			var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + WWW.EscapeURL(Player.nickname);
-			var www : WWW = new WWW(url);
-			while(!www.isDone) {
-				yield;
-			}
-			var xDoc : XmlDocument = new XmlDocument();
-			xDoc.LoadXml(www.text);
-			var result : XmlNodeList = xDoc.GetElementsByTagName("result");
-			var resultElement = result[0] as XmlElement;
-			var row : XmlNodeList = resultElement.ChildNodes;
-			var item : String;
-			var amount : int;
-			while(PhotonNetwork.room == null) {
-				yield;
-			}
-			if(row.Count > 0) {
-				for(var rowElement : XmlElement in row) {
-					item = rowElement.GetElementsByTagName("item")[0].InnerText;
-					amount = int.Parse(rowElement.GetElementsByTagName("amount")[0].InnerText);
-					Inventory.AddItem(item, amount);
-				}
-			} else {
-				Debug.Log(Player.nickname + " doesn't have any item in his or her inventory");
-			}
-		}
+		
 		
 		function PlayerInventory( type:String ){
 		

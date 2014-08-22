@@ -40,6 +40,8 @@ class Item extends MonoBehaviour{
 	public			var _labelOffset		:	int 	=	40;
 	public 			var _audioClip			:	AudioClip;
 	public			var _texture			:	String;
+	// Scene where the item is
+	public			var scene				:	String;
 	
 	private var photonView : PhotonView;
 	
@@ -47,11 +49,12 @@ class Item extends MonoBehaviour{
 		var _done:boolean = false;
 		photonView = GetComponent("PhotonView") as PhotonView;
 		// We get the name of the texture passed by instantiationData
-		if((photonView.instantiationData != null) && (photonView.instantiationData.Length > 0)) {
+		if((photonView.instantiationData != null) && (photonView.instantiationData.Length == 2)) {
 			this.gameObject.name = photonView.instantiationData[0] as String;
+			scene = photonView.instantiationData[1] as String;
 		} else {
-			Debug.LogError("Item needs its name in photonView.instantiateionData[0] when is instantiated"
-							+ " through PhotonNetwork.Instantiate");
+			Debug.LogError("Item needs its name in photonView.instantiationData[0] and the scene where is in photonView.instantiationData[1]"
+							+ " when is instantiated through PhotonNetwork.Instantiate");
 		}
 		Server.StartCoroutine(SetTexture(this.gameObject.name));
 		//ItemManager.ReservePhotonViewID(GetPhotonViewID());
@@ -138,12 +141,12 @@ class Item extends MonoBehaviour{
 			if ( collider.gameObject != Player.object ) return;
 			//Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
-			//Network.Destroy(gameObject);
 			RemoveItemFromScene();
 			Server.StartCoroutine(ItemManager.SyncAddItem(_texture, 1));
 			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
 		}
-		else if(collider.transform.GetComponent("Terrain")){
+		// When the item touches another object, it stops descending
+		else  {// if(collider.transform.GetComponent("Terrain")){
 			Destroy(this.gameObject.rigidbody);
 		}
 	}
