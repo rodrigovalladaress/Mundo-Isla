@@ -75,10 +75,10 @@ static class Player extends MonoBehaviour{
 			if(newPlayer != null && _name != null && _skinString != null) {
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
 				
-				Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, 
+				Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, 
 					newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerName", _name);
 				Server.GetPhotonView().RPC("SyncObject", 
-					PhotonTargets.All, newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerSkin", _skinString);
+					PhotonTargets.AllBuffered, newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerSkin", _skinString);
 			
 				if (newPlayer.GetPhotonView().isMine) {
 					// Debug.Log("Attaching camera.");
