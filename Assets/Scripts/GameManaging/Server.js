@@ -34,15 +34,22 @@
 class Server extends Photon.MonoBehaviour {
 	static var session:String;
 	static var saveDelay:float = 30.0;
-	static var hostData:HostData[];
 	static var SecondsForTimeout:float = 5.0;
 	static private var _gameType = "IslaSAVEH.Alpha";
-	static private var _scriptsFolder:String = Application.dataPath + "/";
+	
 	// Instance used to access non static members from static methods, and starting coroutines
 	private static var instance : Server;
 	
+	// instance initialization
+	function Awake() {
+		instance = this;
+	}
+	
+	// If setted true, the GUI shows some information of the connection to Photon
+	public var showDebugInformationOnGUI:boolean;
+	
 	// If it's setted true, the changes in the skin of the player will be synced with the database.
-	public var playerSkinPersistence : boolean;
+	public var playerSkinPersistence:boolean;
 	public static function IsPlayerSkinPersistence() : boolean {
 		return instance.playerSkinPersistence;
 	}
@@ -57,7 +64,10 @@ class Server extends Photon.MonoBehaviour {
 		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
 	
-	//OnJoinedLobby or OnConnectedToMaster
+	
+	/*******************************************************
+	|	Room management
+	*******************************************************/
 	public static function CreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, gameDescription:String) {
 		var hash:ExitGames.Client.Photon.Hashtable = new ExitGames.Client.Photon.Hashtable();
 		hash.Add("gameDescription", gameDescription);
@@ -76,13 +86,10 @@ class Server extends Photon.MonoBehaviour {
 		PhotonNetwork.JoinRoom(roomName);
 	}
 	
-	function Awake() {
-		instance = this;
-	}
-	
 	/*******************************************************
 	|	Actions taken when this script start
 	*******************************************************/
+	// Connection to Photon and ServerOptions retrieving
 	function Start() {
 		
 		if(!IsPlayerSkinPersistence()) {
@@ -91,46 +98,30 @@ class Server extends Photon.MonoBehaviour {
 		if(!IsMissionPersistence()) {
 			Debug.LogWarning("Mission progresss won't sync. Please set missionPersistence true in Server.");
 		}
-		
 		if(Application.isEditor) {
 			Player.nickname = "Admin";
 		} else {
-			Player.nickname = "Admin_web";
+			Player.nickname = "";
 		}
 		ConnectToPhoton();
-		
-		
-		//if(/*Application.isEditor*/true) {
-		/*	
-			StartCoroutine(Player.RetrieveSkinString());
-			// Wait until the skin of the player is downloaded
-			while(Player.GetSkinString() == null) {
-				yield;
-			}
-			MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
-			//Player.GetSkinString() = MainGUI.Menu.SkinEditor.savedSkin = "female|eyes|female_eyes_blue|face|female_face-1|hair|"
-			//+ "female_hair-2_dark|pants|female_pants-2_black|shoes|female_shoes-1_blue|top|female_top-2_orange";
-		    GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			MainGUI.Menu.current = "Menu";
-			MainGUI.Content.current = "";
-		}*/
-		
+				
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
-		//StartCoroutine(Retrieve.PlayerInventory());
 		
 		while (!Player.isPlaying()) yield;
 		//Server.StartCoroutine( TrackInventory("item", Inventory.items) );
 		//Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
 	}
 	
-	// State of the connection to Photon (debug)
+	// The GUI shows the connection to Photon (debug)
 	function OnGUI() {
-		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-		if(PhotonNetwork.room != null) {
-			GUILayout.Label("Room name = " + PhotonNetwork.room.name);
-			GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
-			if(PhotonNetwork.room.customProperties != null) {
-				GUILayout.Label("Description: " + PhotonNetwork.room.customProperties["gameDescription"]);
+		if(showDebugInformationOnGUI) {
+			GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+			if(PhotonNetwork.room != null) {
+				GUILayout.Label("Room name = " + PhotonNetwork.room.name);
+				GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
+				if(PhotonNetwork.room.customProperties != null) {
+					GUILayout.Label("Description: " + PhotonNetwork.room.customProperties["gameDescription"]);
+				}
 			}
 		}
 	}
@@ -153,13 +144,13 @@ class Server extends Photon.MonoBehaviour {
 	// Join a random room
 	function OnJoinedLobby()
 	{
-    	//PhotonNetwork.JoinRandomRoom();
+    	Server.Log("debug", Player.nickname + " joined lobby");
 	}
 	
 	function OnPhotonRandomJoinFailed()
 	{
-    	Debug.Log("Can't join random room!");
-    	//PhotonNetwork.CreateRoom(null);
+    	Debug.LogError("Can't join room!");
+    	Server.Log("error", Player.nickname + " couldn't join room");
 	}
 	
 	function OnJoinedRoom() {
@@ -199,8 +190,12 @@ class Server extends Photon.MonoBehaviour {
 				while(Player.GetSkinString() == null) {
 					yield;
 				}
+				// Wait for connection to Photon if we weren't connected yet.
+				while(!PhotonNetwork.connectedAndReady) {
+					yield;
+				}
 				MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
-				// Show player skin on GUI
+				// Show player skin next to the GUI menu
 		   		GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 				MainGUI.Menu.current = "Menu";
 				MainGUI.Content.current = "";
@@ -436,16 +431,6 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	/******************************
-	|	Save to database, delayed
-	******************************/
-	
-	/*static function TrackInventory( type:String, list:Dictionary.<String, int> ):IEnumerator {
-		Server.Retrieve.PlayerInventory( type, list );
-		yield WaitForSeconds(saveDelay);
-		Server.StartCoroutine( TrackInventory(type, list) );
-	}*/
-	
-	/******************************
 	|	Start Coroutines
 	******************************/
 	static function StartCoroutine(_function:IEnumerator){
@@ -512,7 +497,7 @@ class Server extends Photon.MonoBehaviour {
 		/******************************
 		|	TXT retrieving
 		******************************/
-		function TXT(scriptTarget:String, path:String):IEnumerator{
+		function TXT(scriptTarget:String, path:String):IEnumerator {
 		
 			var file:String = Paths.GetLocalHost() + "/" + path + ".txt";
 			
@@ -551,9 +536,9 @@ class Server extends Photon.MonoBehaviour {
 								Server.StartCoroutine( MainGUI.SetLanguage( Line.Split("|"[0])[1].Trim() ) );
 								break;
 								
-							case "ScriptsFolder":
+							/*case "ScriptsFolder":
 								Server._scriptsFolder = Line.Split("|"[0])[1].Trim() + "/";
-								break;
+								break;*/
 								
 							case "DialogsFolder":
 								Dialog.folder = Line.Split("|"[0])[1].Trim() + "/";
@@ -598,190 +583,11 @@ class Server extends Photon.MonoBehaviour {
 			if (!www.error){
 				www.LoadImageIntoTexture(image);
 				Inventory.textures[textureName] = image;
+			} else {
+				Debug.LogError("Error downlading " + textureName + " texture.");
 			}
 			www.Dispose();	
 		}
-		/******************************
-		|	Player Skin Retrieving
-		******************************/
-		function PlayerSkin(){
-		
-			if(true) {//Application.isEditor){
-				// Override
-				Server.Log("server", "Editor mode, overriding skin.");
-				Player.SetSkinString("");
-				GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			}
-			else if (Application.isWebPlayer) {
-				// Create a form object for sending data to the server
-			    var form = new WWWForm();
-			     // The name of the player
-			    form.AddField( "user", Player.nickname.ToLower() );
-			
-		    	// Create a download object
-		        var download = new WWW( _scriptsFolder + "getSkin.pl", form );
-			
-			    // Wait until the download is done
-			    while (!download.isDone) yield;
-				
-			    if(download.error) {
-			        print( "Error downloading: " + download.error );
-			        Player.SetSkinString("");
-			        MainGUI.Menu.SkinEditor.savedSkin = "";
-					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			        download.Dispose();
-			        return;
-			    }
-			    else{
-			        // get the anwser, and act on it
-			        Player.SetSkinString(download.text);
-			        MainGUI.Menu.SkinEditor.savedSkin = download.text;
-					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			        download.Dispose();
-			    }
-			}
-		}
-		
-		function PlayerSkin(_skin:String){
-		
-			if(/*Application.isEditor*/true){
-				// Override
-				Server.Log("server", "Editor mode, overriding skin.");
-				Player.SetSkinString(_skin);
-				GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			}
-			else if (Application.isWebPlayer) {
-				// Create a form object for sending data to the server
-			    var form = new WWWForm();
-			     // The name of the player
-			    form.AddField( "user", Player.nickname.ToLower() );
-			    form.AddField( "skin", _skin );
-			
-		    	// Create a download object
-		        var download = new WWW( _scriptsFolder + "getSkin.pl", form );
-			
-			    // Wait until the download is done
-			    while (!download.isDone) yield;
-				
-			    if(download.error) {
-			        print( "Error downloading: " + download.error );
-			        Player.SetSkinString("");
-					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			        download.Dispose();
-			        return;
-			    }
-			    else{
-			        // get the anwser, and act on it
-			        Player.SetSkinString(download.text);
-					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-			        download.Dispose();
-			    }
-			    
-			}
-		}
-		/******************************
-		|	Player Inventory Retrieving
-		******************************/
-		
-		
-		function PlayerInventory( type:String ){
-		
-			if(/*Application.isEditor*/true){
-				// Override
-				Server.Log("server", "Editor mode, overriding inventory.");
-			}
-			else if (Application.isWebPlayer) {
-				// Create a form object for sending data to the server
-			    var form = new WWWForm();
-			     // The name of the player
-			    form.AddField( "user", Player.nickname.ToLower() );
-			    form.AddField( "type", type );
-			
-		    	// Create a download object
-		        var download = new WWW( _scriptsFolder + "getItem.pl", form );
-			
-			    // Wait until the download is done
-			    while (!download.isDone) yield;
-				
-			    if(download.error) {
-			        print( "Error downloading: " + download.error );
-			        download.Dispose();
-			        return;
-			    }
-			    else{
-			        // get the anwser, and act on it
-			        for (var line:String in download.text.Trim().Split("\n"[0])){
-			        	switch (type){
-			        	case "item":
-				        	Inventory.AddItem( line.Split("|"[0])[0], int.Parse(line.Split("|"[0])[1]) );
-				        	break;
-			        	case "mission":
-			        	
-			        		Debug.Log("Server set miiiiiiiiiiiiiiisssssssssssssssssssssssion");
-			        	
-				        	Journal.SetMissionAndSync( line.Split("|"[0])[0], line.Split("|"[0])[1] );
-				        	break;
-			        	}
-			        }
-			        download.Dispose();
-			    }
-			    
-			}
-			
-		}
-		
-		// Se manda al servidor la cantidad de items que tiene el jugador
-		/*function PlayerInventory( type:String, name:String, amount:String ){
-		
-			if (Application.isWebPlayer) {
-				// Create a form object for sending data to the server
-			    var form = new WWWForm();
-			     // The name of the player
-			    form.AddField( "user", Player.nickname.ToLower() );
-			    form.AddField( "type", type );
-			    form.AddField( "name", name );
-			    
-			    if (type == "item"){
-				    if (int.Parse(amount) > 0)
-				    	form.AddField( "value", amount );
-				    else
-				    	form.AddField( "value", "delete" );
-				}
-				else{
-					form.AddField( "value", amount );
-				}
-		    	// Create a download object
-		        var download = new WWW( _scriptsFolder + "getItem.pl", form );
-			
-			    // Wait until the download is done
-			    while (!download.isDone) yield;
-				
-			    if(download.error) Debug.Log( "Error downloading: " + download.error );
-			    download.Dispose();
-			}
-			
-		}*/
-		
-		// Por cada tipo de elemento en el inventario del jugador, se llama al PlayerInventory de arriba
-		/*function PlayerInventory( type:String, list:Dictionary.<String, int> ){
-		
-			if (Application.isWebPlayer) {
-				for (var instance in list){
-					Server.StartCoroutine( Server.Retrieve.PlayerInventory( type, instance.Key.ToString(), instance.Value.ToString() ) );
-				}
-			}
-			if (type == "item"){
-			
-				var tempList:Dictionary.<String, int> = list;
-				for (item in tempList){
-					if ( item.Value <= 0 ){
-						list.Remove(item.Key);
-					}
-				}
-				
-			}
-			
-		}*/
 		
 	}
 	

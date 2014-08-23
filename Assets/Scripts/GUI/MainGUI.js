@@ -258,7 +258,9 @@ class MainGUI extends MonoBehaviour {
 			    // Button for save configurations.
 			    GUI.enabled = ( savedSkin != Skin.generator.GetConfig() );
 			    if (GUILayout.Button( Text("Save") )){
-			    	Server.StartCoroutine( Server.Retrieve.PlayerSkin(Skin.generator.GetConfig()) );
+			    	//Server.StartCoroutine( Server.Retrieve.PlayerSkin(Skin.generator.GetConfig()) );
+			    	Player.SetSkinString(Skin.generator.GetConfig());
+					GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			    	Menu.current = "Menu";
 			    }
 			    

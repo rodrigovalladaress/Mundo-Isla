@@ -35,7 +35,9 @@ class Skin extends MonoBehaviour{
 	    else{
 	        generator = CharacterGenerator.CreateWithRandomConfig("Female");
 	        while (!generator.ConfigReady) yield;
-	        Server.StartCoroutine( Server.Retrieve.PlayerSkin( generator.GetConfig()) );
+	        //Server.StartCoroutine( Server.Retrieve.PlayerSkin( generator.GetConfig()) );
+	        Player.SetSkinString(generator.GetConfig());
+			GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 	    }
 	}
 	
