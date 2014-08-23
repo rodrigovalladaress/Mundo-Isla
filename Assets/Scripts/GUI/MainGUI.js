@@ -1,3 +1,7 @@
+// Edited by Rodrigo Valladares Santana
+// Version: 1.1
+// Changes of 1.1 version:
+//	-	Room finding and creation by Photon.
 ///*******************************************************
 //|	Menu GUI Script
 //|
@@ -11,8 +15,8 @@
 #pragma strict
 class MainGUI extends MonoBehaviour {
 	
+	// Audio clip that's played when a player gets an item from the floor
 	public var _dropItemAudioClip:AudioClip;
-	//public var isKinectScene:boolean;
 	
 	static var lastScreenSize:Vector2 = new Vector2(0,0);
 	static private var _textDictionary:Dictionary.<String,String> = new Dictionary.<String, String>();

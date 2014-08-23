@@ -8,6 +8,7 @@
 // Changes in 2.2 version:                                      //
 // 	-	Login													//
 //	-	Creating and joining rooms through Photon				//
+//	-	Photon messages
 //                                                              //
 // Changes in 2.1 version:                                      //
 // 	-	File retrieving using local server						//
@@ -37,7 +38,7 @@ class Server extends Photon.MonoBehaviour {
 	static var SecondsForTimeout:float = 5.0;
 	static private var _gameType = "IslaSAVEH.Alpha";
 	
-	// Instance used to access non static members from static methods, and starting coroutines
+	// Instance used to access non static members from static methods
 	private static var instance : Server;
 	
 	// instance initialization
@@ -48,13 +49,15 @@ class Server extends Photon.MonoBehaviour {
 	// If setted true, the GUI shows some information of the connection to Photon
 	public var showDebugInformationOnGUI:boolean;
 	
-	// If it's setted true, the changes in the skin of the player will be synced with the database.
+	// If it's setted true, the changes in the skin of the player will be synced 
+	// with the database.
 	public var playerSkinPersistence:boolean;
 	public static function IsPlayerSkinPersistence() : boolean {
 		return instance.playerSkinPersistence;
 	}
 	
-	// If it's setted true, the changes in the journal will be synced with the database.
+	// If it's setted true, the changes in the journal will be synced with the 
+	// database.
 	public var missionPersistence:boolean;
 	public static function IsMissionPersistence():boolean {
 		return instance.missionPersistence;
@@ -68,7 +71,8 @@ class Server extends Photon.MonoBehaviour {
 	/*******************************************************
 	|	Room management
 	*******************************************************/
-	public static function CreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, gameDescription:String) {
+	public static function CreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, 
+										gameDescription:String) {
 		var hash:ExitGames.Client.Photon.Hashtable = new ExitGames.Client.Photon.Hashtable();
 		hash.Add("gameDescription", gameDescription);
 		PhotonNetwork.CreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
@@ -112,53 +116,7 @@ class Server extends Photon.MonoBehaviour {
 		//Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
 	}
 	
-	// The GUI shows the connection to Photon (debug)
-	function OnGUI() {
-		if(showDebugInformationOnGUI) {
-			GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-			if(PhotonNetwork.room != null) {
-				GUILayout.Label("Room name = " + PhotonNetwork.room.name);
-				GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
-				if(PhotonNetwork.room.customProperties != null) {
-					GUILayout.Label("Description: " + PhotonNetwork.room.customProperties["gameDescription"]);
-				}
-			}
-		}
-	}
 	
-	// This is used to escape urls like "Thiago, el Pirata"
-	public static function EscapePath(path : String) : String {
-		var slashPosition = path.LastIndexOf("/") + 1;
-		var firstPart : String;
-		var lastPart : String;
-		if(slashPosition >= 0) {
-			firstPart = path.Substring(0, slashPosition);
-			// Error -> WWW.EscapeURL doesn't escape well the space
-			lastPart = path.Substring(slashPosition).Replace(" ", "%20");
-			return firstPart + lastPart;
-		} else {
-			return path.Replace(" ", "%20");
-		}
-	}	
-		
-	// Join a random room
-	function OnJoinedLobby()
-	{
-    	Server.Log("debug", Player.nickname + " joined lobby");
-	}
-	
-	function OnPhotonRandomJoinFailed()
-	{
-    	Debug.LogError("Can't join room!");
-    	Server.Log("error", Player.nickname + " couldn't join room");
-	}
-	
-	function OnJoinedRoom() {
-		Server.Log("server", Player.nickname + " connected.");
-		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null) {
-			Player.Spawn(Player.nickname, Player.GetSpawnPoint(), Player.GetSkinString());
-		}
-	}
 	
 	/******************************
 	|	Multiplayer Login
@@ -212,13 +170,6 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	/*******************************************************
-	|	Connect to a server directly
-	*******************************************************/
-	static function Connect(serverIP:String, port:String){
-			Network.Connect(serverIP, port);
-	}
-	
-	/*******************************************************
 	|	Close all connections
 	*******************************************************/
 	static function Disconnect(){
@@ -229,80 +180,27 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	/*******************************************************
-	|	Actions taken wen we start a server
-	*******************************************************/
-	/*function OnServerInitialized(){
-		Server.Log("server", "Server initialized!");
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
-	}*/
-	
-	/*******************************************************
-	|	Actions taken wen we connect to a server
-	*******************************************************/
-	/*function OnConnectedToServer(){
-		Server.Log("server", Player.nickname + " connected.");
-		Player.Spawn(Player.nickname, Player.SpawnPoint(), Player.GetSkinString());
-	}*/
-	
-	/*******************************************************
-	|	Actions taken wen a player connect
-	*******************************************************/
-	function OnPlayerConnected(player: NetworkPlayer) {
-	    Server.Log("server", player + " connected.");
-	}
-	
-	/*******************************************************
-	|	Actions taken wen a player disconnect
-	*******************************************************/
-	function OnPlayerDisconnected(player: NetworkPlayer) {
-	    Server.Log("server", player + " disconnected.");
-	    Network.RemoveRPCs(player);
-	    Network.DestroyPlayerObjects(player);
-	}
-	
-	/*******************************************************
-	|	Actions taken wen we are disconnected
-	*******************************************************/
-	/*function OnDisconnectedFromServer(info : NetworkDisconnection) {
-	    if (Network.isServer) {
-	        Server.Log("server", "Local server connection disconnected");
-	    }
-	    else {
-	        if (info == NetworkDisconnection.LostConnection)
-	            Server.Log("server", "Lost connection to the server");
-	        else
-	            Server.Log("server", "Successfully diconnected from the server");
-	    }
-	} */
-	
-	/*******************************************************
-	|	Various server  messages
-	*******************************************************/
-	/*function OnMasterServerEvent(mse:MasterServerEvent){
-		switch (mse){
-		
-		case MasterServerEvent.RegistrationSucceeded:
-			Server.Log("server", "Server registrated!");
-			break;
-			
-		case MasterServerEvent.RegistrationFailedNoServer:
-			Server.Log("server", "Server registration failed: No server initialized.");
-			break;
-			
-		case MasterServerEvent.RegistrationFailedGameType:
-			Server.Log("server", "Server registration failed: Invalid game type.");
-			break;
-			
-		case MasterServerEvent.RegistrationFailedGameName:
-			Server.Log("server", "Server registration failed: Invalid game name.");
-			break;
-		}
-	}*/
-	/*******************************************************
 	|	
 	|	Server utilities
 	|	
 	*******************************************************/
+	/******************************
+	|	Escaping paths for URLs
+	******************************/
+	// This is used to escape urls like "Thiago, el Pirata"
+	public static function EscapePath(path : String) : String {
+		var slashPosition = path.LastIndexOf("/") + 1;
+		var firstPart : String;
+		var lastPart : String;
+		if(slashPosition >= 0) {
+			firstPart = path.Substring(0, slashPosition);
+			// Error -> WWW.EscapeURL doesn't escape well the space
+			lastPart = path.Substring(slashPosition).Replace(" ", "%20");
+			return firstPart + lastPart;
+		} else {
+			return path.Replace(" ", "%20");
+		}
+	}
 	/******************************
 	|	Sync objects across network
 	******************************/
@@ -592,6 +490,56 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	/******************************
+	|	Messages
+	******************************/
+	function OnJoinedLobby()
+	{
+    	Server.Log("server", Player.nickname + " joined lobby");
+	}
+	
+	function OnJoinedRoom() {
+		Server.Log("server", Player.nickname + " connected.");
+		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null) {
+			Player.Spawn(Player.nickname, Player.GetSpawnPoint(), Player.GetSkinString());
+		} else {
+			Debug.LogError(Player.nickname + " couldn't be instantiated.");
+			Server.Log("error", Player.nickname + " couldn't be instantiated.");
+		}
+	}
+	
+	function OnLeftLobby() {
+		Server.Log("server", Player.nickname + " left lobby");
+	}
+	
+	function OnDisconnectedFromPhoton() {
+		Server.Log("server", Player.nickname + " has disconnected.");
+	}
+	
+	/******************************
+	|	Error messages
+	******************************/
+	function OnPhotonRandomJoinFailed()
+	{
+    	Debug.LogError("Can't join random room! Maybe all rooms are full or there are no rooms available.");
+	}
+	
+	function OnPhotonCreateRoomFailed() {
+		Server.Log("error", Player.nickname + " couldn't create room. The room already exists?");
+	}
+	
+	function OnPhotonJoinRoomFailed() {
+		Server.Log("error", Player.nickname + " couldn't join a room. Does the room exists? Is it full?");
+	}
+	
+	function OnConnectionFail(cause:DisconnectCause) {
+		Server.Log("error", Player.nickname + " has lost connection to Photon (" + cause.ToString + ")");
+	}
+	
+	function OnFailedToConnectToPhoton(cause:DisconnectCause) {
+		Server.Log("error", Player.nickname + " couldn't connect to Photon (" + cause.ToString + ")");
+	}
+	
+	/******************************
 	|	Server log management
 	******************************/
 	static function WaitForWWW(www : WWW): IEnumerator {
@@ -606,12 +554,34 @@ class Server extends Photon.MonoBehaviour {
 	    var www : WWW = new WWW(stringURL);
 		Server.StartCoroutine(WaitForWWW(www));
 		if(Application.isEditor) {
-			Debug.Log(header + _message);
+			if(_type.ToLower().Equals("error")) {
+				Debug.LogError(header + _message);
+			} else if(_type.ToLower().Equals("warning")) {
+				Debug.LogWarning(header + _message);
+			} else {
+				Debug.Log(header + _message);
+			}
 		}
 	}
 	
 	static var Header = function(_string:String):String{
 		return "[" + Server.Retrieve.CurrentTime("time") + "]" + "[" + _string.ToUpper() + "] " as String;
 	};
+	
+	/******************************
+	|	GUI (debugging)
+	******************************/
+	function OnGUI() {
+		if(showDebugInformationOnGUI) {
+			GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+			if(PhotonNetwork.room != null) {
+				GUILayout.Label("Room name = " + PhotonNetwork.room.name);
+				GUILayout.Label("Number of players = " + PhotonNetwork.room.playerCount);
+				if(PhotonNetwork.room.customProperties != null) {
+					GUILayout.Label("Description: " + PhotonNetwork.room.customProperties["gameDescription"]);
+				}
+			}
+		}
+	}
 
 }

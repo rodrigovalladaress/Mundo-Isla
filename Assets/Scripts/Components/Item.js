@@ -105,7 +105,7 @@ class Item extends MonoBehaviour{
 			this.gameObject.transform.rotation.eulerAngles = new Vector3(-Camera.main.transform.rotation.eulerAngles.x + 90,
 																Camera.main.transform.rotation.eulerAngles.y - 180, 0);
 			
-			if (Player.exist()){
+			if (Player.exists()){
 				if (_player == null) _player = Player.object;
 				// If the object hasn't been obtained and the player is at a certain distance, it shows the name of the object
 				if ((Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {

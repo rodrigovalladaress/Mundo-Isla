@@ -12,7 +12,7 @@ class NPC extends MonoBehaviour{
 	
 	
 	function OnMouseOver(){
-		while (!Player.exist()) return;
+		while (!Player.exists()) return;
 		if ((Vector3.Distance(Player.position(), gameObject.transform.position) <= _minDistance)){
 			// Al pulsar el boton derecho del raton sobre un NPC, abrir el editor de dialogos 
 			// de ese  NPC. Aparece un arbol a la derecha que representa como cambia el 

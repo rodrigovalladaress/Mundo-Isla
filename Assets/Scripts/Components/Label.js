@@ -28,7 +28,7 @@ class Label extends MonoBehaviour
 	function OnGUI(){
 		GUI.skin = Resources.Load("Skin") as GUISkin;
 		GUI.depth = 1;
-		if (Player.exist()){
+		if (Player.exists()){
 			if (_player == null) _player = Player.object;
 			if(_player != null) {
 				if ((Vector3.Distance(_player.transform.position, gameObject.transform.position) <= _minDistance)) {

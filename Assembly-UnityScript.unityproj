@@ -58,7 +58,6 @@
      <Compile Include="Assets\Scripts\Components\Walls\Fence Post.js" />
      <Compile Include="Assets\Scripts\Components\Walls\Telescoping Edge Finder.js" />
      <Compile Include="Assets\Scripts\GUI\Chat.js" />
-     <Compile Include="Assets\Scripts\GUI\GameSelectionGUI.js" />
      <Compile Include="Assets\Scripts\GUI\MainGUI.js" />
      <Compile Include="Assets\Scripts\GUI\Minimap.js" />
      <Compile Include="Assets\Scripts\GUI\Tutorial.js" />

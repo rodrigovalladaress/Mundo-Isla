@@ -30,6 +30,7 @@ import System.Text.RegularExpressions;
 static class Player extends MonoBehaviour{
 	var nickname:String = "";
 	var password:String = "";
+	// This string represents player's avatar
 	private var skinString:String;
 	public function GetSkinString() : String {
 		return skinString;
@@ -44,11 +45,13 @@ static class Player extends MonoBehaviour{
 	var localPlayerComponents:String[] = ["ThirdPersonCamera", "Movement"];
 	
 	var isPlaying = function():boolean{if(Network.isClient || Network.isServer)return true; else return false;};
-	var exist = function():boolean{if(GameObject.Find(nickname))return true; else return false;};
-//	var object = function():GameObject{var _players:GameObject[] = GameObject.FindGameObjectsWithTag("Player"); for (var _player:GameObject in _players) if (_player.networkView.isMine) return _player;return;};
+	var exists = function():boolean{if(GameObject.Find(nickname))return true; else return false;};
 	public var object:GameObject;
 	var position = function():Vector3{return Player.object.transform.position;};
 	
+	/*******************************************************
+	|	Player spawning
+	*******************************************************/	
 	function GetSpawnPoint(scene:String):Vector3 {
 		return GameObject.Find("SpawnPoint" + scene).transform.position;
 	}
@@ -56,15 +59,6 @@ static class Player extends MonoBehaviour{
 	function GetSpawnPoint():Vector3 {
 		return GetSpawnPoint(LevelManager.GetCurrentScene());
 	}
-	
-	/*******************************************************
-	|	Makes a player spawns
-	*******************************************************/
-	/*function Spawn(_name:String, spawnPoint:Vector3, _skinString:String){
-		Spawn(_name, spawnPoint, Quaternion.identity, _skinString);
-	}*/
-	
-	
 	
 	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) {//: IEnumerator {
 		Server.Log("debug", "Spawning " + _name + " at " + spawnPoint);
@@ -74,9 +68,10 @@ static class Player extends MonoBehaviour{
 
 			if(newPlayer != null && _name != null && _skinString != null) {
 				//var playerSetup:Component = newPlayer.GetComponent("PlayerSetup") as Component;
-				
+				// The name of the player is changed for everyone
 				Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, 
 					newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerName", _name);
+				// The skin of the player is changed for everyone
 				Server.GetPhotonView().RPC("SyncObject", 
 					PhotonTargets.AllBuffered, newPlayer.GetComponent(PhotonView).viewID.ToString(), "playerSkin", _skinString);
 			
@@ -95,7 +90,6 @@ static class Player extends MonoBehaviour{
 						newPlayer.AddComponent(component);
 					}
 				}
-				//DontDestroyOnLoad(Player.object);
 				Server.Log("Game event", _name + " spawned.");
 			}
 		}
@@ -117,11 +111,10 @@ static class Player extends MonoBehaviour{
 		GameObject.Find(nickname).transform.position = newPosition;
 	}
 	
-	
 	/*******************************************************
 	|	skinString retrieving and syncing
 	*******************************************************/
-	// Downloading of the database's skinString
+	// skinString downloading from database
 	public function RetrieveSkinString() : IEnumerator {
 		var url : String = Paths.GetPlayerQuery() + "/get_skin.php/?player=" + WWW.EscapeURL(nickname);
 		var www : WWW = new WWW(url);
@@ -134,9 +127,12 @@ static class Player extends MonoBehaviour{
 		} else {
 			skinString = www.text;
 		}
+		if(skinString.Equals("") || skinString == null) {
+			Server.Log("warning", Player.nickname + " doesn't have skinString");
+		}
 	}
 	
-	// Syncing database's skinString
+	// Syncing database's skinString when it's changed
 	private function ChangeSkinString(skinString : String) : IEnumerator {
 		var url : String = Paths.GetPlayerQuery() + "/set_skin.php/?player=" 
 							+ WWW.EscapeURL(nickname) + "&skinstring=" + skinString;
