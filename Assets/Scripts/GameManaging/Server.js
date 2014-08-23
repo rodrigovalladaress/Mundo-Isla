@@ -3,7 +3,11 @@
 //////////////////////////////////////////////////////////////////
 // Edited by Rodrigo Valladares Santana <rodriv_tf@hotmail.com> //
 //                                                              //
-// Version 2.1                                                  //
+// Version 2.2                                                  //
+//                                                              //
+// Changes in 2.2 version:                                      //
+// 	-	Login													//
+//	-	Creating and joining rooms through Photon				//
 //                                                              //
 // Changes in 2.1 version:                                      //
 // 	-	File retrieving using local server						//
@@ -94,12 +98,10 @@ class Server extends Photon.MonoBehaviour {
 			Player.nickname = "Admin_web";
 		}
 		ConnectToPhoton();
-		StartCoroutine(Journal.RetrieveMissions());
-		StartCoroutine(ItemManager.RetrieveItemInformation());
-		StartCoroutine(Inventory.Retrieve());
 		
-		if(/*Application.isEditor*/true) {
-			
+		
+		//if(/*Application.isEditor*/true) {
+		/*	
 			StartCoroutine(Player.RetrieveSkinString());
 			// Wait until the skin of the player is downloaded
 			while(Player.GetSkinString() == null) {
@@ -111,7 +113,7 @@ class Server extends Photon.MonoBehaviour {
 		    GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 			MainGUI.Menu.current = "Menu";
 			MainGUI.Content.current = "";
-		}
+		}*/
 		
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
 		//StartCoroutine(Retrieve.PlayerInventory());
@@ -170,41 +172,46 @@ class Server extends Photon.MonoBehaviour {
 	/******************************
 	|	Multiplayer Login
 	******************************/
-	static function Login():IEnumerator{
-		// Create a form object for sending data to the server
-	    var form = new WWWForm();
-	     // The name of the player
-	    form.AddField( "user", Player.nickname.ToLower() );
-	     // The password
-	    form.AddField( "password", Player.password );
-	
+	static function Login():IEnumerator{	
     	// Create a download object
-        var download = new WWW( _scriptsFolder + "login.pl", form );
-	
+    	var url:String = Paths.GetPlayerQuery() + "/login.php/?player=" + Player.nickname 
+    						+ "&password=" + Player.password;
+    	var www:WWW = new WWW(url);
 	    // Wait until the download is done
-	    while (!download.isDone) yield;
+	    while (!www.isDone) {
+	    	yield;
+		}
 		
-	    if(download.error) {
-	        print( "Error downloading: " + download.error );
+	    if(www.error) {
+	        print( "Error downloading: " + www.error );
 	        return;
 	    }
 	    else{
 	        // get the anwser, and act on it
-	        if(download.text == "true"){
+	        if(www.text.Equals("true")) {
 	        	MainGUI.Content.Login.wrong = false;
 	        	Server.Log("server", "User logged in.");
-	        	Server.StartCoroutine( Retrieve.PlayerSkin() );
-	        	Server.StartCoroutine( Retrieve.PlayerInventory("item") );
-	        	Server.StartCoroutine( Retrieve.PlayerInventory("mission") );
+	        	Server.StartCoroutine(Journal.RetrieveMissions());
+				Server.StartCoroutine(ItemManager.RetrieveItemInformation());
+				Server.StartCoroutine(Inventory.Retrieve());
+				StartCoroutine(Player.RetrieveSkinString());
+				// Wait until the skin of the player is downloaded
+				while(Player.GetSkinString() == null) {
+					yield;
+				}
+				MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
+				// Show player skin on GUI
+		   		GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
 				MainGUI.Menu.current = "Menu";
 				MainGUI.Content.current = "";
-				download.Dispose();
 			}
-	        else {
+	        else if(www.text.Equals("false")) {
 	        	MainGUI.Content.Login.wrong = true;
-	        	download.Dispose();
+	        } else {
+	        	Debug.LogError("Error in player login = " + www.text);
 	        }
 	    }
+	    www.Dispose();
 	    // Clean the password field
 	    Player.password = "";
 	}
@@ -220,27 +227,10 @@ class Server extends Photon.MonoBehaviour {
 	|	Close all connections
 	*******************************************************/
 	static function Disconnect(){
-		Network.Disconnect(200);
-	    MasterServer.UnregisterHost();
 	    MainGUI.Menu.current = "";
 	    MainGUI.Content.current = "Login";
-	    Application.LoadLevel("Main");
-	}
-	
-	/*******************************************************
-	|	Refresh the host list
-	*******************************************************/
-	static function RefreshHostList():IEnumerator{
-		
-		Server.Log("server", "Refreshing hosts...");
-		var _time:float = Time.time;
-		MasterServer.RequestHostList(_gameType);
-		while ( MasterServer.PollHostList().Length <= 0 && (Time.time - _time) < SecondsForTimeout ) {
-			yield;
-		}
-		Server.Log("server", "Servers found: " + MasterServer.PollHostList().Length);
-		hostData = MasterServer.PollHostList();
-		MasterServer.ClearHostList();
+	    PhotonNetwork.LeaveRoom();
+	    LevelManager.LoadScene("Main");
 	}
 	
 	/*******************************************************
@@ -278,7 +268,7 @@ class Server extends Photon.MonoBehaviour {
 	/*******************************************************
 	|	Actions taken wen we are disconnected
 	*******************************************************/
-	function OnDisconnectedFromServer(info : NetworkDisconnection) {
+	/*function OnDisconnectedFromServer(info : NetworkDisconnection) {
 	    if (Network.isServer) {
 	        Server.Log("server", "Local server connection disconnected");
 	    }
@@ -288,12 +278,12 @@ class Server extends Photon.MonoBehaviour {
 	        else
 	            Server.Log("server", "Successfully diconnected from the server");
 	    }
-	} 
+	} */
 	
 	/*******************************************************
 	|	Various server  messages
 	*******************************************************/
-	function OnMasterServerEvent(mse:MasterServerEvent){
+	/*function OnMasterServerEvent(mse:MasterServerEvent){
 		switch (mse){
 		
 		case MasterServerEvent.RegistrationSucceeded:
@@ -312,7 +302,7 @@ class Server extends Photon.MonoBehaviour {
 			Server.Log("server", "Server registration failed: Invalid game name.");
 			break;
 		}
-	}
+	}*/
 	/*******************************************************
 	|	
 	|	Server utilities
@@ -538,62 +528,61 @@ class Server extends Photon.MonoBehaviour {
 			
 			switch (scriptTarget){
 			
-			case "ServerOptions":
-				var Lines:String[] = output.Split(";"[0]);
-				for (var i:int = 0; i > Lines.Length; i++)
-					Lines[i] = Lines[i].Trim();
-				
-				for (var Line:String in Lines){
+				case "ServerOptions":
+					var Lines:String[] = output.Split(";"[0]);
+					for (var i:int = 0; i > Lines.Length; i++)
+						Lines[i] = Lines[i].Trim();
 					
-					switch( Line.Split("|"[0])[0].Trim() ){
-					
-					case "NatFacilitatorIp":
-						Network.natFacilitatorIP = Line.Split("|"[0])[1].Trim().Split(":"[0])[0];
-						Network.natFacilitatorPort = int.Parse(Line.Split("|"[0])[1].Trim().Split(":"[0])[1]);
-						break;
+					for (var Line:String in Lines){
 						
-					case "MasterServerIp":
-						MasterServer.ipAddress = Line.Split("|"[0])[1].Trim().Split(":"[0])[0];
-						MasterServer.port = int.Parse(Line.Split("|"[0])[1].Trim().Split(":"[0])[1]);
-						break;
+						switch( Line.Split("|"[0])[0].Trim() ){
 						
-					case "Language":
-						Server.StartCoroutine( MainGUI.SetLanguage( Line.Split("|"[0])[1].Trim() ) );
-						break;
-						
-					case "ScriptsFolder":
-						Server._scriptsFolder = Line.Split("|"[0])[1].Trim() + "/";
-						break;
-						
-					case "DialogsFolder":
-						Dialog.folder = Line.Split("|"[0])[1].Trim() + "/";
-						break;
-						
-					case "MissionDescFolder":
-						MainGUI.missionDescFolder = Line.Split("|"[0])[1].Trim() + "/";
-						break;
-						
-					case "Session":
-						Server.session = Line.Split("|"[0])[1].Trim();
-						break;
-						
-					case "SaveDelay":
-						Server.saveDelay = float.Parse( Line.Split("|"[0])[1].Trim() );
-						break;
+							case "NatFacilitatorIp":
+								Network.natFacilitatorIP = Line.Split("|"[0])[1].Trim().Split(":"[0])[0];
+								Network.natFacilitatorPort = int.Parse(Line.Split("|"[0])[1].Trim().Split(":"[0])[1]);
+								break;
+								
+							case "MasterServerIp":
+								MasterServer.ipAddress = Line.Split("|"[0])[1].Trim().Split(":"[0])[0];
+								MasterServer.port = int.Parse(Line.Split("|"[0])[1].Trim().Split(":"[0])[1]);
+								break;
+								
+							case "Language":
+								Server.StartCoroutine( MainGUI.SetLanguage( Line.Split("|"[0])[1].Trim() ) );
+								break;
+								
+							case "ScriptsFolder":
+								Server._scriptsFolder = Line.Split("|"[0])[1].Trim() + "/";
+								break;
+								
+							case "DialogsFolder":
+								Dialog.folder = Line.Split("|"[0])[1].Trim() + "/";
+								break;
+								
+							case "MissionDescFolder":
+								MainGUI.missionDescFolder = Line.Split("|"[0])[1].Trim() + "/";
+								break;
+								
+							case "Session":
+								Server.session = Line.Split("|"[0])[1].Trim();
+								break;
+								
+							case "SaveDelay":
+								Server.saveDelay = float.Parse( Line.Split("|"[0])[1].Trim() );
+								break;
+						}
 						
 					}
+					if (!session) session = "";
+					break;
 					
-				}
-				if (!session) session = "";
-				break;
-				
-			case "JournalInterface":
-				MainGUI.JournalInterface.description = output;
-				break;
-				
-			case "SetLanguage":
-				MainGUI._languageFile = output.Split(";"[0]);
-				break;
+				case "JournalInterface":
+					MainGUI.JournalInterface.description = output;
+					break;
+					
+				case "SetLanguage":
+					MainGUI._languageFile = output.Split(";"[0]);
+					break;
 			}
 		}
 		/******************************

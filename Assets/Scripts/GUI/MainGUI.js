@@ -12,7 +12,7 @@
 class MainGUI extends MonoBehaviour {
 	
 	public var _dropItemAudioClip:AudioClip;
-	public var isKinectScene:boolean;
+	//public var isKinectScene:boolean;
 	
 	static var lastScreenSize:Vector2 = new Vector2(0,0);
 	static private var _textDictionary:Dictionary.<String,String> = new Dictionary.<String, String>();
@@ -25,14 +25,9 @@ class MainGUI extends MonoBehaviour {
 		// We define the area to draw the menus
 		
 		Area.Reload();
-		
-		// The GUI showed when we are using a isKinectScene activity
-		if(isKinectScene) {
-			Menu.current = "Menu";
-			Content.current = "";
-			Menu.show = false;
-		} // Spawning the player in Main when we are entering from other level
-		else if(!Menu.show && GameObject.Find(Player.nickname) == null) {
+
+		// Spawning the player in Main when we are entering from other level
+		if(!Menu.show && GameObject.Find(Player.nickname) == null) {
 			Player.Spawn(Player.nickname, Player.GetSpawnPoint(LevelManager.GetCurrentScene()), Player.GetSkinString());
 		}
 	}
@@ -207,7 +202,7 @@ class MainGUI extends MonoBehaviour {
 				GUILayout.FlexibleSpace();
 				ContentSwitch( Text("Host room"), "Host" );
 				GUILayout.FlexibleSpace();
-				ContentSwitch( Text("Find rooms"), "Servers", Server.RefreshHostList() );
+				ContentSwitch( Text("Find rooms"), "Servers");
 				GUILayout.FlexibleSpace();
 				//ContentSwitch( Text("Direct Connect"), "Direct Connect" );
 				GUILayout.FlexibleSpace();
@@ -362,19 +357,19 @@ class MainGUI extends MonoBehaviour {
 			var SP : Vector2 = Vector2.zero;
 		
 			function Box(){
+				var rooms:RoomInfo[] = PhotonNetwork.GetRoomList();
 				// Refresh button
 				GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
 					if(GUILayout.Button(Text("Refresh room list"), GUILayout.ExpandWidth(false))){
-						Server.StartCoroutine( Server.RefreshHostList() );
+						rooms = PhotonNetwork.GetRoomList();
 					}
 				GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
 				
 				// Start scroll view
-				SP = GUILayout.BeginScrollView (SP);
+				SP = GUILayout.BeginScrollView (SP);				
 				
-				var rooms:RoomInfo[] = PhotonNetwork.GetRoomList();
 				for(var room:RoomInfo in rooms) {
 					if(room.visible) {
 						if(GUILayout.Button(room.name + " (" + room.playerCount + "/" + room.maxPlayers + ")")) {
@@ -392,8 +387,6 @@ class MainGUI extends MonoBehaviour {
 		
 		static class Host{
 		
-			//private var serverIP:String = "127.0.0.1";
-			//private var port:int = 25001;
 			private var maxPlayers:int = 5;
 			
 			var SP:Vector2 = Vector2.zero;
@@ -553,10 +546,15 @@ class MainGUI extends MonoBehaviour {
 				
 				if (Chat.inputBoxValue != ""){
 					// Execute the send function if this button is pressed
-					if(GUILayout.Button(Text("Send"), GUILayout.Width(rect.width * 0.25 - rect.x))) Chat.Send();
+					if(GUILayout.Button(Text("Send"), GUILayout.Width(rect.width * 0.25 - rect.x))) {
+						Chat.Send();
+					}
 					
 					// Execute the send function if return is pressed and the box has focus
-					if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' && GUI.GetNameOfFocusedControl() == "Chat input box") Chat.Send();
+					if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' 
+						&& GUI.GetNameOfFocusedControl() == "Chat input box") {
+						Chat.Send();
+					}
 				}
 				else{
 					GUI.enabled = false;
