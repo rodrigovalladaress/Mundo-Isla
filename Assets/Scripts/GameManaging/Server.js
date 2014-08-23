@@ -68,6 +68,10 @@ class Server extends Photon.MonoBehaviour {
 		}
 	}
 	
+	public static function JoinRoom(roomName:String) {
+		PhotonNetwork.JoinRoom(roomName);
+	}
+	
 	function Awake() {
 		instance = this;
 	}
@@ -203,26 +207,6 @@ class Server extends Photon.MonoBehaviour {
 	    }
 	    // Clean the password field
 	    Player.password = "";
-	}
-	
-	/*******************************************************
-	|	Start and register a server
-	*******************************************************/
-	static function Host(maxPlayers:int, port:int, gameName:String, gameDescription:String){
-			//Server.Log("server", "Starting Public Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
-			//Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
-			//MasterServer.RegisterHost(_gameType, gameName, gameDescription);
-			ConnectToPhoton();
-	}
-	static function Host(maxPlayers:int, port:int){
-			//Server.Log("server", "Starting Private Server... [MaxPlayers = " + maxPlayers + " Port = " + port + "]");
-			//Network.InitializeServer(maxPlayers, port, !Network.HavePublicAddress());
-			ConnectToPhoton();
-	}
-	static function Host(){
-			//Server.Log("server", "Starting Offline Server...");
-			//Network.InitializeServer(0, 0, false);
-			ConnectToPhoton();
 	}
 	
 	/*******************************************************

@@ -349,10 +349,6 @@ class MainGUI extends MonoBehaviour {
 					Host.Box();
 					break;
 					
-				case "Direct Connect":
-					DirectConnect.Box();
-					break;
-					
 				case "Login":
 					rect = Area._Center;
 					Login.Box();
@@ -369,7 +365,7 @@ class MainGUI extends MonoBehaviour {
 				// Refresh button
 				GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-					if(GUILayout.Button(Text("Refresh server list"), GUILayout.ExpandWidth(false))){
+					if(GUILayout.Button(Text("Refresh room list"), GUILayout.ExpandWidth(false))){
 						Server.StartCoroutine( Server.RefreshHostList() );
 					}
 				GUILayout.FlexibleSpace();
@@ -378,19 +374,18 @@ class MainGUI extends MonoBehaviour {
 				// Start scroll view
 				SP = GUILayout.BeginScrollView (SP);
 				
-				// Only show if there is data to work with
-				if(Server.hostData){
-					// Create a button for each server found
-					for(var i:int = 0; i < Server.hostData.length; i++){
-						if(GUILayout.Button(Server.hostData[i].gameName + " (" + Server.hostData[i].connectedPlayers + "/" + Server.hostData[i].playerLimit + ")")){
-							Network.Connect(Server.hostData[i]);
+				var rooms:RoomInfo[] = PhotonNetwork.GetRoomList();
+				for(var room:RoomInfo in rooms) {
+					if(room.visible) {
+						if(GUILayout.Button(room.name + " (" + room.playerCount + "/" + room.maxPlayers + ")")) {
+							Server.JoinRoom(room.name);
 							Menu.Toogle();
 						}
-					}		
+					}
 				}
 				
 				// End scroll view
-					GUILayout.EndScrollView();
+				GUILayout.EndScrollView();
 			}
 			
 		}
@@ -409,13 +404,6 @@ class MainGUI extends MonoBehaviour {
 			var gameDescription:String = "";
 			
 			function Box(){
-				// Port input field
-					/*GUILayout.BeginHorizontal();
-						GUILayout.Label(Text("Port") + ": ", GUILayout.ExpandWidth(false));
-						var portString = GUILayout.TextField (port.ToString());
-						if(portString == "") port = 0;
-						else try port = int.Parse(portString); catch(FormatException) Server.Log("server", "Bad input in port field");
-					GUILayout.EndHorizontal();*/
 				
 				// Max Players input scroll
 					GUILayout.BeginHorizontal();
@@ -466,8 +454,9 @@ class MainGUI extends MonoBehaviour {
 							Menu.Toogle();
 						}
 						// Execute the startServer function if return is pressed and the box has focus
-						if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' && GUI.GetNameOfFocusedControl() == "New server name box"){
-							//Server.Host(maxPlayers, port, gameName, gameDescription);
+						if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' 
+							&& GUI.GetNameOfFocusedControl() == "New server name box"){
+							Server.CreateRoom(gameName, maxPlayers, true, gameDescription);
 							Menu.Toogle();
 						}
 					}
@@ -479,36 +468,11 @@ class MainGUI extends MonoBehaviour {
 					
 					// Start button
 					if(GUILayout.Button( Text("Start") )){
-						//Server.Host(maxPlayers, port);
+						Server.CreateRoom("", maxPlayers, false, null);
 						Menu.Toogle();
 					}
 				}
 				
-			}
-			
-		}
-		
-		static class DirectConnect{
-			
-			private var serverIP:String = "127.0.0.1";
-			private var port:int = 25001;
-			
-			function Box(){
-				// IP input field
-				GUI.SetNextControlName("DC Server IP box");
-				GUILayout.Label("IP");
-				serverIP = GUILayout.TextField (serverIP);
-			
-				// Port input field
-				GUILayout.Label( Text("Port") );
-				var portString = GUILayout.TextField (port.ToString());
-				if(portString == "") port = 0;
-				else try port = int.Parse(portString); catch(FormatException) print("Bad input in port field");
-					
-				if(GUILayout.Button( Text("Connect") )){
-						Server.Connect(serverIP, port.ToString());
-						Menu.Toogle();
-				}
 			}
 			
 		}

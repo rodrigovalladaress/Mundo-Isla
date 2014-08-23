@@ -23,6 +23,7 @@
 |	Proyecto SAVEH
 *******************************************************/
 #pragma strict
+#pragma downcast
 static class Journal extends MonoBehaviour{
 
 	// Constants used in status of missions

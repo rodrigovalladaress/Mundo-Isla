@@ -1,6 +1,13 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Server.js">
+    <Files>
+      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="199" Column="23" />
+      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="158" Column="41" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="49" Column="38" />
+      <File FileName="Assets\Plugins\PhotonNetwork\PhotonNetwork.cs" Line="1404" Column="135" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

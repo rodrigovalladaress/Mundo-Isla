@@ -1,4 +1,5 @@
 #pragma strict
+#pragma downcast
 // Edited by Rodrigo Valladares Santana
 // <rodriv_tf@hotmail.com>
 // Version: 1.1
