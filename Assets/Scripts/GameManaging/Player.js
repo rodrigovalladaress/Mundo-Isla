@@ -27,6 +27,8 @@
 
 import System.Text.RegularExpressions;
 
+public static final var SpawnPointNotFound:Vector3 = new Vector3(-999999, -999999, -999999);
+
 static class Player extends MonoBehaviour{
 	private var nickname:String = "";
 	public function GetNickname():String {
@@ -60,7 +62,12 @@ static class Player extends MonoBehaviour{
 	|	Player spawning
 	*******************************************************/	
 	function GetSpawnPoint(scene:String):Vector3 {
-		return GameObject.Find("SpawnPoint" + scene).transform.position;
+		var spawnPoint:GameObject = GameObject.Find("SpawnPoint" + scene) as GameObject;
+		if(spawnPoint != null) {
+			return spawnPoint.transform.position;
+		} else {
+			return SpawnPointNotFound;
+		}
 	}
 	
 	function GetSpawnPoint():Vector3 {

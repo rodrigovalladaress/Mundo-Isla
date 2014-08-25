@@ -32,7 +32,8 @@ class MainGUI extends MonoBehaviour {
 
 		// Spawning the player in Main when we are entering from other level
 		if(!Menu.show && GameObject.Find(Player.GetNickname()) == null) {
-			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(LevelManager.GetCurrentScene()), Player.GetSkinString());
+			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(LevelManager.GetCurrentScene()), 
+				Player.GetSkinString());
 		}
 	}
 	

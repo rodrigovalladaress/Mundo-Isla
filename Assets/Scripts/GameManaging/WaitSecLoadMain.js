@@ -4,5 +4,5 @@ public var seconds:int;
 
 function Start () {
 	yield WaitForSeconds (seconds);
-	LevelManager.Load("Main");
+	LevelManager.LoadLevel("Main");
 }

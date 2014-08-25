@@ -63,6 +63,11 @@ class Server extends Photon.MonoBehaviour {
 		return instance.missionPersistence;
 	}
 	
+	public var showLogin:boolean;
+	public static function IsShowLogin():boolean {
+		return instance.showLogin;
+	}
+	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
@@ -177,7 +182,7 @@ class Server extends Photon.MonoBehaviour {
 	    MainGUI.Menu.current = "";
 	    MainGUI.Content.current = "Login";
 	    PhotonNetwork.LeaveRoom();
-	    LevelManager.LoadScene("Main");
+	    LevelManager.LoadLevel("Main");
 	}
 	
 	/*******************************************************

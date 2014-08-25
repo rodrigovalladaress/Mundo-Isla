@@ -37,17 +37,76 @@
 // Changes in 1.0 version:
 //	 - 	Scene loading.
 public class LevelManager extends ScriptableObject {
+	
 	private static var currentScene:String;
-
-	public static function Load(name : String) {
-		LevelManager.LoadScene(name);
-	}
+	
+	public static var kinectScene:boolean = false;
 
 	// Loads the given level
-	public static function LoadScene(name : String) {
-		Player.Reposition(Player.GetSpawnPoint(name));
-		SetCurrentScene(name);
-		Server.Log("server", Player.GetNickname() + " is now in " + name);
+	public static function LoadLevel(name : String) {
+		var newPosition:Vector3 = Player.GetSpawnPoint(name);
+		if(newPosition != Player.SpawnPointNotFound) {
+			Player.Reposition(newPosition);
+			SetCurrentScene(name);
+			if(kinectScene) {
+				DesactivateZigfu();
+				Player.object.active = true;
+				kinectScene = false;
+			}
+			Server.Log("server", Player.GetNickname() + " is now in " + name);
+		} else {
+			Debug.LogError("SpawnPoint" + name + " should exist to load scene " + name);
+		}
+	}
+	
+	private static function ActivateZigfu() {
+		var zigfu:GameObject = GameObject.Find("Zigfu") as GameObject;
+		if(zigfu != null) {
+			(zigfu.GetComponent("ZigUsersRadar") as MonoBehaviour).enabled = true;
+			(zigfu.GetComponent("ZigEngageSingleUser") as MonoBehaviour).enabled = true;
+			(zigfu.GetComponent("ZigDepthViewer") as MonoBehaviour).enabled = true;
+		} else {
+			Server.Log("error", "Zigfu is not found");
+			Debug.LogError("Zigfu is not found");
+		}
+	}
+	
+	private static function DesactivateZigfu() {
+		var zigfu:GameObject = GameObject.Find("Zigfu") as GameObject;
+		if(zigfu != null) {
+			(zigfu.GetComponent("ZigUsersRadar") as MonoBehaviour).enabled = false;
+			(zigfu.GetComponent("ZigEngageSingleUser") as MonoBehaviour).enabled = false;
+			(zigfu.GetComponent("ZigDepthViewer") as MonoBehaviour).enabled = false;
+		} else {
+			Server.Log("error", "Zigfu is not found");
+			Debug.LogError("Zigfu is not found");
+		}
+	}
+	
+	public static function LoadKinectLevel(name:String) {
+		var kinectCamera:GameObject = GameObject.Find(name + "Camera");
+		if(kinectCamera != null) {
+			var cameraComponent:Camera = kinectCamera.GetComponent("Camera") as Camera;
+			if(cameraComponent != null) {
+				Camera.main.enabled = false;
+				cameraComponent.enabled = true;
+				SetCurrentScene(name);
+				if(!kinectScene) {
+					ActivateZigfu();
+					Player.object.active = false;
+					kinectScene = true;
+				}
+				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
+			} else {
+				Server.Log("error", name + "Camera must have a Camera component to load "
+								+ "kinect scene " + name);
+				Debug.LogError(name + "Camera must have a Camera component to load "
+								+ "kinect scene " + name);
+			}
+		} else {
+			Server.Log("error", name + "Camera must exist to load Kinect scene " + name);
+			Debug.LogError(name + "Camera must exist to load Kinect scene " + name);
+		}
 	}
 
 	public static function GetCurrentScene() : String {
@@ -57,7 +116,7 @@ public class LevelManager extends ScriptableObject {
 		return currentScene;
 	}
 
-	public static function SetCurrentScene(currentScene : String) : String {
+	public static function SetCurrentScene(currentScene : String) {
 		this.currentScene = currentScene;
 	}
 }

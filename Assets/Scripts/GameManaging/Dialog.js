@@ -1,6 +1,8 @@
 #pragma strict
 // Edited by Rodrigo Valladares Santana
-// Version: 1.2
+// Version: 1.3
+// Changes of 1.3 version:
+//	-	Added a XML node to load Kinect levels.
 // Changes of 1.2 version:
 //	-	Use of PhotonView instead of NetworkView.
 // Changes of 1.1 version: 
@@ -22,7 +24,7 @@ static class Dialog extends MonoBehaviour{
 	var folder:String = "Dialogs/";
 	var fileName:String = "Default";
 	var nodeTypes:String[] = ["if", "journal", "inventory", "script", "log", "not", "load", 
-	"loadLevel", "loadScene", "loadMain", "loadMainScene", "loadMainLevel"];
+	"loadLevel", "loadMain", "loadMainLevel", "loadKinect", "loadKinectLevel"];
 	
 	var text:String;
 	var id:String = "";
@@ -257,13 +259,18 @@ static class Dialog extends MonoBehaviour{
 		
 		// Loads the main scene
 		case "loadMain": case "loadMainScene": case "loadMainLevel":
-			LevelManager.LoadScene("Main");
+			LevelManager.LoadLevel("Main");
 			break;
 		
 		// Loads a new level
-		case "load": case "loadScene": case "loadLevel":
+		case "load": case "loadLevel":
 			var _level:String = _node["@name"] as String;
-			LevelManager.LoadScene(_level);
+			LevelManager.LoadLevel(_level);
+			break;
+			
+		case "loadKinect": case "loadKinectLevel":
+			var _kinectLevel:String = _node["@name"] as String;
+			LevelManager.LoadKinectLevel(_kinectLevel);
 			break;
 			
 		default:
