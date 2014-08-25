@@ -251,7 +251,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 	// Adds an amount of items to the original amount of items
 	public static function SyncAddItem(item : String, amount : int) : IEnumerator {
 		if(instance.inventoryPersistence) {
-			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + WWW.EscapeURL(Player.nickname) 
+			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + WWW.EscapeURL(Player.GetNickname()) 
 								+ "&item=" + WWW.EscapeURL(item) + "&amount=" + amount;
 			var www : WWW = new WWW(url);
 			while(!www.isDone) {

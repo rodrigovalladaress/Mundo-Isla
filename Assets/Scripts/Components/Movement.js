@@ -59,7 +59,7 @@ function Update () {
 		return;
 	}
 	
-	if (Player.nickname == "Admin") {
+	if (Player.GetNickname() == "Admin") {
 		if(Input.GetKeyDown ("v")) {
 			if(isNormalSpeed) {
 				speed = HIGH_SPEED;

@@ -18,7 +18,7 @@ class NPC extends MonoBehaviour{
 			// de ese  NPC. Aparece un arbol a la derecha que representa como cambia el 
 			// dialogo segun las opciones que se elijan.
 			if ( Input.GetMouseButtonDown(1) ){
-				if ( Player.nickname.ToLower() == "admin" ){
+				if ( Player.GetNickname().ToLower() == "admin" ){
 					if( !GameObject.Find( "Root" ) ){
 						var _root:GameObject = new GameObject();
 						_root.name = "Root";

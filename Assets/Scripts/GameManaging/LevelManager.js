@@ -47,7 +47,7 @@ public class LevelManager extends ScriptableObject {
 	public static function LoadScene(name : String) {
 		Player.Reposition(Player.GetSpawnPoint(name));
 		SetCurrentScene(name);
-		Server.Log("server", Player.nickname + " is now in " + name);
+		Server.Log("server", Player.GetNickname() + " is now in " + name);
 	}
 
 	public static function GetCurrentScene() : String {

@@ -28,7 +28,14 @@
 import System.Text.RegularExpressions;
 
 static class Player extends MonoBehaviour{
-	var nickname:String = "";
+	private var nickname:String = "";
+	public function GetNickname():String {
+		return nickname;
+	}
+	public function SetNickname(nickname:String) {
+		this.nickname = nickname;
+		PhotonNetwork.player.name = nickname;
+	}
 	var password:String = "";
 	// This string represents player's avatar
 	private var skinString:String;

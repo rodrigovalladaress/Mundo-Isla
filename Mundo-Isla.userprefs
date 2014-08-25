@@ -2,8 +2,7 @@
   <MonoDevelop.Ide.Workspace />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Server.js">
     <Files>
-      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="587" Column="69" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="412" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

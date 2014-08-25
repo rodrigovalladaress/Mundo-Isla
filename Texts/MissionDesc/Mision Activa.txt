@@ -1,2 +1,0 @@
-Este texto aparecerá cuando seleccionemos una misión que el jugador tenga asignada en este momento.
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed risus a enim mollis auctor at sit amet enim. Quisque quis felis in elit pulvinar dictum in iaculis quam. Nullam id consectetur risus. Vivamus ac arcu arcu, sit amet mollis justo. Cras vel justo in velit molestie tristique ut sed felis. Nullam blandit justo aliquam nulla venenatis vitae blandit leo luctus. Ut eget eros libero. Cras at lorem vel purus pretium volutpat.

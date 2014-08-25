@@ -20,8 +20,8 @@ static class Chat extends MonoBehaviour{
 	var inputBoxValue:String = "";
 	
 	function Send(){
-		Server.Log("chat", Player.nickname + ": " + inputBoxValue);
-		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.nickname + ": " 
+		Server.Log("chat", Player.GetNickname() + ": " + inputBoxValue);
+		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.GetNickname() + ": " 
 			+ inputBoxValue);
 		inputBoxValue = "";
 		// We unfocus the text input field with a hack on lack of a GUI.UnfocusControl() by focusing on the disabled send button
@@ -29,7 +29,7 @@ static class Chat extends MonoBehaviour{
 	}
 	
 	function Send(string:String){
-		Server.Log("chat", Player.nickname + ": " + string);
-		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.nickname + ": " + string);
+		Server.Log("chat", Player.GetNickname() + ": " + string);
+		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.All, Server.GetPhotonView().viewID.ToString(), "chat", Player.GetNickname() + ": " + string);
 	}
 }

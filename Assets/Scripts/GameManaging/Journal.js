@@ -173,10 +173,10 @@ static class Journal extends MonoBehaviour{
 				}
 				Server.Log("Game event", "The mission, \"" + mission + "\" stage is now \"" + missionStatus + "\"");
 			} else {
-				Debug.LogWarning("Mission '" + mission + "' of " +   Player.nickname + " status is failed. It can't be updated");
+				Debug.LogWarning("Mission '" + mission + "' of " +   Player.GetNickname() + " status is failed. It can't be updated");
 			}
 		} else {
-			Debug.LogError(Player.nickname + " doesn't have mission '" + mission + "' to update.");
+			Debug.LogError(Player.GetNickname() + " doesn't have mission '" + mission + "' to update.");
 		}
 		
 	}
@@ -186,7 +186,7 @@ static class Journal extends MonoBehaviour{
 	*******************************************************/
 	
 	function DelMissionSync(mission:String) {
-		var url : String = Paths.GetPlayerQuery() + "/delete_mission.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.nickname)) 
+		var url : String = Paths.GetPlayerQuery() + "/delete_mission.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.GetNickname())) 
 							+ "&mission=" + WWW.EscapeURL(mission);
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
@@ -199,7 +199,7 @@ static class Journal extends MonoBehaviour{
 	
 	// Synchronization of the mission
 	function MissionSync(mission:String, status:int) : IEnumerator {
-		var url : String = Paths.GetPlayerQuery() + "/set_mission.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.nickname)) 
+		var url : String = Paths.GetPlayerQuery() + "/set_mission.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.GetNickname())) 
 							+ "&mission=" + WWW.EscapeURL(mission) + "&status=" + status;
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
@@ -211,7 +211,7 @@ static class Journal extends MonoBehaviour{
 	}
 	
 	function RetrieveMissions() : IEnumerator {
-		var url:String = Paths.GetPlayerQuery() + "/get_missions.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.nickname));
+		var url:String = Paths.GetPlayerQuery() + "/get_missions.php/?player=" + Server.EscapePath(WWW.EscapeURL(Player.GetNickname()));
 		// If we are the only player on the scene, initialization is necesary
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
@@ -231,7 +231,7 @@ static class Journal extends MonoBehaviour{
 				SetMission(mission, status);
 			}
 		} else {
-			Debug.Log(Player.nickname + " has no missions.");
+			Debug.Log(Player.GetNickname() + " has no missions.");
 		}
 	}
 	

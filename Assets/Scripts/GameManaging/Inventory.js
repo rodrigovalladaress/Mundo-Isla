@@ -55,7 +55,7 @@ static class Inventory extends MonoBehaviour{
 	
 	function DropItem(item:String){
 		AddItem(item, -1);
-		Server.Log("game event","Player " + Player.nickname + " dropped " + item);
+		Server.Log("game event","Player " + Player.GetNickname() + " dropped " + item);
 		
 		Server.StartCoroutine(ItemManager.AddItemToScene(item, LevelManager.GetCurrentScene(), Player.position() + Vector3.forward));
 		
@@ -64,7 +64,7 @@ static class Inventory extends MonoBehaviour{
 	// This function loads the data of the inventory stored in the database and stores that
 	// in the Inventory.
 	function Retrieve():IEnumerator {
-		var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + WWW.EscapeURL(Player.nickname);
+		var url : String = Paths.GetPlayerQuery() + "/get_items.php?player=" + WWW.EscapeURL(Player.GetNickname());
 		var www : WWW = new WWW(url);
 		while(!www.isDone) {
 			yield;
@@ -86,7 +86,7 @@ static class Inventory extends MonoBehaviour{
 				Inventory.AddItem(item, amount);
 			}
 		} else {
-			Debug.Log(Player.nickname + " doesn't have any item in his or her inventory");
+			Debug.Log(Player.GetNickname() + " doesn't have any item in his or her inventory");
 		}
 	}
 	

@@ -103,17 +103,15 @@ class Server extends Photon.MonoBehaviour {
 			Debug.LogWarning("Mission progresss won't sync. Please set missionPersistence true in Server.");
 		}
 		if(Application.isEditor) {
-			Player.nickname = "Admin";
+			Player.SetNickname("Admin");
 		} else {
-			Player.nickname = "";
+			Player.SetNickname("");
 		}
 		ConnectToPhoton();
 				
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
 		
 		while (!Player.isPlaying()) yield;
-		//Server.StartCoroutine( TrackInventory("item", Inventory.items) );
-		//Server.StartCoroutine( TrackInventory("mission", Journal.missions) );
 	}
 	
 	
@@ -123,7 +121,7 @@ class Server extends Photon.MonoBehaviour {
 	******************************/
 	static function Login():IEnumerator{	
     	// Create a download object
-    	var url:String = Paths.GetPlayerQuery() + "/login.php/?player=" + Player.nickname 
+    	var url:String = Paths.GetPlayerQuery() + "/login.php/?player=" + Player.GetNickname() 
     						+ "&password=" + Player.password;
     	var www:WWW = new WWW(url);
 	    // Wait until the download is done
@@ -160,6 +158,9 @@ class Server extends Photon.MonoBehaviour {
 			}
 	        else if(www.text.Equals("false")) {
 	        	MainGUI.Content.Login.wrong = true;
+	        } else if(www.text.Equals("connected")) {
+	        	MainGUI.Content.Login.wrong = true;
+	        	Debug.LogError(Player.GetNickname() + " is already connected.");
 	        } else {
 	        	Debug.LogError("Error in player login = " + www.text);
 	        }
@@ -397,11 +398,13 @@ class Server extends Photon.MonoBehaviour {
 		******************************/
 		function TXT(scriptTarget:String, path:String):IEnumerator {
 		
-			var file:String = Paths.GetLocalHost() + "/" + path + ".txt";
+			var file:String = Paths.GetLocalHost() + "/" + EscapePath(path) + ".txt";
 			
 			// Downloads the TXT file and waits until it has finished download
 			var www:WWW = new WWW(file);
 			while (!www.isDone) yield;
+			
+			Debug.Log(file);
 			
 			// we create a new empty string
 			var newString:String = "";
@@ -494,25 +497,30 @@ class Server extends Photon.MonoBehaviour {
 	******************************/
 	function OnJoinedLobby()
 	{
-    	Server.Log("server", Player.nickname + " joined lobby");
+    	Server.Log("server", Player.GetNickname() + " joined lobby");
+	}
+	
+	function OnPhotonPlayerConnected(newPlayer:PhotonPlayer) {
+		Server.Log("server", Player.GetNickname() + " connected.");
 	}
 	
 	function OnJoinedRoom() {
-		Server.Log("server", Player.nickname + " connected.");
-		if(!MainGUI.Menu.show && GameObject.Find(Player.nickname) == null) {
-			Player.Spawn(Player.nickname, Player.GetSpawnPoint(), Player.GetSkinString());
+		Server.Log("server", Player.GetNickname() + " joined room.");
+		var canInstantiate:boolean = false;
+		if(!MainGUI.Menu.show && GameObject.Find(Player.GetNickname()) == null) {
+			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(), Player.GetSkinString());
 		} else {
-			Debug.LogError(Player.nickname + " couldn't be instantiated.");
-			Server.Log("error", Player.nickname + " couldn't be instantiated.");
+			Debug.LogError(Player.GetNickname() + " couldn't be instantiated.");
+			Server.Log("error", Player.GetNickname() + " couldn't be instantiated.");
 		}
 	}
 	
 	function OnLeftLobby() {
-		Server.Log("server", Player.nickname + " left lobby");
+		Server.Log("server", Player.GetNickname() + " left lobby");
 	}
 	
 	function OnDisconnectedFromPhoton() {
-		Server.Log("server", Player.nickname + " has disconnected.");
+		Server.Log("server", Player.GetNickname() + " has disconnected.");
 	}
 	
 	/******************************
@@ -524,19 +532,19 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	function OnPhotonCreateRoomFailed() {
-		Server.Log("error", Player.nickname + " couldn't create room. The room already exists?");
+		Server.Log("error", Player.GetNickname() + " couldn't create room. The room already exists?");
 	}
 	
 	function OnPhotonJoinRoomFailed() {
-		Server.Log("error", Player.nickname + " couldn't join a room. Does the room exists? Is it full?");
+		Server.Log("error", Player.GetNickname() + " couldn't join a room. Does the room exists? Is it full?");
 	}
 	
 	function OnConnectionFail(cause:DisconnectCause) {
-		Server.Log("error", Player.nickname + " has lost connection to Photon (" + cause.ToString + ")");
+		Server.Log("error", Player.GetNickname() + " has lost connection to Photon (" + cause.ToString + ")");
 	}
 	
 	function OnFailedToConnectToPhoton(cause:DisconnectCause) {
-		Server.Log("error", Player.nickname + " couldn't connect to Photon (" + cause.ToString + ")");
+		Server.Log("error", Player.GetNickname() + " couldn't connect to Photon (" + cause.ToString + ")");
 	}
 	
 	/******************************

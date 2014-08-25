@@ -31,8 +31,8 @@ class MainGUI extends MonoBehaviour {
 		Area.Reload();
 
 		// Spawning the player in Main when we are entering from other level
-		if(!Menu.show && GameObject.Find(Player.nickname) == null) {
-			Player.Spawn(Player.nickname, Player.GetSpawnPoint(LevelManager.GetCurrentScene()), Player.GetSkinString());
+		if(!Menu.show && GameObject.Find(Player.GetNickname()) == null) {
+			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(LevelManager.GetCurrentScene()), Player.GetSkinString());
 		}
 	}
 	
@@ -146,21 +146,21 @@ class MainGUI extends MonoBehaviour {
 					
 					GUILayout.FlexibleSpace();
 					GUILayout.FlexibleSpace();
-					MenuSwitch(Text("Player options"), "SkinEditor");
+					MenuSwitch(Text("Customization"), "SkinEditor");
 					GUILayout.FlexibleSpace();
-					// TODO if (Player.nickname == "Admin"){
+					// TODO if (Player.GetNickname() == "Admin"){
 					
-						GUILayout.FlexibleSpace();
-						if(Player.nickname.Equals("Admin") || Player.nickname.Equals("Admin_web")) {
-							if (GUILayout.Button( Text("Random room") )){
-								//Server.Host();
-								Server.CreateOrJoinRandomRoom();
-								Toogle();
-							}
-							GUILayout.FlexibleSpace();
-						}
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button( Text("Play") )){
+						//Server.Host();
+						// TODO Crear o unirse a la sala que el jugador tiene en 
+						// la base de datos
+						Server.CreateOrJoinRandomRoom();
+						Toogle();
+					}
+					GUILayout.FlexibleSpace();
 						
-						MenuSwitch(Text("Multiplayer"), "Multiplayer");
+						//MenuSwitch(Text("Multiplayer"), "Multiplayer");
 					// }
 					GUILayout.FlexibleSpace();
 					GUILayout.FlexibleSpace();
@@ -490,7 +490,7 @@ class MainGUI extends MonoBehaviour {
 				GUILayout.FlexibleSpace();
 				// Name input field
 				GUILayout.Label(Text("Player Name") + ": ");
-				Player.nickname = GUILayout.TextField(Player.nickname);
+				Player.SetNickname(GUILayout.TextField(Player.GetNickname()));
 				
 				GUILayout.FlexibleSpace();
 				

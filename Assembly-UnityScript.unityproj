@@ -69,7 +69,6 @@
      <Compile Include="Assets\Scripts\GameManaging\Player.js" />
      <Compile Include="Assets\Scripts\GameManaging\ReservedPhotonViewIDHash.js" />
      <Compile Include="Assets\Scripts\GameManaging\Server.js" />
-     <Compile Include="Assets\Scripts\GameManaging\SpawnManager.js" />
      <Compile Include="Assets\Scripts\GameManaging\WaitSecLoadMain.js" />
      <Compile Include="Assets\Scripts\Tools\DialogEditor.js" />
      <Compile Include="Assets\Scripts\Tools\Node.js" />
