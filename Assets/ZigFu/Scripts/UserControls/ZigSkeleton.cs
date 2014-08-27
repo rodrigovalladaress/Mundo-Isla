@@ -320,17 +320,14 @@ public class ZigSkeleton : MonoBehaviour
 	public IEnumerator Cargar()
 	{
 		XmlDocument xDoc = new XmlDocument();
-		if(Application.isWebPlayer) {
-			string url = Paths.GetKinect() + "/ejer.xml";
-			WWW www = new WWW(url);
-			while(!www.isDone) {
-				yield return new WaitForSeconds(1);
-			}
-			string xmlString = www.text;
-			xDoc.LoadXml(xmlString);
-		} else {
-			xDoc.Load("./ejer.xml");
+		string url = Paths.GetKinect() + "/ejer.xml";
+		WWW www = new WWW(url);
+		while(!www.isDone) {
+			yield return new WaitForSeconds(1);
 		}
+		string xmlString = www.text;
+		xDoc.LoadXml(xmlString);
+		
 		
 		
 		XmlNodeList exer = xDoc.GetElementsByTagName("EXERCISE");	  

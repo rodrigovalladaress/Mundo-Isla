@@ -107,12 +107,33 @@ class Server extends Photon.MonoBehaviour {
 		if(!IsMissionPersistence()) {
 			Debug.LogWarning("Mission progresss won't sync. Please set missionPersistence true in Server.");
 		}
+		LevelManager.mainCamera = Camera.main.gameObject;
+		ConnectToPhoton();
 		if(Application.isEditor) {
 			Player.SetNickname("Admin");
+			if(!IsShowLogin()) {
+				MainGUI.Menu.current = "Menu";
+				MainGUI.Content.current = "";
+				Server.StartCoroutine(Journal.RetrieveMissions());
+				Server.StartCoroutine(ItemManager.RetrieveItemInformation());
+				Server.StartCoroutine(Inventory.Retrieve());
+				StartCoroutine(Player.RetrieveSkinString());
+				// Wait until the skin of the player is downloaded
+				while(Player.GetSkinString() == null) {
+					yield;
+				}
+				// Wait for connection to Photon if we weren't connected yet.
+				while(!PhotonNetwork.connectedAndReady) {
+					yield;
+				}
+				MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
+				// Show player skin next to the GUI menu
+		   		GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
+				
+			}
 		} else {
 			Player.SetNickname("");
 		}
-		ConnectToPhoton();
 				
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
 		
@@ -479,7 +500,7 @@ class Server extends Photon.MonoBehaviour {
 		/******************************
 		|	Texture retrieving
 		******************************/
-		function ItemTexture(textureName:String){
+		function ItemTexture(textureName:String):IEnumerator{
 			var file:String = Paths.GetTextures() + "/" + EscapePath(textureName) + ".png";;		    
 			var www:WWW = new WWW(file);
 			var image:Texture2D = new Texture2D(64, 64);

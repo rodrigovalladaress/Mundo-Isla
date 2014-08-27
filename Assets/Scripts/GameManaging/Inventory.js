@@ -35,7 +35,7 @@ static class Inventory extends MonoBehaviour{
 		return;
 	}
 	
-	function AddItem (item:String, amount:int){
+	function AddItem (item:String, amount:int):IEnumerator{
 		if ( !textures.ContainsKey( item ) )
 			Server.StartCoroutine(Server.Retrieve.ItemTexture(item));
 	

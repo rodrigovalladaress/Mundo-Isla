@@ -32,7 +32,6 @@ public class NetworkCharacter : Photon.MonoBehaviour
 		}
 		else
 		{
-			string networkPlayerScene;
 			// Network player, receive data
 			this.correctPlayerPos = (Vector3)stream.ReceiveNext();
 			this.correctPlayerRot = (Quaternion)stream.ReceiveNext();

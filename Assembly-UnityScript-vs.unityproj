@@ -65,6 +65,7 @@
      <Compile Include="Assets\Scripts\GameManaging\Inventory.js" />
      <Compile Include="Assets\Scripts\GameManaging\ItemManager.js" />
      <Compile Include="Assets\Scripts\GameManaging\Journal.js" />
+     <Compile Include="Assets\Scripts\GameManaging\KinectLevelManager.js" />
      <Compile Include="Assets\Scripts\GameManaging\LevelManager.js" />
      <Compile Include="Assets\Scripts\GameManaging\Player.js" />
      <Compile Include="Assets\Scripts\GameManaging\ReservedPhotonViewIDHash.js" />

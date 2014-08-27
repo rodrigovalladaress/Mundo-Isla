@@ -1,11 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\ZigFu\Scripts\Zig.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\LevelManager.js">
     <Files>
-      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="79" Column="5" />
-      <File FileName="Assets\Plugins\Paths.js" Line="8" Column="42" />
-      <File FileName="Assets\ZigFu\Scripts\Viewers\ZigUsersRadar.cs" Line="1" Column="1" />
-      <File FileName="Assets\ZigFu\Scripts\Zig.cs" Line="20" Column="11" />
+      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="123" Column="35" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="110" Column="51" />
+      <File FileName="Assets\ZigFu\Scripts\Zig.cs" Line="29" Column="19" />
+      <File FileName="Assets\Plugins\GlobalData.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManaging\WaitSecLoadMain.js" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
