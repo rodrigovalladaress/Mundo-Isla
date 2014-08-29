@@ -88,8 +88,11 @@ class Server extends Photon.MonoBehaviour {
 		PhotonNetwork.JoinOrCreateRoom(gameName, roomOptions, PhotonNetwork.lobby);
 	}
 	
+	// This method gets the room that's asigned to the player from the database,
+	// retrieves its data and joins or creates that room
 	public static function JoinOrCreateDefaultRoom(): IEnumerator {
-		var url: String = Paths.GetPlayerQuery() + "/get_room.php/?player=" + WWW.EscapeURL(Player.GetNickname());
+		var url: String = Paths.GetPlayerQuery() + "/get_room.php/?player=" 
+							+ WWW.EscapeURL(Player.GetNickname());
 		var www: WWW = new WWW(url);
 		var room: String;
 		while(!www.isDone) {

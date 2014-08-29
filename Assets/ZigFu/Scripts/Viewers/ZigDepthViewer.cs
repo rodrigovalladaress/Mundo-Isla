@@ -64,60 +64,63 @@ public class ZigDepthViewer : MonoBehaviour {
 
     void UpdateHistogram(ZigDepth depth)
     {
-        int i, numOfPoints = 0;
+		if(GlobalData.inKinectScene) {
+	        int i, numOfPoints = 0;
 
-        System.Array.Clear(depthHistogramMap, 0, depthHistogramMap.Length);
-        short[] rawDepthMap = depth.data;
+	        System.Array.Clear(depthHistogramMap, 0, depthHistogramMap.Length);
+	        short[] rawDepthMap = depth.data;
 
-        int depthIndex = 0;
-        // assume only downscaling
-        // calculate the amount of source pixels to move per column and row in
-        // output pixels
-        int factorX = depth.xres/textureSize.Width;
-        int factorY = ((depth.yres / textureSize.Height) - 1) * depth.xres;
-        for (int y = 0; y < textureSize.Height; ++y, depthIndex += factorY) {
-            for (int x = 0; x < textureSize.Width; ++x, depthIndex += factorX) {
-                short pixel = rawDepthMap[depthIndex];
-                if (pixel != 0) {
-                    depthHistogramMap[pixel]++;
-                    numOfPoints++;
-                }
-            }
-        }
-        depthHistogramMap[0] = 0;
-        if (numOfPoints > 0) {
-            for (i = 1; i < depthHistogramMap.Length; i++) {
-                depthHistogramMap[i] += depthHistogramMap[i - 1];
-            }
-            depthToColor[0] = Color.black;
-            for (i = 1; i < depthHistogramMap.Length; i++) {
-                float intensity = (1.0f - (depthHistogramMap[i] / numOfPoints));
-                //depthHistogramMap[i] = intensity * 255;
-                depthToColor[i].r = (byte)(BaseColor.r * intensity);
-                depthToColor[i].g = (byte)(BaseColor.g * intensity);
-                depthToColor[i].b = (byte)(BaseColor.b * intensity);
-                depthToColor[i].a = 255;//(byte)(BaseColor.a * intensity);
-            }
-        }
+	        int depthIndex = 0;
+	        // assume only downscaling
+	        // calculate the amount of source pixels to move per column and row in
+	        // output pixels
+	        int factorX = depth.xres/textureSize.Width;
+	        int factorY = ((depth.yres / textureSize.Height) - 1) * depth.xres;
+	        for (int y = 0; y < textureSize.Height; ++y, depthIndex += factorY) {
+	            for (int x = 0; x < textureSize.Width; ++x, depthIndex += factorX) {
+	                short pixel = rawDepthMap[depthIndex];
+	                if (pixel != 0) {
+	                    depthHistogramMap[pixel]++;
+	                    numOfPoints++;
+	                }
+	            }
+	        }
+	        depthHistogramMap[0] = 0;
+	        if (numOfPoints > 0) {
+	            for (i = 1; i < depthHistogramMap.Length; i++) {
+	                depthHistogramMap[i] += depthHistogramMap[i - 1];
+	            }
+	            depthToColor[0] = Color.black;
+	            for (i = 1; i < depthHistogramMap.Length; i++) {
+	                float intensity = (1.0f - (depthHistogramMap[i] / numOfPoints));
+	                //depthHistogramMap[i] = intensity * 255;
+	                depthToColor[i].r = (byte)(BaseColor.r * intensity);
+	                depthToColor[i].g = (byte)(BaseColor.g * intensity);
+	                depthToColor[i].b = (byte)(BaseColor.b * intensity);
+	                depthToColor[i].a = 255;//(byte)(BaseColor.a * intensity);
+	            }
+	        }
         
-
+		}
     }
 
     void UpdateTexture(ZigDepth depth)
     {
-        short[] rawDepthMap = depth.data;
-        int depthIndex = 0;
-        int factorX = depth.xres / textureSize.Width;
-        int factorY = ((depth.yres / textureSize.Height) - 1) * depth.xres;
-        // invert Y axis while doing the update
-        for (int y = textureSize.Height - 1; y >= 0 ; --y, depthIndex += factorY) {
-            int outputIndex = y * textureSize.Width;
-            for (int x = 0; x < textureSize.Width; ++x, depthIndex += factorX, ++outputIndex) {
-                outputPixels[outputIndex] = depthToColor[rawDepthMap[depthIndex]];
-            }
-        }
-        texture.SetPixels32(outputPixels);
-        texture.Apply();
+		if(GlobalData.inKinectScene) {
+	        short[] rawDepthMap = depth.data;
+	        int depthIndex = 0;
+	        int factorX = depth.xres / textureSize.Width;
+	        int factorY = ((depth.yres / textureSize.Height) - 1) * depth.xres;
+	        // invert Y axis while doing the update
+	        for (int y = textureSize.Height - 1; y >= 0 ; --y, depthIndex += factorY) {
+	            int outputIndex = y * textureSize.Width;
+	            for (int x = 0; x < textureSize.Width; ++x, depthIndex += factorX, ++outputIndex) {
+	                outputPixels[outputIndex] = depthToColor[rawDepthMap[depthIndex]];
+	            }
+	        }
+	        texture.SetPixels32(outputPixels);
+	        texture.Apply();
+		}
     }
 
     void Zig_Update(ZigInput input)

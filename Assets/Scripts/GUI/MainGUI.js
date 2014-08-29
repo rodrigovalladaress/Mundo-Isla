@@ -715,7 +715,7 @@ class MainGUI extends MonoBehaviour {
 					}
 				}
 				catch (InvalidOperationException){
-					Debug.Log("Expected error dropping item. Don't panic.");
+					Debug.LogWarning("Expected error dropping item. Don't panic.");
 				}
 				
 			GUILayout.EndScrollView();

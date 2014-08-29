@@ -103,9 +103,9 @@ public class LevelManager extends ScriptableObject {
 				kinectManagerComponent.Initialize();
 				SetCurrentLevel(name);
 				if(!IsKinectLevel()) {
-					SetKinectLevel(true);
 					ActivateZigfu();
-					DesactivatePlayer();					
+					DesactivatePlayer();
+					SetKinectLevel(true);					
 				}
 				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
 			} else {
@@ -147,7 +147,10 @@ public class LevelManager extends ScriptableObject {
 	}
 	
 	private static function DesactivatePlayer() {
-		Player.object.active = false;
+	
+		Debug.Log("Desactivate Player ------------------------");
+		
+		Player.object.renderer.enabled = false;
 	}
 	
 	private static function ActivatePlayer() {
