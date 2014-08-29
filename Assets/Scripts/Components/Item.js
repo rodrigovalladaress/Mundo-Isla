@@ -125,8 +125,8 @@ class Item extends MonoBehaviour{
 		}
 	}
 	
-	private function RemoveItemFromScene() {
-		ItemManager.RemoveItemFromScene(this, LevelManager.GetCurrentScene());
+	private function RemoveItemFromLevel() {
+		ItemManager.RemoveItemFromLevel(this, LevelManager.GetCurrentLevel());
 	}
 	
 	/*********************************
@@ -141,8 +141,8 @@ class Item extends MonoBehaviour{
 			if ( collider.gameObject != Player.object ) return;
 			//Inventory.AddItem(this.gameObject.name);
 			Player.object.audio.PlayOneShot(_audioClip);
-			RemoveItemFromScene();
-			Server.StartCoroutine(ItemManager.SyncAddItem(_texture, 1));
+			RemoveItemFromLevel();
+			Server.StartCoroutine(Inventory.SyncAddItem(_texture, 1));
 			Server.Log("GAME EVENT", collider.transform.gameObject.name + " got " + this.gameObject.name + " from the floor.");
 		}
 		// When the item touches another object, it stops descending

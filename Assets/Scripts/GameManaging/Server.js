@@ -76,11 +76,58 @@ class Server extends Photon.MonoBehaviour {
 	/*******************************************************
 	|	Room management
 	*******************************************************/
-	public static function CreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, 
+	public static function JoinOrCreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, 
 										gameDescription:String) {
+		var roomOptions:RoomOptions = new RoomOptions();
 		var hash:ExitGames.Client.Photon.Hashtable = new ExitGames.Client.Photon.Hashtable();
 		hash.Add("gameDescription", gameDescription);
-		PhotonNetwork.CreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
+		roomOptions.maxPlayers = maxPlayers;
+		roomOptions.isVisible = isVisible;
+		roomOptions.customRoomProperties = hash;
+		//PhotonNetwork.JoinOrCreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
+		PhotonNetwork.JoinOrCreateRoom(gameName, roomOptions, PhotonNetwork.lobby);
+	}
+	
+	public static function JoinOrCreateDefaultRoom(): IEnumerator {
+		var url: String = Paths.GetPlayerQuery() + "/get_room.php/?player=" + WWW.EscapeURL(Player.GetNickname());
+		var www: WWW = new WWW(url);
+		var room: String;
+		while(!www.isDone) {
+			yield;
+		}
+		if(www.text.Equals("ERROR")) {
+			Debug.LogError("Error in default room " + www.text);
+		} else {
+			room = www.text;
+			var maxPlayers: int;
+			var description: String;
+			var isVisible: boolean;
+			var roomOptions: RoomOptions;
+			url = Paths.GetRoomQuery() + "/get_details.php/?room=" + WWW.EscapeURL(room);
+			www = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			if(!www.Equals("<error/>")) {
+				var xDoc : XmlDocument = new XmlDocument();
+				xDoc.LoadXml(www.text);
+				var result : XmlNodeList = xDoc.GetElementsByTagName("result");
+				var resultElement = result[0] as XmlElement;
+				var row : XmlNodeList = resultElement.ChildNodes;
+				var rowElement : XmlElement = row[0];
+				var hash: ExitGames.Client.Photon.Hashtable;
+				if(row.Count > 0) {
+					maxPlayers = int.Parse(rowElement.GetElementsByTagName("maxPlayers")[0].InnerText);
+					description = rowElement.GetElementsByTagName("description")[0].InnerText;
+					isVisible = ((int.Parse(rowElement.GetElementsByTagName("private")[0].InnerText) == 1) ? true : false);
+					JoinOrCreateRoom(room, maxPlayers, isVisible, description);
+				} else {
+					Debug.LogError("Error retrieveing room properties of " + room);
+				}
+			} else {
+				Debug.LogError("Error in room properties.");
+			}
+		}
 	}
 	
 	public static function CreateOrJoinRandomRoom() {
@@ -138,6 +185,7 @@ class Server extends Photon.MonoBehaviour {
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
 		
 		while (!Player.isPlaying()) yield;
+		// 
 	}
 	
 	

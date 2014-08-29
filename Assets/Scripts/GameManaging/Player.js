@@ -71,7 +71,7 @@ static class Player extends MonoBehaviour{
 	}
 	
 	function GetSpawnPoint():Vector3 {
-		return GetSpawnPoint(LevelManager.GetCurrentScene());
+		return GetSpawnPoint(LevelManager.GetCurrentLevel());
 	}
 	
 	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) {//: IEnumerator {

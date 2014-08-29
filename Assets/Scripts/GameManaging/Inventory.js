@@ -53,11 +53,29 @@ static class Inventory extends MonoBehaviour{
 		AddItem(item, 1);
 	}
 	
+	// Syncs the amount of items
+	// Adds an amount of items to the original amount of items
+	public static function SyncAddItem(item : String, amount : int) : IEnumerator {
+		if(ItemManager.IsInventoryPersistence()) {
+			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + WWW.EscapeURL(Player.GetNickname()) 
+								+ "&item=" + WWW.EscapeURL(item) + "&amount=" + amount;
+			var www : WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			if(!www.text.Equals("OK")) {
+				Debug.LogError("Error syncing item " + item + " with the database (" + www.text 
+								+ ") url = " + url);
+			}
+		}
+		Inventory.AddItem(item, amount);
+	}
+	
 	function DropItem(item:String){
 		AddItem(item, -1);
 		Server.Log("game event","Player " + Player.GetNickname() + " dropped " + item);
 		
-		Server.StartCoroutine(ItemManager.AddItemToScene(item, LevelManager.GetCurrentScene(), Player.position() + Vector3.forward));
+		Server.StartCoroutine(ItemManager.AddItemToLevel(item, LevelManager.GetCurrentLevel(), Player.position() + Vector3.forward));
 		
 	}
 	

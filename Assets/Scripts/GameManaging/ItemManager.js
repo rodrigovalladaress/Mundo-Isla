@@ -33,6 +33,10 @@ public class ItemManager extends Photon.MonoBehaviour {
 
 	// If it's setted true, the changes in the inventory will be synced with database.
 	public var inventoryPersistence : boolean;
+	
+	public static function IsInventoryPersistence(): boolean {
+		return instance.inventoryPersistence;
+	}
 
 	// Acces to non-static members by static functions.
 	private static var instance : ItemManager;
@@ -61,7 +65,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 	// instantiates them.
 	public static function RetrieveItemInformation() : IEnumerator {
 		var url : String = Paths.GetSceneQuery() + "/get_items.php/?scene=" + 
-							WWW.EscapeURL(LevelManager.GetCurrentScene());
+							WWW.EscapeURL(LevelManager.GetCurrentLevel());
 		// Wait for the connection to a room
 		while(PhotonNetwork.room == null) {
 			yield;
@@ -108,7 +112,7 @@ public class ItemManager extends Photon.MonoBehaviour {
 				}
 			}
 		} else {
-			Debug.Log("There are no items on scene " + LevelManager.GetCurrentScene());
+			Debug.Log("There are no items on scene " + LevelManager.GetCurrentLevel());
 		}
 	}
 
@@ -184,13 +188,13 @@ public class ItemManager extends Photon.MonoBehaviour {
 	}
 
 	// This adds an item to the scene and syncs it.
-	public static function AddItemToScene(item : String, scene : String, position : Vector3) : IEnumerator {
+	public static function AddItemToLevel(item : String, level : String, position : Vector3) : IEnumerator {
 		var id : int;//= GetFirstAvailablePhotonViewID();
 		var texture : String = item;
 		var x : float = position.x;
 		var y : float = position.y;
 		var z : float = position.z;
-		var object : GameObject = InstantiateItem(NoID, x, y, z, texture, scene);
+		var object : GameObject = InstantiateItem(NoID, x, y, z, texture, level);
 		id = (object.GetComponent("PhotonView") as PhotonView).viewID;
 		
 		Server.GetPhotonView().RPC("SyncObject", PhotonTargets.AllBuffered, 
@@ -198,14 +202,15 @@ public class ItemManager extends Photon.MonoBehaviour {
 		
 		if(object != null) {
 			if(instance.sceneItemsPersistence) {
-				var url : String = Paths.GetSceneQuery() + "/add_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(scene)
-									+ "&texture=" + WWW.EscapeURL(texture) + "&x=" + x + "&y=" + y + "&z=" + z;
+				var url : String = Paths.GetSceneQuery() + "/add_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(level)
+									+ "&room=" + WWW.EscapeURL(PhotonNetwork.room.name) + "&texture=" + WWW.EscapeURL(texture) 
+									+ "&x=" + x + "&y=" + y + "&z=" + z;
 				var www : WWW = new WWW(url);
 				while(!www.isDone) {
 					yield;
 				}
 				if(!www.text.Equals("OK")) {
-					Debug.LogError("Error syncing adding item to scene (" + www.text + ") url = " + url);
+					Debug.LogError("Error syncing adding item to level (" + www.text + ") url = " + url);
 				}
 			}
 		} else {
@@ -219,18 +224,18 @@ public class ItemManager extends Photon.MonoBehaviour {
 	}
 
 	// This removes an item from a scene. 
-	public static function RemoveItemFromScene(item : Item, scene : String) : IEnumerator {
+	public static function RemoveItemFromLevel(item : Item, level : String) : IEnumerator {
 		var id : int = item.GetPhotonViewID();
 		// We check if the id is being used by the item
 		//if(IsIDReserved(id)) {
 			if(instance.sceneItemsPersistence) {
-				var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(scene);
+				var url : String = Paths.GetSceneQuery() + "/delete_item.php/?id=" + id + "&scene=" + WWW.EscapeURL(level);
 				var www : WWW = new WWW(url);
 				while(!www.isDone) {
 					yield;
 				}
 				if(!www.text.Equals("OK")) {
-					Debug.LogError("Error deleting item " + id + " from scene " + scene + " on the database (" 
+					Debug.LogError("Error deleting item " + id + " from scene " + level + " on the database (" 
 									+ www.text + ") url = " + url);
 				}
 			}
@@ -247,21 +252,5 @@ public class ItemManager extends Photon.MonoBehaviour {
 		}*/
 	}
 
-	// Syncs the amount of items
-	// Adds an amount of items to the original amount of items
-	public static function SyncAddItem(item : String, amount : int) : IEnumerator {
-		if(instance.inventoryPersistence) {
-			var url : String = Paths.GetPlayerQuery() + "/add_item.php/?player=" + WWW.EscapeURL(Player.GetNickname()) 
-								+ "&item=" + WWW.EscapeURL(item) + "&amount=" + amount;
-			var www : WWW = new WWW(url);
-			while(!www.isDone) {
-				yield;
-			}
-			if(!www.text.Equals("OK")) {
-				Debug.LogError("Error syncing item " + item + " with the database (" + www.text 
-								+ ") url = " + url);
-			}
-		}
-		Inventory.AddItem(item, amount);
-	}
+	
 }

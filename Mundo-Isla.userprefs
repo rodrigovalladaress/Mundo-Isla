@@ -2,11 +2,16 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\LevelManager.js">
     <Files>
-      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="123" Column="35" />
-      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="110" Column="51" />
-      <File FileName="Assets\ZigFu\Scripts\Zig.cs" Line="29" Column="19" />
-      <File FileName="Assets\Plugins\GlobalData.js" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManaging\WaitSecLoadMain.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="236" Column="16" />
+      <File FileName="Assets\Scripts\Components\NPC.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Components\Item.js" Line="129" Column="69" />
+      <File FileName="Assets\Scripts\GameManaging\Player.js" Line="74" Column="52" />
+      <File FileName="Assets\Scripts\GameManaging\ItemManager.js" Line="187" Column="39" />
+      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="13" Column="31" />
+      <File FileName="Assets\Scripts\Components\Label.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManaging\Dialog.js" Line="197" Column="38" />
+      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="35" Column="88" />
+      <File FileName="Assets\Scripts\GameManaging\Inventory.js" Line="60" Column="86" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

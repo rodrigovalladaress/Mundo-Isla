@@ -5,11 +5,18 @@
 // independent scenes. They have different parents in the
 // Unity hieararchy. 
 // In order to achieve that, each subscene needs an 
-// GameObject named "SpawnPoint<SceneName>" as the player 
-// spawn point on that scene.
+// GameObject named "SpawnPoint<SceneName>" as the spawn 
+// point on that scene.
+// There are special subscenes where the Kinect device is
+// needed. In those cases, instead of a spawn point, that
+// subscene needs a GameObject with a Camera component
+// called "<SceneName>Camera".
 //
-// Version: 2.0
+// Version: 2.1
 // Autor: Rodrigo Valladares Santana <rodriv_tf@hotmail.com> 
+//
+// Changes in 2.1 version:
+//	-	Kinect levels loading.
 //
 // Changes in 2.0 version:
 // 	-	There's only one scene with many subscenes.	
@@ -38,13 +45,13 @@
 //	 - 	Scene loading.
 public class LevelManager extends ScriptableObject {
 	
-	private static var currentScene:String;
+	private static var currentLevel:String;
 	
-	public static function IsKinectScene():boolean {
+	public static function IsKinectLevel():boolean {
 		return GlobalData.inKinectScene;
 	}
-	public static function SetKinectScene(kinectScene:boolean) {
-		GlobalData.inKinectScene = kinectScene;
+	public static function SetKinectLevel(kinectLevel:boolean) {
+		GlobalData.inKinectScene = kinectLevel;
 	}
 	
 	public static var mainCamera:GameObject;
@@ -52,30 +59,68 @@ public class LevelManager extends ScriptableObject {
 	// Loads the given level
 	public static function LoadLevel(name : String) {
 		var newPosition:Vector3;
-		if(IsKinectScene()) {
+		if(IsKinectLevel()) {
 			var camera:GameObject = mainCamera;
 			var cameraComponent:Camera = camera.GetComponent("Camera") as Camera;
 			var audioListenerComponent:AudioListener = camera.GetComponent("AudioListener")
 														as AudioListener;
+			// Desactivation of the Kinect camera
 			(Camera.main.GetComponent("AudioListener") as AudioListener).enabled = false;
 			(Camera.main.GetComponent("Camera") as Camera).enabled = false;
 			(Camera.main.GetComponent("KinectLevelManager") as KinectLevelManager).Revert();
+			// Activation of Main Camera
 			audioListenerComponent.enabled = true;
 			cameraComponent.enabled = true;
+			
 			DesactivateZigfu();
 			ActivatePlayer();
-			SetKinectScene(false);
+			SetKinectLevel(false);
 		}
 		newPosition = Player.GetSpawnPoint(name);
 		if(newPosition != Player.SpawnPointNotFound) {
 			Player.Reposition(newPosition);
-			SetCurrentScene(name);
+			SetCurrentLevel(name);
 			Server.Log("server", Player.GetNickname() + " is now in " + name);
 		} else {
 			Debug.LogError("SpawnPoint" + name + " should exist to load scene " + name);
 		}
 	}
 	
+	// Kinect level loading
+	public static function LoadKinectLevel(name:String) {
+		var kinectCamera:GameObject = GameObject.Find(name + "Camera");
+		if(kinectCamera != null) {
+			var cameraComponent:Camera = kinectCamera.GetComponent("Camera") as Camera;
+			var audioListenerComponent:AudioListener = kinectCamera.GetComponent("AudioListener")
+														as AudioListener;
+			var kinectManagerComponent:KinectLevelManager = kinectCamera.GetComponent("KinectLevelManager")
+															as KinectLevelManager;
+			if(cameraComponent != null) {
+				(mainCamera.GetComponent("AudioListener") as AudioListener).enabled = false;
+				(mainCamera.GetComponent("Camera") as Camera).enabled = false;
+				audioListenerComponent.enabled = true;
+				cameraComponent.enabled = true;	
+				kinectManagerComponent.Initialize();
+				SetCurrentLevel(name);
+				if(!IsKinectLevel()) {
+					SetKinectLevel(true);
+					ActivateZigfu();
+					DesactivatePlayer();					
+				}
+				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
+			} else {
+				Server.Log("error", name + "Camera must have a Camera component to load "
+								+ "kinect scene " + name);
+				Debug.LogError(name + "Camera must have a Camera component to load "
+								+ "kinect scene " + name);
+			}
+		} else {
+			Server.Log("error", name + "Camera must exist to load Kinect scene " + name);
+			Debug.LogError(name + "Camera must exist to load Kinect scene " + name);
+		}
+	}
+	
+	// Activation of the Components of Zigfu that track player
 	private static function ActivateZigfu() {
 		var zigfu:GameObject = GameObject.Find("zigfu") as GameObject;
 		if(zigfu != null) {
@@ -88,6 +133,7 @@ public class LevelManager extends ScriptableObject {
 		}
 	}
 	
+	// Desactivation of the Components of Zigfu that track player
 	private static function DesactivateZigfu() {
 		var zigfu:GameObject = GameObject.Find("zigfu") as GameObject;
 		if(zigfu != null) {
@@ -107,48 +153,15 @@ public class LevelManager extends ScriptableObject {
 	private static function ActivatePlayer() {
 		Player.object.active = true;
 	}
-	
-	public static function LoadKinectLevel(name:String) {
-		var kinectCamera:GameObject = GameObject.Find(name + "Camera");
-		if(kinectCamera != null) {
-			var cameraComponent:Camera = kinectCamera.GetComponent("Camera") as Camera;
-			var audioListenerComponent:AudioListener = kinectCamera.GetComponent("AudioListener")
-														as AudioListener;
-			var kinectManagerComponent:KinectLevelManager = kinectCamera.GetComponent("KinectLevelManager")
-															as KinectLevelManager;
-			if(cameraComponent != null) {
-				(mainCamera.GetComponent("AudioListener") as AudioListener).enabled = false;
-				(mainCamera.GetComponent("Camera") as Camera).enabled = false;
-				audioListenerComponent.enabled = true;
-				cameraComponent.enabled = true;	
-				kinectManagerComponent.Initialize();
-				SetCurrentScene(name);
-				if(!IsKinectScene()) {
-					SetKinectScene(true);
-					ActivateZigfu();
-					DesactivatePlayer();					
-				}
-				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
-			} else {
-				Server.Log("error", name + "Camera must have a Camera component to load "
-								+ "kinect scene " + name);
-				Debug.LogError(name + "Camera must have a Camera component to load "
-								+ "kinect scene " + name);
-			}
-		} else {
-			Server.Log("error", name + "Camera must exist to load Kinect scene " + name);
-			Debug.LogError(name + "Camera must exist to load Kinect scene " + name);
+
+	public static function GetCurrentLevel() : String {
+		if(currentLevel == null || currentLevel.Equals("")) {
+			SetCurrentLevel("Main");
 		}
+		return currentLevel;
 	}
 
-	public static function GetCurrentScene() : String {
-		if(currentScene == null || currentScene.Equals("")) {
-			SetCurrentScene("Main");
-		}
-		return currentScene;
-	}
-
-	public static function SetCurrentScene(currentScene : String) {
-		this.currentScene = currentScene;
+	public static function SetCurrentLevel(currentLevel : String) {
+		this.currentLevel = currentLevel;
 	}
 }

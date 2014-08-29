@@ -63,3 +63,8 @@ private static var playerQuery : String = Paths.query + "/player";
 public static function GetPlayerQuery() : String {
 	return playerQuery;
 }
+
+private static var roomQuery: String = Paths.query + "/room";
+public static function GetRoomQuery(): String {
+	return roomQuery;
+}

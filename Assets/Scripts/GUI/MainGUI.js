@@ -32,7 +32,7 @@ class MainGUI extends MonoBehaviour {
 
 		// Spawning the player in Main when we are entering from other level
 		if(!Menu.show && GameObject.Find(Player.GetNickname()) == null) {
-			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(LevelManager.GetCurrentScene()), 
+			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(LevelManager.GetCurrentLevel()), 
 				Player.GetSkinString());
 		}
 	}
@@ -156,7 +156,8 @@ class MainGUI extends MonoBehaviour {
 						//Server.Host();
 						// TODO Crear o unirse a la sala que el jugador tiene en 
 						// la base de datos
-						Server.CreateOrJoinRandomRoom();
+						//Server.CreateOrJoinRandomRoom();
+						Server.StartCoroutine(Server.JoinOrCreateDefaultRoom());
 						Toogle();
 					}
 					GUILayout.FlexibleSpace();
@@ -450,13 +451,13 @@ class MainGUI extends MonoBehaviour {
 					else{
 						if(GUILayout.Button( Text("Start") )){
 							//Server.Host(maxPlayers, port, gameName, gameDescription);
-							Server.CreateRoom(gameName, maxPlayers, true, gameDescription);
+							Server.JoinOrCreateRoom(gameName, maxPlayers, true, gameDescription);
 							Menu.Toogle();
 						}
 						// Execute the startServer function if return is pressed and the box has focus
 						if (Event.current.type == EventType.KeyDown && Event.current.character == '\n' 
 							&& GUI.GetNameOfFocusedControl() == "New server name box"){
-							Server.CreateRoom(gameName, maxPlayers, true, gameDescription);
+							Server.JoinOrCreateRoom(gameName, maxPlayers, true, gameDescription);
 							Menu.Toogle();
 						}
 					}
@@ -468,7 +469,7 @@ class MainGUI extends MonoBehaviour {
 					
 					// Start button
 					if(GUILayout.Button( Text("Start") )){
-						Server.CreateRoom("", maxPlayers, false, null);
+						Server.JoinOrCreateRoom("", maxPlayers, false, null);
 						Menu.Toogle();
 					}
 				}
