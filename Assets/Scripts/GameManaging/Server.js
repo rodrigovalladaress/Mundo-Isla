@@ -46,6 +46,8 @@ class Server extends Photon.MonoBehaviour {
 		instance = this;
 	}
 	
+	
+	
 	// If setted true, the GUI shows some information of the connection to Photon
 	public var showDebugInformationOnGUI:boolean;
 	
@@ -70,6 +72,27 @@ class Server extends Photon.MonoBehaviour {
 	
 	private static function ConnectToPhoton() {
 		PhotonNetwork.ConnectUsingSettings("0.1");
+	}
+	
+	@RPC
+	private function DesactivatePlayer(id: int) {
+		Debug.Log("desactivate player");
+		GetPhotonView().Find(id).gameObject.SetActive(false);
+		//Debug.Log(Player.object.renderer == null ? "es null" : "no lo es");
+		//(Player.object.GetComponent("MeshRenderer") as MeshRenderer).enabled = false;
+		Debug.Log("Desactivate player desp object rendererrrr");
+		//(Player.object.GetComponent("Label") as MonoBehaviour).enabled = false;
+		Debug.Log("dessss labellllll");
+	}
+	
+	@RPC
+	private function ActivatePlayer(id: int) {
+		GetPhotonView().Find(id).gameObject.SetActive(true);
+		Debug.Log("activatinggggggggggggggg");
+		//Player.object.renderer.enabled = true;
+		Debug.Log("activatinggggggggggggggg 2");
+		//(Player.object.GetComponent("Label") as MonoBehaviour).enabled = true;
+		Debug.Log("activatinggggggggggggggg 3");
 	}
 	
 	

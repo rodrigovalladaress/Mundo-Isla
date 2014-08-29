@@ -5,7 +5,6 @@ public var seconds:int;
 private var waiting:boolean = false;
 
 function Update () {
-	Debug.Log("wait");
 	if(GlobalData.inKinectScene && !waiting) {
 		StartCoroutine(Wait());
 	}
@@ -14,6 +13,7 @@ function Update () {
 function Wait():IEnumerator{
 	waiting = true;
 	yield WaitForSeconds (seconds);
+	Debug.Log("Cargar main");
 	LevelManager.LoadLevel("Main");
 	waiting = false;
 }

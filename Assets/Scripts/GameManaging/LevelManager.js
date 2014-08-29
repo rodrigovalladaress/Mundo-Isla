@@ -73,7 +73,8 @@ public class LevelManager extends ScriptableObject {
 			cameraComponent.enabled = true;
 			
 			DesactivateZigfu();
-			ActivatePlayer();
+			//ActivatePlayer();
+			Server.GetPhotonView().RPC("ActivatePlayer", PhotonTargets.AllBuffered, Player.object.GetComponent(PhotonView).viewID);
 			SetKinectLevel(false);
 		}
 		newPosition = Player.GetSpawnPoint(name);
@@ -104,8 +105,9 @@ public class LevelManager extends ScriptableObject {
 				SetCurrentLevel(name);
 				if(!IsKinectLevel()) {
 					ActivateZigfu();
-					DesactivatePlayer();
-					SetKinectLevel(true);					
+					SetKinectLevel(true);
+					//DesactivatePlayer();
+					Server.GetPhotonView().RPC("DesactivatePlayer", PhotonTargets.AllBuffered, Player.object.GetComponent(PhotonView).viewID);
 				}
 				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
 			} else {
@@ -144,17 +146,6 @@ public class LevelManager extends ScriptableObject {
 			Server.Log("error", "zigfu is not found");
 			Debug.LogError("zigfu is not found");
 		}
-	}
-	
-	private static function DesactivatePlayer() {
-	
-		Debug.Log("Desactivate Player ------------------------");
-		
-		Player.object.renderer.enabled = false;
-	}
-	
-	private static function ActivatePlayer() {
-		Player.object.active = true;
 	}
 
 	public static function GetCurrentLevel() : String {
