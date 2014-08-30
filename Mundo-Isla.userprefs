@@ -1,6 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManaging\Server.js">
+    <Files>
+      <File FileName="Assets\Scripts\GameManaging\LevelManager.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Components\Label.js" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManaging\Server.js" Line="293" Column="18" />
+      <File FileName="Assets\Scripts\GUI\MainGUI.js" Line="496" Column="52" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

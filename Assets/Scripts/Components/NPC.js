@@ -29,7 +29,6 @@ class NPC extends MonoBehaviour{
 			}
 			// Si se pulsa el boton izquierdo, se muestra el dialogo del NPC.
 			else if ( Input.GetMouseButtonDown(0) ) {
-				print("Opening dialog " + this.gameObject.name);
 				Dialog.Open(this.gameObject.name);
 			}
 		}

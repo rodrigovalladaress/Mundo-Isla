@@ -71,10 +71,9 @@ public class LevelManager extends ScriptableObject {
 			// Activation of Main Camera
 			audioListenerComponent.enabled = true;
 			cameraComponent.enabled = true;
-			
 			DesactivateZigfu();
-			//ActivatePlayer();
-			Server.GetPhotonView().RPC("ActivatePlayer", PhotonTargets.AllBuffered, Player.object.GetComponent(PhotonView).viewID);
+			Server.GetPhotonView().RPC("ActivatePlayer", PhotonTargets.AllBuffered, 
+										Player.object.GetComponent(PhotonView).viewID);
 			SetKinectLevel(false);
 		}
 		newPosition = Player.GetSpawnPoint(name);
@@ -104,10 +103,10 @@ public class LevelManager extends ScriptableObject {
 				kinectManagerComponent.Initialize();
 				SetCurrentLevel(name);
 				if(!IsKinectLevel()) {
-					ActivateZigfu();
 					SetKinectLevel(true);
-					//DesactivatePlayer();
-					Server.GetPhotonView().RPC("DesactivatePlayer", PhotonTargets.AllBuffered, Player.object.GetComponent(PhotonView).viewID);
+					Server.GetPhotonView().RPC("DesactivatePlayer", PhotonTargets.AllBuffered, 
+												Player.object.GetComponent(PhotonView).viewID);
+					ActivateZigfu();
 				}
 				Server.Log("server", Player.GetNickname() + " is now in " + name + "(Kinect)");
 			} else {

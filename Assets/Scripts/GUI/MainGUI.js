@@ -158,6 +158,7 @@ class MainGUI extends MonoBehaviour {
 						// la base de datos
 						//Server.CreateOrJoinRandomRoom();
 						Server.StartCoroutine(Server.JoinOrCreateDefaultRoom());
+						
 						Toogle();
 					}
 					GUILayout.FlexibleSpace();
@@ -481,12 +482,18 @@ class MainGUI extends MonoBehaviour {
 		static class Login{
 			
 			var wrong:boolean = false;
+			var alreadyConnected:boolean = false;
 			
 			function Box(){
 				if (wrong){
 					GUILayout.FlexibleSpace();
 					GUI.backgroundColor = Color.red;
 					GUILayout.Box( Text("Incorrect User or Password") );
+					GUI.backgroundColor = Color.white;
+				} else if(alreadyConnected) {
+					GUILayout.FlexibleSpace();
+					GUI.backgroundColor = Color.red;
+					GUILayout.Box( Text("User is already connected") );
 					GUI.backgroundColor = Color.white;
 				}
 				GUILayout.FlexibleSpace();

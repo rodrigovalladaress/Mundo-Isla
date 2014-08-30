@@ -37,6 +37,7 @@ class Server extends Photon.MonoBehaviour {
 	static var saveDelay:float = 30.0;
 	static var SecondsForTimeout:float = 5.0;
 	static private var _gameType = "IslaSAVEH.Alpha";
+	public static final var SecondsForConnectionUpdate = 30;
 	
 	// Instance used to access non static members from static methods
 	private static var instance : Server;
@@ -45,8 +46,6 @@ class Server extends Photon.MonoBehaviour {
 	function Awake() {
 		instance = this;
 	}
-	
-	
 	
 	// If setted true, the GUI shows some information of the connection to Photon
 	public var showDebugInformationOnGUI:boolean;
@@ -74,25 +73,28 @@ class Server extends Photon.MonoBehaviour {
 		PhotonNetwork.ConnectUsingSettings("0.1");
 	}
 	
+	/*public function OnApplicationQuit() {
+		Debug.Log("Se cierra!");
+		if(Application.isEditor) {
+		
+		} else if(Application.isWebplayer) {
+			
+		}
+	}*/
+	
+	/*******************************************************
+	|	RPC
+	*******************************************************/
 	@RPC
-	private function DesactivatePlayer(id: int) {
-		Debug.Log("desactivate player");
+	public function DesactivatePlayer(id: int) {
+		// TODO Animacion de desactivacion de personaje
 		GetPhotonView().Find(id).gameObject.SetActive(false);
-		//Debug.Log(Player.object.renderer == null ? "es null" : "no lo es");
-		//(Player.object.GetComponent("MeshRenderer") as MeshRenderer).enabled = false;
-		Debug.Log("Desactivate player desp object rendererrrr");
-		//(Player.object.GetComponent("Label") as MonoBehaviour).enabled = false;
-		Debug.Log("dessss labellllll");
 	}
 	
 	@RPC
-	private function ActivatePlayer(id: int) {
+	public function ActivatePlayer(id: int) {
+		// TODO Animacion de activacion del personaje
 		GetPhotonView().Find(id).gameObject.SetActive(true);
-		Debug.Log("activatinggggggggggggggg");
-		//Player.object.renderer.enabled = true;
-		Debug.Log("activatinggggggggggggggg 2");
-		//(Player.object.GetComponent("Label") as MonoBehaviour).enabled = true;
-		Debug.Log("activatinggggggggggggggg 3");
 	}
 	
 	
@@ -109,6 +111,7 @@ class Server extends Photon.MonoBehaviour {
 		roomOptions.customRoomProperties = hash;
 		//PhotonNetwork.JoinOrCreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
 		PhotonNetwork.JoinOrCreateRoom(gameName, roomOptions, PhotonNetwork.lobby);
+		Server.StartCoroutine(ConnectionUpdate());
 	}
 	
 	// This method gets the room that's asigned to the player from the database,
@@ -162,10 +165,12 @@ class Server extends Photon.MonoBehaviour {
 		} else {
 			PhotonNetwork.CreateRoom(null);
 		}
+		Server.StartCoroutine(ConnectionUpdate());
 	}
 	
 	public static function JoinRoom(roomName:String) {
 		PhotonNetwork.JoinRoom(roomName);
+		Server.StartCoroutine(ConnectionUpdate());
 	}
 	
 	/*******************************************************
@@ -214,7 +219,30 @@ class Server extends Photon.MonoBehaviour {
 		// 
 	}
 	
-	
+	// Update of the last connection in the database
+	private static function ConnectionUpdate(): IEnumerator {
+		// Waiting for the connection to the room
+		while(PhotonNetwork.room == null) {
+			yield;
+		}
+		// Update of the connection until the player leaves the room
+		while(PhotonNetwork.room != null) {
+			var url: String = Paths.GetPlayerQuery() + "/update_last_connection.php/?player=" 
+								+ WWW.EscapeURL(Player.GetNickname());
+			var www:WWW = new WWW(url);
+			while(!www.isDone) {
+				yield;
+			}
+			if(www.text.Equals("OK")) {
+				Debug.Log("Updating last connection of the player");
+			} else {
+				Debug.LogError("Error updating connection = " + www.text);
+				Server.Log("error", "Error updating connection = " + www.text);
+			}
+			// Wait two minutes for the next connection update
+			yield WaitForSeconds(SecondsForConnectionUpdate);
+		}
+	}
 	
 	/******************************
 	|	Multiplayer Login
@@ -258,9 +286,10 @@ class Server extends Photon.MonoBehaviour {
 			}
 	        else if(www.text.Equals("false")) {
 	        	MainGUI.Content.Login.wrong = true;
-	        } else if(www.text.Equals("connected")) {
-	        	MainGUI.Content.Login.wrong = true;
+	        } else if(www.text.Equals("already_connected")) {
+	        	MainGUI.Content.Login.alreadyConnected = true;
 	        	Debug.LogError(Player.GetNickname() + " is already connected.");
+	        	Server.Log("error", Player.GetNickname() + " is already connected.");
 	        } else {
 	        	Debug.LogError("Error in player login = " + www.text);
 	        }
