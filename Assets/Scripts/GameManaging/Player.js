@@ -61,17 +61,18 @@ static class Player extends MonoBehaviour{
 	/*******************************************************
 	|	Player spawning
 	*******************************************************/	
-	function GetSpawnPoint(scene:String):Vector3 {
+	/*function GetSpawnPoint(scene:String):Vector3 {
 		var spawnPoint:GameObject = GameObject.Find("SpawnPoint" + scene) as GameObject;
 		if(spawnPoint != null) {
 			return spawnPoint.transform.position;
 		} else {
 			return SpawnPointNotFound;
 		}
-	}
+	}*/
 	
 	function GetSpawnPoint():Vector3 {
-		return GetSpawnPoint(LevelManager.GetCurrentLevel());
+		//return GetSpawnPoint(LevelManager.GetCurrentLevel());
+		return GameObject.Find("SpawnPoint").transform.position;
 	}
 	
 	function Spawn(_name:String, spawnPoint:Vector3, _skinString:String) {//: IEnumerator {

@@ -57,8 +57,8 @@ public class LevelManager extends ScriptableObject {
 	public static var mainCamera:GameObject;
 
 	// Loads the given level
-	public static function LoadLevel(name : String) {
-		var newPosition:Vector3;
+	public static function LoadLevel(name : String): IEnumerator {
+		/*var newPosition:Vector3;
 		if(IsKinectLevel()) {
 			var camera:GameObject = mainCamera;
 			var cameraComponent:Camera = camera.GetComponent("Camera") as Camera;
@@ -83,7 +83,22 @@ public class LevelManager extends ScriptableObject {
 			Server.Log("server", Player.GetNickname() + " is now in " + name);
 		} else {
 			Debug.LogError("SpawnPoint" + name + " should exist to load scene " + name);
+		}*/
+		//var room:String = PhotonNetwork.room.name;
+		PhotonNetwork.LeaveRoom();
+		while(PhotonNetwork.room != null) {
+			yield;
 		}
+		while(!PhotonNetwork.connectedAndReady) {
+			yield;
+		}
+		
+		PhotonNetwork.LoadLevel(name);
+		Server.StartCoroutine(Server.JoinOrCreateDefaultRoom());
+		while(PhotonNetwork.room == null) {
+			yield;
+		}
+		SetCurrentLevel(name);
 	}
 	
 	// Kinect level loading

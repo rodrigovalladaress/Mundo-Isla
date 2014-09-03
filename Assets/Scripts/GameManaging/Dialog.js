@@ -265,7 +265,7 @@ static class Dialog extends MonoBehaviour{
 		// Loads a new level
 		case "load": case "loadLevel":
 			var _level:String = _node["@name"] as String;
-			LevelManager.LoadLevel(_level);
+			Server.StartCoroutine(LevelManager.LoadLevel(_level));
 			break;
 			
 		case "loadKinect": case "loadKinectLevel":

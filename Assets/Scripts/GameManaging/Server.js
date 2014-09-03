@@ -102,7 +102,7 @@ class Server extends Photon.MonoBehaviour {
 	|	Room management
 	*******************************************************/
 	public static function JoinOrCreateRoom(gameName:String, maxPlayers:int, isVisible:boolean, 
-										gameDescription:String) {
+										gameDescription:String): IEnumerator {
 		var roomOptions:RoomOptions = new RoomOptions();
 		var hash:ExitGames.Client.Photon.Hashtable = new ExitGames.Client.Photon.Hashtable();
 		hash.Add("gameDescription", gameDescription);
@@ -110,6 +110,9 @@ class Server extends Photon.MonoBehaviour {
 		roomOptions.isVisible = isVisible;
 		roomOptions.customRoomProperties = hash;
 		//PhotonNetwork.JoinOrCreateRoom(gameName, isVisible, true, maxPlayers, hash, null);
+		while(!PhotonNetwork.connectedAndReady) {
+			yield;
+		}
 		PhotonNetwork.JoinOrCreateRoom(gameName, roomOptions, PhotonNetwork.lobby);
 		Server.StartCoroutine(ConnectionUpdate());
 	}
@@ -149,7 +152,7 @@ class Server extends Photon.MonoBehaviour {
 					maxPlayers = int.Parse(rowElement.GetElementsByTagName("maxPlayers")[0].InnerText);
 					description = rowElement.GetElementsByTagName("description")[0].InnerText;
 					isVisible = ((int.Parse(rowElement.GetElementsByTagName("private")[0].InnerText) == 1) ? true : false);
-					JoinOrCreateRoom(room, maxPlayers, isVisible, description);
+					Server.StartCoroutine(JoinOrCreateRoom(room, maxPlayers, isVisible, description));
 				} else {
 					Debug.LogError("Error retrieveing room properties of " + room);
 				}
@@ -186,31 +189,34 @@ class Server extends Photon.MonoBehaviour {
 			Debug.LogWarning("Mission progresss won't sync. Please set missionPersistence true in Server.");
 		}
 		LevelManager.mainCamera = Camera.main.gameObject;
-		ConnectToPhoton();
-		if(Application.isEditor) {
-			Player.SetNickname("Admin");
-			if(!IsShowLogin()) {
-				MainGUI.Menu.current = "Menu";
-				MainGUI.Content.current = "";
-				Server.StartCoroutine(Journal.RetrieveMissions());
-				Server.StartCoroutine(ItemManager.RetrieveItemInformation());
-				Server.StartCoroutine(Inventory.Retrieve());
-				StartCoroutine(Player.RetrieveSkinString());
-				// Wait until the skin of the player is downloaded
-				while(Player.GetSkinString() == null) {
-					yield;
+		
+		if(Player.GetNickname() == null || Player.GetNickname().Equals("") ) {			
+			ConnectToPhoton();
+			if(Application.isEditor) {
+				Player.SetNickname("Admin");
+				if(!IsShowLogin()) {
+					MainGUI.Menu.current = "Menu";
+					MainGUI.Content.current = "";
+					Server.StartCoroutine(Journal.RetrieveMissions());
+					Server.StartCoroutine(ItemManager.RetrieveItemInformation());
+					Server.StartCoroutine(Inventory.Retrieve());
+					StartCoroutine(Player.RetrieveSkinString());
+					// Wait until the skin of the player is downloaded
+					while(Player.GetSkinString() == null) {
+						yield;
+					}
+					// Wait for connection to Photon if we weren't connected yet.
+					while(!PhotonNetwork.connectedAndReady) {
+						yield;
+					}
+					MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
+					// Show player skin next to the GUI menu
+			   		GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
+					
 				}
-				// Wait for connection to Photon if we weren't connected yet.
-				while(!PhotonNetwork.connectedAndReady) {
-					yield;
-				}
-				MainGUI.Menu.SkinEditor.savedSkin = Player.GetSkinString();
-				// Show player skin next to the GUI menu
-		   		GameObject.Find("Constructor").GetComponent(Skin).enabled = true;
-				
+			} else {
+				Player.SetNickname("");
 			}
-		} else {
-			Player.SetNickname("");
 		}
 				
 		StartCoroutine( Retrieve.TXT( "ServerOptions", Paths.GetConfigurationFromRoot() + "/" + "options" ) );
@@ -626,6 +632,9 @@ class Server extends Photon.MonoBehaviour {
 	******************************/
 	function OnJoinedLobby()
 	{
+		if(Player.GetNickname() != null && !Player.GetNickname().Equals("") ) {
+			StartCoroutine(JoinOrCreateDefaultRoom());
+		}
     	Server.Log("server", Player.GetNickname() + " joined lobby");
 	}
 	
@@ -634,7 +643,6 @@ class Server extends Photon.MonoBehaviour {
 	}
 	
 	function OnJoinedRoom() {
-		Server.Log("server", Player.GetNickname() + " joined room.");
 		var canInstantiate:boolean = false;
 		if(!MainGUI.Menu.show && GameObject.Find(Player.GetNickname()) == null) {
 			Player.Spawn(Player.GetNickname(), Player.GetSpawnPoint(), Player.GetSkinString());
